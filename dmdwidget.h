@@ -24,6 +24,11 @@ private:
 	bool findFX3();
 	bool findDMD();
 	void captureDMD();
+	bool isGarbage(const uint8_t* rawDMD) const;
+	bool isWilliamsDMD(const uint8_t* rawDMD) const;
+	void correctWilliamsDMD(uint8_t* rawDMD);
+	void normalizeDMD(uint8_t* rawDMD);
+	void normalizeWilliamsDMD(uint8_t* rawDMD);
 
 	uint32_t findDMDMemoryOffset(uint8_t* buffer, SIZE_T buffer_size);
 

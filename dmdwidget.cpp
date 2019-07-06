@@ -69,7 +69,7 @@ void DMDWidget::findDMDButton_clicked()
 
 void DMDWidget::captureDMDButton_clicked()
 {
-	captureTimer->start(16);
+	captureTimer->start(40);
 }
 
 void DMDWidget::captureTimeout()
@@ -182,31 +182,48 @@ void DMDWidget::captureDMD()
 	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr + 0xF0),        &ptr, sizeof(uint32_t), NULL);
 	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr + 0x34),        &ptr, sizeof(uint32_t), NULL);
 
-	if (ptr == 0)
-		return;
-
-	uint8_t rawDMD[128 * 32];
-	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr),               rawDMD, sizeof(rawDMD), NULL);
-	// valid DMD address
-
-	// Fill DMD with colors
 	const int DMDSIZE = 6;
 	m_DMD_label->setGeometry(700, 160, DMDWIDTH * DMDSIZE, DMDHEIGHT * DMDSIZE);
 	QImage image(DMDWIDTH, DMDHEIGHT, QImage::Format_RGBA8888);
 	QPainter p(&image);
 
-	uint32_t bytepos = 0;
-	for (int y = 0; y < 32; ++y)
+	if (ptr == 0)
 	{
-		for (int x = 0; x < 128; ++x)
+		p.fillRect(QRect(0, 0, DMDWIDTH, DMDHEIGHT), Qt::black);
+	
+	}
+	else
+	{
+		// valid DMD address
+		uint8_t rawDMD[128 * 32];
+		ReadProcessMemory(m_FX3_process_handle, (void*)(ptr), rawDMD, sizeof(rawDMD), NULL);
+
+		if (isGarbage(rawDMD))
 		{
-			uint8_t c = rawDMD[bytepos];
-			uint8_t r = c <<= 6;
-			uint8_t g = c <<= 4;
-			uint8_t b = 0;
-			p.setPen(QColor(r, g, b));
-			p.drawPoint(x, y);
-			bytepos++;
+			memset(rawDMD, 0, sizeof(rawDMD));
+		}
+
+		if (isWilliamsDMD(rawDMD))
+		{
+			correctWilliamsDMD(rawDMD);
+			normalizeWilliamsDMD(rawDMD);
+		}
+		else
+		{
+			normalizeDMD(rawDMD);
+		}
+
+		// Fill DMD with colors
+		uint32_t bytepos = 0;
+		for (int y = 0; y < 32; ++y)
+		{
+			for (int x = 0; x < 128; ++x)
+			{
+				uint8_t c = rawDMD[bytepos];
+				p.setPen(QColor(c, c, c));
+				p.drawPoint(x, y);
+				bytepos++;
+			}
 		}
 	}
 
@@ -242,4 +259,103 @@ uint32_t DMDWidget::findDMDMemoryOffset(uint8_t* buffer, SIZE_T buffer_size)
 		}
 	}
 	return 0;
+}
+
+bool DMDWidget::isGarbage(const uint8_t* rawDMD) const
+{
+	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
+
+	for (uint32_t i = 0; i < pixelCount; ++i)
+	{
+		if (rawDMD[i] > 6)
+			return true;
+	}
+
+	return false;
+}
+
+bool DMDWidget::isWilliamsDMD(const uint8_t* rawDMD) const
+{
+	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
+
+#ifdef FAST_CHECK
+	for (uint32_t i = 0; i < pixelCount; ++i)
+	{
+		if (rawDMD[i] > 6)
+			return true;
+	}
+	return false;
+#else
+	uint32_t count3 = 0;
+	uint32_t count4 = 0;
+	uint32_t count5 = 0;
+	uint32_t count6 = 0;
+
+	for (uint32_t i = 0; i < pixelCount; ++i)
+	{
+		switch (rawDMD[i])
+		{
+		case 3: 
+			count3++;
+			break;
+		case 4:
+			count4++;
+			break;
+		case 5:
+			count5++;
+			break;
+		case 6:
+			count6++;
+			break;
+		}
+	}
+
+	return count3 + count4 + count5 + count6 == pixelCount;
+#endif
+}
+
+void DMDWidget::correctWilliamsDMD(uint8_t* rawDMD)
+{
+	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
+	for (uint32_t i = 0; i < pixelCount; ++i)
+	{
+		rawDMD[i] -= 3;
+	}
+}
+
+void DMDWidget::normalizeDMD(uint8_t* rawDMD)
+{
+	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
+	for (uint32_t i = 0; i < pixelCount; ++i)
+	{
+		switch (rawDMD[i])
+		{
+		case 1:
+			rawDMD[i] = 128;
+			break;
+		case 2:
+			rawDMD[i] = 255;
+			break;
+		}
+	}
+}
+
+void DMDWidget::normalizeWilliamsDMD(uint8_t* rawDMD)
+{
+	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
+	for (uint32_t i = 0; i < pixelCount; ++i)
+	{
+		switch (rawDMD[i])
+		{
+		case 1:
+			rawDMD[i] = 85;
+			break;
+		case 2:
+			rawDMD[i] = 170;
+			break;
+		case 3:
+			rawDMD[i] = 255;
+			break;
+		}
+	}
 }
