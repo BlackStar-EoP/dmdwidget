@@ -208,22 +208,29 @@ void DMDWidget::captureDMD()
 	{
 		p.fillRect(QRect(0, 0, DMDWIDTH * 2, DMDHEIGHT * 2), Qt::black);
 		m_DMD_color_found = false;
+		memset(m_previous_DMD, 0, sizeof(m_previous_DMD));
 	}
 	else
 	{
 		// valid DMD address
-		uint8_t rawDMD[128 * 32];
+		uint8_t rawDMD[DMDWIDTH * DMDHEIGHT];
 		ReadProcessMemory(m_FX3_process_handle, (void*)(ptr), rawDMD, sizeof(rawDMD), NULL);
 		
 		if (isGarbage(rawDMD))
 		{
 			memset(rawDMD, 0, sizeof(rawDMD));
+			memset(m_previous_DMD, 0, sizeof(m_previous_DMD));
 		}
 		else
 		{
 			if (!m_DMD_color_found)
 				getDMDColor();
 		}
+
+		if (isEqual(rawDMD, m_previous_DMD))
+			return;
+		else
+			memcpy(m_previous_DMD, rawDMD, sizeof(rawDMD));
 
 		if (isWilliamsDMD(rawDMD))
 		{
@@ -238,9 +245,9 @@ void DMDWidget::captureDMD()
 		// Fill DMD with colors
 		p.fillRect(QRect(0, 0, DMDWIDTH * 2, DMDHEIGHT * 2), Qt::black);
 		uint32_t bytepos = 0;
-		for (int y = 0; y < 32; ++y)
+		for (int y = 0; y < DMDHEIGHT; ++y)
 		{
-			for (int x = 0; x < 128; ++x)
+			for (int x = 0; x < DMDWIDTH; ++x)
 			{
 				uint8_t c = rawDMD[bytepos];
 				float col = c / 255.0f;

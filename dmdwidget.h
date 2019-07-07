@@ -51,6 +51,7 @@ private:
 	float m_DMD_r = 1.0f;
 	float m_DMD_g = 1.0f;
 	float m_DMD_b = 1.0f;
+	uint8_t m_previous_DMD[128 * 32];
 
 	QLabel* m_DMD_label = nullptr;
 	QTimer* captureTimer = nullptr;
