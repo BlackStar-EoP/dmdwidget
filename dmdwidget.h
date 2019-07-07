@@ -23,6 +23,7 @@ private slots:
 private:
 	bool findFX3();
 	bool findDMD();
+	void getDMDColor();
 	void captureDMD();
 	bool isGarbage(const uint8_t* rawDMD) const;
 	bool isWilliamsDMD(const uint8_t* rawDMD) const;
@@ -39,6 +40,11 @@ private:
 	uint32_t m_FX3_base_offset = 0;
 	uint32_t m_DMD_memory_offset = 0;
 	bool m_DMD_found = false;
+	bool m_DMD_color_found = false;
+	float m_DMD_r = 1.0f;
+	float m_DMD_g = 1.0f;
+	float m_DMD_b = 1.0f;
+
 	QLabel* m_DMD_label = nullptr;
 	QTimer* captureTimer = nullptr;
 };

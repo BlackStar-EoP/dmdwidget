@@ -62,7 +62,6 @@ void DMDWidget::findDMDButton_clicked()
 	{
 		if (findDMD())
 		{
-
 		}
 	}
 }
@@ -166,34 +165,65 @@ bool DMDWidget::findDMD()
 
 	m_DMD_memory_offset = findDMDMemoryOffset(&buffer[0], bytes_read);
 	if (m_DMD_memory_offset != 0)
+	{
+		ReadProcessMemory(m_FX3_process_handle, (void*)(m_FX3_base_offset + m_DMD_memory_offset), &m_DMD_memory_offset, sizeof(uint32_t), NULL);
 		return true;
+	}
 
 	return false;
 }
 
+void DMDWidget::getDMDColor()
+{
+	uint32_t ptr;
+	uint32_t col;
+
+	ReadProcessMemory(m_FX3_process_handle, (void*)(m_DMD_memory_offset), &ptr, sizeof(uint32_t), NULL);
+	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr + 0xF0), &ptr, sizeof(uint32_t), NULL);
+	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr + 0x50), &ptr, sizeof(uint32_t), NULL);
+	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr + 0x08), &col, sizeof(uint32_t), NULL);
+	// Color is fetched as ARGB, values seem to be either 0x11 or 0x33 per channel
+	if (col >> 24 != 0xFF)
+	{
+		// Color not ready?
+		m_DMD_r = 1;
+		m_DMD_g = 1;
+		m_DMD_b = 1;
+		return;
+	}
+	uint8_t r = (col >> 16) & 0x000000FF;
+	uint8_t g = (col >> 8) & 0x000000FF;
+	uint8_t b = col         & 0x000000FF;
+
+	float divisor = 0x33;
+	m_DMD_r = r / divisor;
+	m_DMD_g = g / divisor;
+	m_DMD_b = b / divisor;
+	m_DMD_color_found = true;
+}
+
 void DMDWidget::captureDMD()
 {
-	if (m_DMD_memory_offset == 0)
-		return;
-
 	uint32_t ptr;
-	ReadProcessMemory(m_FX3_process_handle, (void*)(m_FX3_base_offset + m_DMD_memory_offset), &ptr, sizeof(uint32_t), NULL);
-	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr),               &ptr, sizeof(uint32_t), NULL);
-	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr + 0xF0),        &ptr, sizeof(uint32_t), NULL);
-	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr + 0x34),        &ptr, sizeof(uint32_t), NULL);
+	ReadProcessMemory(m_FX3_process_handle, (void*)(m_DMD_memory_offset), &ptr, sizeof(uint32_t), NULL);
+	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr + 0xF0),          &ptr, sizeof(uint32_t), NULL);
+	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr + 0x34),          &ptr, sizeof(uint32_t), NULL);
 
 	const int DMDSIZE = 6;
 	m_DMD_label->setGeometry(700, 160, DMDWIDTH * DMDSIZE, DMDHEIGHT * DMDSIZE);
-	QImage image(DMDWIDTH, DMDHEIGHT, QImage::Format_RGBA8888);
+	QImage image(DMDWIDTH * 2, DMDHEIGHT * 2, QImage::Format_RGBA8888);
 	QPainter p(&image);
 
 	if (ptr == 0)
 	{
-		p.fillRect(QRect(0, 0, DMDWIDTH, DMDHEIGHT), Qt::black);
-	
+		p.fillRect(QRect(0, 0, DMDWIDTH * 2, DMDHEIGHT * 2), Qt::black);
+		m_DMD_color_found = false;
 	}
 	else
 	{
+		if (!m_DMD_color_found)
+			getDMDColor();
+
 		// valid DMD address
 		uint8_t rawDMD[128 * 32];
 		ReadProcessMemory(m_FX3_process_handle, (void*)(ptr), rawDMD, sizeof(rawDMD), NULL);
@@ -214,14 +244,17 @@ void DMDWidget::captureDMD()
 		}
 
 		// Fill DMD with colors
+		p.fillRect(QRect(0, 0, DMDWIDTH * 2, DMDHEIGHT * 2), Qt::black);
 		uint32_t bytepos = 0;
 		for (int y = 0; y < 32; ++y)
 		{
 			for (int x = 0; x < 128; ++x)
 			{
 				uint8_t c = rawDMD[bytepos];
-				p.setPen(QColor(c, c, c));
-				p.drawPoint(x, y);
+				float col = c / 255.0f;
+				p.setPen(QColor(c * m_DMD_r, c * m_DMD_g, c * m_DMD_b));
+				//p.setPen(QColor(c,c,c));
+				p.drawPoint(x * 2, y * 2);
 				bytepos++;
 			}
 		}
