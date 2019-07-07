@@ -310,10 +310,10 @@ bool DMDWidget::isWilliamsDMD(const uint8_t* rawDMD) const
 {
 	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
 
-#ifdef FAST_CHECK
+#ifdef FAST_WILLIAMS_CHECK
 	for (uint32_t i = 0; i < pixelCount; ++i)
 	{
-		if (rawDMD[i] > 6)
+		if (rawDMD[i] > 2)
 			return true;
 	}
 	return false;
@@ -394,8 +394,8 @@ void DMDWidget::normalizeWilliamsDMD(uint8_t* rawDMD)
 
 bool DMDWidget::isEmpty(const uint8_t* rawDMD) const
 {
-	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
-	for (uint32_t i = 0; i < pixelCount; ++i)
+	const uint64_t blockCount = DMDWIDTH * DMDHEIGHT / sizeof(uint64_t);
+	for (uint64_t i = 0; i < blockCount; ++i)
 	{
 		if (rawDMD[i] != 0)
 			return false;
@@ -405,8 +405,8 @@ bool DMDWidget::isEmpty(const uint8_t* rawDMD) const
 
 bool DMDWidget::isEqual(const uint8_t* DMD1, const uint8_t* DMD2)
 {
-	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
-	for (uint32_t i = 0; i < pixelCount; ++i)
+	const uint64_t blockCount = DMDWIDTH * DMDHEIGHT / sizeof(uint64_t);
+	for (uint64_t i = 0; i < blockCount; ++i)
 	{
 		if (DMD1[i] != DMD2[i])
 			return false;
