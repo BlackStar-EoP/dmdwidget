@@ -49,6 +49,8 @@ DMDWidget::DMDWidget(QWidget* parent)
 	connect(openFX3Button, SIGNAL(clicked()), this, SLOT(captureDMDButton_clicked()));
 
 	m_DMD_label = new QLabel(this);
+	m_DMD_label->setGeometry(10, 85, DMDWIDTH * DMDSIZE, DMDHEIGHT * DMDSIZE);
+
 	captureTimer = new QTimer(this);
 	connect(captureTimer, SIGNAL(timeout()), this, SLOT(captureTimeout()));
 }
@@ -199,8 +201,6 @@ void DMDWidget::captureDMD()
 	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr + 0xF0),          &ptr, sizeof(uint32_t), NULL);
 	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr + 0x34),          &ptr, sizeof(uint32_t), NULL);
 
-	const int DMDSIZE = 6;
-	m_DMD_label->setGeometry(700, 160, DMDWIDTH * DMDSIZE, DMDHEIGHT * DMDSIZE);
 	QImage image(DMDWIDTH * 2, DMDHEIGHT * 2, QImage::Format_RGBA8888);
 	QPainter p(&image);
 
@@ -310,7 +310,7 @@ bool DMDWidget::isWilliamsDMD(const uint8_t* rawDMD) const
 {
 	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
 
-#ifdef FAST_WILLIAMS_CHECK
+#ifdef FAST_CHECK
 	for (uint32_t i = 0; i < pixelCount; ++i)
 	{
 		if (rawDMD[i] > 2)
@@ -394,8 +394,8 @@ void DMDWidget::normalizeWilliamsDMD(uint8_t* rawDMD)
 
 bool DMDWidget::isEmpty(const uint8_t* rawDMD) const
 {
-	const uint64_t blockCount = DMDWIDTH * DMDHEIGHT / sizeof(uint64_t);
-	for (uint64_t i = 0; i < blockCount; ++i)
+	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
+	for (uint32_t i = 0; i < pixelCount; ++i)
 	{
 		if (rawDMD[i] != 0)
 			return false;
@@ -405,8 +405,8 @@ bool DMDWidget::isEmpty(const uint8_t* rawDMD) const
 
 bool DMDWidget::isEqual(const uint8_t* DMD1, const uint8_t* DMD2)
 {
-	const uint64_t blockCount = DMDWIDTH * DMDHEIGHT / sizeof(uint64_t);
-	for (uint64_t i = 0; i < blockCount; ++i)
+	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
+	for (uint32_t i = 0; i < pixelCount; ++i)
 	{
 		if (DMD1[i] != DMD2[i])
 			return false;
