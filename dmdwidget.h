@@ -13,6 +13,11 @@ class DMDWidget : public QWidget
 {
 	Q_OBJECT
 public:
+	static const uint32_t DMDWIDTH = 128;
+	static const uint32_t DMDHEIGHT = 32;
+
+
+public:
 	DMDWidget(QWidget* parent);
 
 private slots:
@@ -27,6 +32,8 @@ private:
 	void captureDMD();
 	bool isGarbage(const uint8_t* rawDMD) const;
 	bool isWilliamsDMD(const uint8_t* rawDMD) const;
+	bool isEmpty(const uint8_t* rawDMD) const;
+	bool isEqual(const uint8_t* DMD1, const uint8_t* DMD2);
 	void correctWilliamsDMD(uint8_t* rawDMD);
 	void normalizeDMD(uint8_t* rawDMD);
 	void normalizeWilliamsDMD(uint8_t* rawDMD);

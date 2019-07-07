@@ -37,9 +37,6 @@ SOFTWARE.
 #include <QMessageBox>
 #include <QTimer>
 
-int DMDWIDTH = 128;
-int DMDHEIGHT = 32;
-
 DMDWidget::DMDWidget(QWidget* parent)
 : QWidget(parent)
 {
@@ -68,7 +65,7 @@ void DMDWidget::findDMDButton_clicked()
 
 void DMDWidget::captureDMDButton_clicked()
 {
-	captureTimer->start(40);
+	captureTimer->start(16);
 }
 
 void DMDWidget::captureTimeout()
@@ -182,15 +179,8 @@ void DMDWidget::getDMDColor()
 	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr + 0xF0), &ptr, sizeof(uint32_t), NULL);
 	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr + 0x50), &ptr, sizeof(uint32_t), NULL);
 	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr + 0x08), &col, sizeof(uint32_t), NULL);
+	
 	// Color is fetched as ARGB, values seem to be either 0x11 or 0x33 per channel
-	if (col >> 24 != 0xFF)
-	{
-		// Color not ready?
-		m_DMD_r = 1;
-		m_DMD_g = 1;
-		m_DMD_b = 1;
-		return;
-	}
 	uint8_t r = (col >> 16) & 0x000000FF;
 	uint8_t g = (col >> 8) & 0x000000FF;
 	uint8_t b = col         & 0x000000FF;
@@ -221,16 +211,18 @@ void DMDWidget::captureDMD()
 	}
 	else
 	{
-		if (!m_DMD_color_found)
-			getDMDColor();
-
 		// valid DMD address
 		uint8_t rawDMD[128 * 32];
 		ReadProcessMemory(m_FX3_process_handle, (void*)(ptr), rawDMD, sizeof(rawDMD), NULL);
-
+		
 		if (isGarbage(rawDMD))
 		{
 			memset(rawDMD, 0, sizeof(rawDMD));
+		}
+		else
+		{
+			if (!m_DMD_color_found)
+				getDMDColor();
 		}
 
 		if (isWilliamsDMD(rawDMD))
@@ -391,4 +383,26 @@ void DMDWidget::normalizeWilliamsDMD(uint8_t* rawDMD)
 			break;
 		}
 	}
+}
+
+bool DMDWidget::isEmpty(const uint8_t* rawDMD) const
+{
+	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
+	for (uint32_t i = 0; i < pixelCount; ++i)
+	{
+		if (rawDMD[i] != 0)
+			return false;
+	}
+	return true;
+}
+
+bool DMDWidget::isEqual(const uint8_t* DMD1, const uint8_t* DMD2)
+{
+	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
+	for (uint32_t i = 0; i < pixelCount; ++i)
+	{
+		if (DMD1[i] != DMD2[i])
+			return false;
+	}
+	return true;
 }
