@@ -21,22 +21,3 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-
-#include "mainwindow.h"
-
-#include <QDragEnterEvent>
-#include <QDropEvent>
-#include <QUrl>
-#include <QMimeData>
-#include <QDebug>
-#include <QFileInfo>
-#include <QFile>
-
-#include "dmdwidget.h"
-
-MainWindow::MainWindow()
-{
-	m_DMD_widget = new DMDWidget(this);
-	setCentralWidget(m_DMD_widget);
-	m_DMD_widget->show();
-}

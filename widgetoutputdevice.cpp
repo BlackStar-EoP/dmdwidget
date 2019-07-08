@@ -22,21 +22,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "mainwindow.h"
+#pragma once
 
-#include <QDragEnterEvent>
-#include <QDropEvent>
-#include <QUrl>
-#include <QMimeData>
-#include <QDebug>
-#include <QFileInfo>
-#include <QFile>
+#include <widgetoutputdevice.h>
 
-#include "dmdwidget.h"
-
-MainWindow::MainWindow()
+WidgetOutputDevice::WidgetOutputDevice()
 {
-	m_DMD_widget = new DMDWidget(this);
-	setCentralWidget(m_DMD_widget);
-	m_DMD_widget->show();
+}
+
+WidgetOutputDevice::~WidgetOutputDevice()
+{
+}
+
+bool WidgetOutputDevice::isDeviceAvailable()
+{
+	return true;
+}
+
+void WidgetOutputDevice::clearDMD()
+{
+	
+}
+
+void WidgetOutputDevice::sendFrame()
+{
+}
+
+bool WidgetOutputDevice::supportsColor() const
+{
+	return true;
+}
+
+void WidgetOutputDevice::setColor(float r, float g, float b)
+{
+	m_r = r;
+	m_g = g;
+	m_b = b;
 }

@@ -1,3 +1,5 @@
+#pragma once
+
 /*
 MIT License
 
@@ -22,21 +24,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "mainwindow.h"
+#include <stdint.h>
+#include <string>
+#include <vector>
+#include <Windows.h>
 
-#include <QDragEnterEvent>
-#include <QDropEvent>
-#include <QUrl>
-#include <QMimeData>
-#include <QDebug>
-#include <QFileInfo>
-#include <QFile>
+#include <QColor>
 
-#include "dmdwidget.h"
-
-MainWindow::MainWindow()
+class FX3Process
 {
-	m_DMD_widget = new DMDWidget(this);
-	setCentralWidget(m_DMD_widget);
-	m_DMD_widget->show();
-}
+public:
+	bool findFX3();
+	bool findDMD();
+	QColor getDMDColor();
+
+private:
+	uint32_t findDMDMemoryOffset(uint8_t* buffer, SIZE_T buffer_size);
+
+private:
+	std::wstring m_executable_name = L"Pinball FX3.exe";
+	DWORD m_FX3_process_id = 0;
+	HANDLE m_FX3_process_handle = nullptr;
+	uint32_t m_FX3_base_offset = 0;
+	uint32_t m_DMD_memory_offset = 0;
+	bool m_DMD_found = false;
+	bool m_DMD_color_found = false;
+};

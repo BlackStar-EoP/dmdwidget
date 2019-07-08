@@ -27,7 +27,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="dmddata.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dmdoutputdevice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="dmdwidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fx3process.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
@@ -36,12 +45,33 @@
     <ClCompile Include="mainwindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="pindmd2outputdevice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="widgetoutputdevice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="dmddata.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dmdoutputdevice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <CustomBuild Include="dmdwidget.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <ClInclude Include="fx3process.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="mainwindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pindmd2outputdevice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="widgetoutputdevice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

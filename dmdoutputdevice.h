@@ -1,3 +1,5 @@
+#pragma once
+
 /*
 MIT License
 
@@ -22,21 +24,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "mainwindow.h"
-
-#include <QDragEnterEvent>
-#include <QDropEvent>
-#include <QUrl>
-#include <QMimeData>
-#include <QDebug>
-#include <QFileInfo>
-#include <QFile>
-
-#include "dmdwidget.h"
-
-MainWindow::MainWindow()
+class DMDOutputDevice
 {
-	m_DMD_widget = new DMDWidget(this);
-	setCentralWidget(m_DMD_widget);
-	m_DMD_widget->show();
-}
+public:
+	DMDOutputDevice() = default;
+	virtual ~DMDOutputDevice() = default;
+
+	virtual bool isDeviceAvailable() = 0;
+	virtual void clearDMD() = 0;
+	virtual void sendFrame() = 0;
+
+	virtual bool supportsColor() const = 0;
+	virtual void setColor(float r, float g, float b) = 0;
+};

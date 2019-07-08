@@ -1,3 +1,5 @@
+#pragma once
+
 /*
 MIT License
 
@@ -22,21 +24,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "mainwindow.h"
+#include <stdint.h>
 
-#include <QDragEnterEvent>
-#include <QDropEvent>
-#include <QUrl>
-#include <QMimeData>
-#include <QDebug>
-#include <QFileInfo>
-#include <QFile>
-
-#include "dmdwidget.h"
-
-MainWindow::MainWindow()
+class DMDData
 {
-	m_DMD_widget = new DMDWidget(this);
-	setCentralWidget(m_DMD_widget);
-	m_DMD_widget->show();
-}
+public:
+	static const uint32_t DMDWIDTH = 128;
+	static const uint32_t DMDHEIGHT = 32;
+
+private:
+	bool isGarbage(const uint8_t* rawDMD) const;
+	bool isWilliamsDMD(const uint8_t* rawDMD) const;
+	bool isEmpty(const uint8_t* rawDMD) const;
+	bool isEqual(const uint8_t* DMD1, const uint8_t* DMD2);
+	void correctWilliamsDMD(uint8_t* rawDMD);
+	void normalizeDMD(uint8_t* rawDMD);
+	void normalizeWilliamsDMD(uint8_t* rawDMD);
+
+private:
+	uint8_t m_current_frame[DMDWIDTH * DMDHEIGHT];
+	uint8_t m_previous_frame[DMDWIDTH * DMDHEIGHT];
+};
