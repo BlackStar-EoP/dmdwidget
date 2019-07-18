@@ -36,6 +36,8 @@ SOFTWARE.
 #include <QPixmap>
 #include <QMessageBox>
 #include <QTimer>
+#include <QLineEdit>
+#include <QListWidget>
 
 DMDWidget::DMDWidget(QWidget* parent)
 : QWidget(parent)
@@ -49,7 +51,17 @@ DMDWidget::DMDWidget(QWidget* parent)
 	connect(openFX3Button, SIGNAL(clicked()), this, SLOT(captureDMDButton_clicked()));
 
 	m_DMD_label = new QLabel(this);
-	m_DMD_label->setGeometry(10, 85, DMDWIDTH * DMDSIZE, DMDHEIGHT * DMDSIZE);
+	m_DMD_label->setGeometry(10, 120, DMDWIDTH * DMDSIZE, DMDHEIGHT * DMDSIZE);
+
+	m_line_edit = new QLineEdit(this);
+	m_line_edit->setGeometry(10, 85, 120, 20);
+
+	QPushButton* findStringButton = new QPushButton("Find string", this);
+	findStringButton->setGeometry(130, 85, 120, 20);
+	connect(findStringButton, SIGNAL(clicked()), this, SLOT(findStringButton_clicked()));
+
+	m_list_widget = new QListWidget(this);
+	m_list_widget->setGeometry(500, 85, 280, 800);
 
 	captureTimer = new QTimer(this);
 	connect(captureTimer, SIGNAL(timeout()), this, SLOT(captureTimeout()));
@@ -73,6 +85,47 @@ void DMDWidget::captureDMDButton_clicked()
 void DMDWidget::captureTimeout()
 {
 	captureDMD();
+}
+
+void DMDWidget::findStringButton_clicked()
+{
+	if (m_line_edit->text() == "")
+		return;
+
+	m_list_widget->clear();
+
+	unsigned char *p = NULL;
+	MEMORY_BASIC_INFORMATION info;
+
+	int count = 0;
+	int totalmem = 0;
+	for (p = NULL;
+		VirtualQueryEx(m_FX3_process_handle, p, &info, sizeof(info)) == sizeof(info);
+		p += info.RegionSize)
+	{
+		std::vector<uint8_t> buffer;
+
+		if (info.State == MEM_COMMIT &&
+			(info.Type == MEM_MAPPED || info.Type == MEM_PRIVATE))
+		{
+			SIZE_T bytes_read;
+			buffer.resize(info.RegionSize);
+			ReadProcessMemory(m_FX3_process_handle, p, &buffer[0], info.RegionSize, &bytes_read);
+			if (bytes_read == 0)
+				continue;
+
+			++count;
+			totalmem += bytes_read;
+			buffer.resize(bytes_read);
+			findString(&buffer[0], bytes_read, m_line_edit->text());
+			/*char filename[512];
+			sprintf_s(filename, "test-%u-%d.dmp", (uint32_t)p, count);
+			FILE* fp;
+			fopen_s(&fp, filename, "wb");
+			fwrite(&buffer[0], 1, bytes_read, fp);
+			fclose(fp);*/
+		}
+	}
 }
 
 bool DMDWidget::findFX3()
@@ -161,7 +214,7 @@ bool DMDWidget::findDMD()
 	ReadProcessMemory(m_FX3_process_handle, (void*)m_FX3_base_offset, &buffer[0], READSIZE, &bytes_read);
 
 	buffer.resize(bytes_read);
-
+	
 	m_DMD_memory_offset = findDMDMemoryOffset(&buffer[0], bytes_read);
 	if (m_DMD_memory_offset != 0)
 	{
@@ -252,7 +305,6 @@ void DMDWidget::captureDMD()
 				uint8_t c = rawDMD[bytepos];
 				float col = c / 255.0f;
 				p.setPen(QColor(c * m_DMD_r, c * m_DMD_g, c * m_DMD_b));
-				//p.setPen(QColor(c,c,c));
 				p.drawPoint(x * 2, y * 2);
 				bytepos++;
 			}
@@ -260,6 +312,39 @@ void DMDWidget::captureDMD()
 	}
 
 	m_DMD_label->setPixmap(QPixmap::fromImage(image).scaled(QSize(DMDWIDTH * DMDSIZE, DMDHEIGHT * DMDSIZE)));
+}
+
+
+uint32_t DMDWidget::findString(uint8_t* buffer, SIZE_T buffer_size, const QString& string)
+{
+
+	for (SIZE_T i = 0; i < buffer_size - string.length(); ++i)
+	{
+		if (buffer[i] != string[0])
+			continue;
+
+		bool match = true;
+		for (uint32_t test = 1; test < string.length(); ++test)
+		{
+			//if (DMDSIGNATURE[test] == 0xFF)
+			//	continue;
+
+			if (buffer[i + test] != string[test])
+			{
+				match = false;
+				break;
+			}
+		}
+
+		if (match)
+		{
+			QString matchloc = QString::number((uint32_t)buffer) + QString(" - offset - ") + QString::number(i);
+			//uint8_t* buffer2 = buffer + i - 100;
+			m_list_widget->addItem(new QListWidgetItem(matchloc));
+			//return i;
+		}
+	}
+	return 0;
 }
 
 uint32_t DMDWidget::findDMDMemoryOffset(uint8_t* buffer, SIZE_T buffer_size)

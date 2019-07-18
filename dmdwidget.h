@@ -34,6 +34,8 @@ SOFTWARE.
 class QLabel;
 class QPushButton;
 class QTimer;
+class QLineEdit;
+class QListWidget;
 
 class DMDWidget : public QWidget
 {
@@ -41,7 +43,7 @@ class DMDWidget : public QWidget
 public:
 	static const uint32_t DMDWIDTH = 128;
 	static const uint32_t DMDHEIGHT = 32;
-	static const uint32_t DMDSIZE = 10;
+	static const uint32_t DMDSIZE = 2;
 
 
 public:
@@ -51,6 +53,7 @@ private slots:
 	void findDMDButton_clicked();
 	void captureDMDButton_clicked();
 	void captureTimeout();
+	void findStringButton_clicked();
 
 private:
 	bool findFX3();
@@ -66,13 +69,14 @@ private:
 	void normalizeWilliamsDMD(uint8_t* rawDMD);
 
 	uint32_t findDMDMemoryOffset(uint8_t* buffer, SIZE_T buffer_size);
+	uint32_t findString(uint8_t* buffer, SIZE_T buffer_size, const QString& string);
 
 private:
 	std::wstring m_executable_name = L"Pinball FX3.exe";
 	DWORD m_FX3_process_id = 0;
 	HANDLE m_FX3_process_handle = nullptr;
 	uint32_t m_FX3_base_offset = 0;
-	uint32_t m_DMD_memory_offset = 0;
+	uint32_t m_DMD_memory_offset = 0; 
 	bool m_DMD_found = false;
 	bool m_DMD_color_found = false;
 	float m_DMD_r = 1.0f;
@@ -82,4 +86,6 @@ private:
 
 	QLabel* m_DMD_label = nullptr;
 	QTimer* captureTimer = nullptr;
+	QLineEdit* m_line_edit = nullptr;
+	QListWidget* m_list_widget = nullptr;
 };

@@ -24,6 +24,11 @@ SOFTWARE.
 
 #include "dmddata.h"
 
+const uint8_t* const DMDData::frameData() const
+{
+	return m_current_frame;
+}
+
 bool DMDData::isGarbage(const uint8_t* rawDMD) const
 {
 	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
@@ -86,7 +91,7 @@ void DMDData::correctWilliamsDMD(uint8_t* rawDMD)
 	}
 }
 
-void DMDData::normalizeDMD(uint8_t* rawDMD)
+void DMDData::normalizeZenDMD(uint8_t* rawDMD)
 {
 	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
 	for (uint32_t i = 0; i < pixelCount; ++i)

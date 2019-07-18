@@ -32,13 +32,16 @@ public:
 	static const uint32_t DMDWIDTH = 128;
 	static const uint32_t DMDHEIGHT = 32;
 
+public:
+	const uint8_t* const frameData() const;
+
 private:
 	bool isGarbage(const uint8_t* rawDMD) const;
 	bool isWilliamsDMD(const uint8_t* rawDMD) const;
 	bool isEmpty(const uint8_t* rawDMD) const;
 	bool isEqual(const uint8_t* DMD1, const uint8_t* DMD2);
 	void correctWilliamsDMD(uint8_t* rawDMD);
-	void normalizeDMD(uint8_t* rawDMD);
+	void normalizeZenDMD(uint8_t* rawDMD);
 	void normalizeWilliamsDMD(uint8_t* rawDMD);
 
 private:

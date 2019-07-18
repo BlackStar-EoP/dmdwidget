@@ -21,24 +21,3 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-
-#include "mainwindow.h"
-
-#include "widgetoutputdevice.h"
-
-#include <QtWidgets>
-#include <QApplication>
-
-int main(int argc, char *argv[])
-{
-    QApplication app(argc, argv);
-#if 1
-
-	DMDOutputDevice* outputDevice = new WidgetOutputDevice(nullptr, 4);
-#else
-
-    MainWindow w;
-    w.showMaximized();
-#endif
-    return app.exec();
-}

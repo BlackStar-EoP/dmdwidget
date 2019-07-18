@@ -27,6 +27,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="dmdanimation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dmdanimationframe.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="dmddata.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -53,6 +59,12 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="dmdanimation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dmdanimationframe.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="dmddata.h">
       <Filter>Header Files</Filter>
     </ClInclude>

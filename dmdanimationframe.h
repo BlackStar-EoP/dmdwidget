@@ -1,3 +1,5 @@
+#pragma once
+
 /*
 MIT License
 
@@ -22,23 +24,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "mainwindow.h"
+#include "dmddata.h"
 
-#include "widgetoutputdevice.h"
+#include <stdint.h>
 
-#include <QtWidgets>
-#include <QApplication>
+class QImage;
 
-int main(int argc, char *argv[])
+class DMDAnimationFrame
 {
-    QApplication app(argc, argv);
-#if 1
+public:
+	DMDAnimationFrame(const QImage& image, bool supports_color);
+	~DMDAnimationFrame() = default;
 
-	DMDOutputDevice* outputDevice = new WidgetOutputDevice(nullptr, 4);
-#else
+	const DMDData& frame_data() const;
 
-    MainWindow w;
-    w.showMaximized();
-#endif
-    return app.exec();
-}
+private:
+	void parse_image(const QImage& image);
+
+private:
+	DMDData m_dmd_frame;
+};

@@ -26,8 +26,25 @@ SOFTWARE.
 
 #include <widgetoutputdevice.h>
 
-WidgetOutputDevice::WidgetOutputDevice()
+#include "dmddata.h"
+
+#include <QLabel>
+#include <QImage>
+#include <QPainter>
+#include <QPoint>
+
+
+WidgetOutputDevice::WidgetOutputDevice(QWidget* parent, uint32_t size)
+: QWidget(parent, Qt::Window)
 {
+	m_DMD_label = new QLabel(this);
+
+	m_DMD_width = DMDData::DMDWIDTH * size;
+	m_DMD_height = DMDData::DMDHEIGHT * size;
+
+	m_DMD_label->setGeometry(0, 0, m_DMD_width, m_DMD_height);
+	clearDMD();
+	showNormal();
 }
 
 WidgetOutputDevice::~WidgetOutputDevice()
@@ -41,11 +58,34 @@ bool WidgetOutputDevice::isDeviceAvailable()
 
 void WidgetOutputDevice::clearDMD()
 {
-	
+	QImage image(DMDData::DMDWIDTH * 2, DMDData::DMDHEIGHT * 2, QImage::Format_RGBA8888);
+	QPainter p(&image);
+	p.fillRect(QRect(0, 0, DMDData::DMDWIDTH * 2, DMDData::DMDHEIGHT * 2), Qt::black);
+	m_DMD_label->setPixmap(QPixmap::fromImage(image).scaled(QSize(m_DMD_width, m_DMD_height)));
 }
 
-void WidgetOutputDevice::sendFrame()
+void WidgetOutputDevice::sendFrame(const DMDData& frame)
 {
+	const uint8_t* const frameData = frame.frameData();
+
+	QImage image(DMDData::DMDWIDTH * 2, DMDData::DMDHEIGHT * 2, QImage::Format_RGBA8888);
+	QPainter p(&image);
+
+	// Fill DMD with colors
+	uint32_t bytepos = 0;
+	for (int y = 0; y < DMDData::DMDHEIGHT; ++y)
+	{
+		for (int x = 0; x < DMDData::DMDWIDTH; ++x)
+		{
+			uint8_t c = frameData[bytepos];
+			float col = c / 255.0f;
+			p.setPen(QColor(c * m_r, c * m_g, c * m_b));
+			p.drawPoint(x * 2, y * 2);
+			bytepos++;
+		}
+	}
+
+	m_DMD_label->setPixmap(QPixmap::fromImage(image).scaled(QSize(m_DMD_width, m_DMD_height)));
 }
 
 bool WidgetOutputDevice::supportsColor() const

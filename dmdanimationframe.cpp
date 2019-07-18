@@ -22,23 +22,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "mainwindow.h"
+#include "dmdanimationframe.h"
 
-#include "widgetoutputdevice.h"
-
-#include <QtWidgets>
-#include <QApplication>
-
-int main(int argc, char *argv[])
+DMDAnimationFrame::DMDAnimationFrame(const QImage& image, bool supports_color)
 {
-    QApplication app(argc, argv);
-#if 1
+	m_dmd_frame.
+}
 
-	DMDOutputDevice* outputDevice = new WidgetOutputDevice(nullptr, 4);
-#else
+const DMDData& DMDAnimationFrame::frame_data() const
+{
+	return m_dmd_frame;
+}
 
-    MainWindow w;
-    w.showMaximized();
-#endif
-    return app.exec();
+void DMDAnimationFrame::parse_image(const QImage& image)
+{
+
 }

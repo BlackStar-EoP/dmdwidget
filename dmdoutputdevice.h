@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+class DMDData;
+
 class DMDOutputDevice
 {
 public:
@@ -32,7 +34,7 @@ public:
 
 	virtual bool isDeviceAvailable() = 0;
 	virtual void clearDMD() = 0;
-	virtual void sendFrame() = 0;
+	virtual void sendFrame(const DMDData& frame) = 0;
 
 	virtual bool supportsColor() const = 0;
 	virtual void setColor(float r, float g, float b) = 0;
