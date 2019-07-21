@@ -33,14 +33,26 @@ class QImage;
 class DMDAnimationFrame
 {
 public:
-	DMDAnimationFrame(const QImage& image, bool supports_color);
+	enum EGrayScaleMode
+	{
+		AVERAGE,
+		RED_CHANNEL_ONLY,
+		GREEN_CHANNEL_ONLY,
+		BLUE_CHANNEL_ONLY,
+	};
+
+public:
+	DMDAnimationFrame(const QImage& image);
 	~DMDAnimationFrame() = default;
 
-	const DMDData& frame_data() const;
+	const uint8_t* const grayscale_frame() const;
+	const uint32_t* const color_frame() const;
 
 private:
 	void parse_image(const QImage& image);
 
 private:
-	DMDData m_dmd_frame;
+	uint8_t m_grayscale_frame[DMDData::DMDWIDTH * DMDData::DMDHEIGHT];
+	uint32_t m_color_frame[DMDData::DMDWIDTH * DMDData::DMDHEIGHT];
+	EGrayScaleMode m_grayscale_mode = RED_CHANNEL_ONLY;
 };

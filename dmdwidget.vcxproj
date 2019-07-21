@@ -136,7 +136,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dmdanimation.cpp" />
+    <ClCompile Include="dmdanimationengine.cpp" />
     <ClCompile Include="dmdanimationframe.cpp" />
+    <ClCompile Include="dmdapplication.cpp" />
     <ClCompile Include="dmddata.cpp" />
     <ClCompile Include="dmdoutputdevice.cpp" />
     <ClCompile Include="dmdwidget.cpp" />
@@ -148,7 +150,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dmdanimation.h" />
+    <ClInclude Include="dmdanimationengine.h" />
     <ClInclude Include="dmdanimationframe.h" />
+    <ClInclude Include="dmdapplication.h" />
     <ClInclude Include="dmddata.h" />
     <ClInclude Include="dmdoutputdevice.h" />
     <CustomBuild Include="dmdwidget.h">

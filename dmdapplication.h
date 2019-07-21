@@ -1,3 +1,5 @@
+#pragma once
+
 /*
 MIT License
 
@@ -22,24 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "mainwindow.h"
+#include <QApplication>
 
-#include "dmdanimationengine.h"
-#include "dmdapplication.h"
-#include "widgetoutputdevice.h"
-
-#include <QtWidgets>
-
-int main(int argc, char *argv[])
+class DMDApplication : public QApplication
 {
-    DMDApplication app(argc, argv);
-#if 1
-	DMDAnimationEngine animationEngine;
-	DMDOutputDevice* outputDevice = new WidgetOutputDevice(nullptr, 4);
-#else
-
-    MainWindow w;
-    w.showMaximized();
-#endif
-    return app.exec();
-}
+public:
+	DMDApplication(int argc, char *argv[]);
+};

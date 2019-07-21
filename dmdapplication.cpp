@@ -22,24 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "mainwindow.h"
-
-#include "dmdanimationengine.h"
 #include "dmdapplication.h"
-#include "widgetoutputdevice.h"
 
-#include <QtWidgets>
-
-int main(int argc, char *argv[])
+DMDApplication::DMDApplication(int argc, char *argv[])
+: QApplication(argc, argv)
 {
-    DMDApplication app(argc, argv);
-#if 1
-	DMDAnimationEngine animationEngine;
-	DMDOutputDevice* outputDevice = new WidgetOutputDevice(nullptr, 4);
-#else
 
-    MainWindow w;
-    w.showMaximized();
-#endif
-    return app.exec();
 }

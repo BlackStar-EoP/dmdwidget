@@ -26,6 +26,7 @@ SOFTWARE.
 
 #include <stdint.h>
 
+/* TODO rename this to FX3DMDFrame */
 class DMDData
 {
 public:

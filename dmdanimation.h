@@ -24,9 +24,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include <QVector>
+
+class DMDAnimationFrame;
+
 class DMDAnimation
 {
 public:
-	DMDAnimation() = default;
-	~DMDAnimation() = default;
+	DMDAnimation(const QVector<DMDAnimationFrame*> frames);
+	~DMDAnimation();
+
+private:
+	QVector<DMDAnimationFrame*> m_frames;
 };

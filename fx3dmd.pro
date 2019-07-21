@@ -9,6 +9,7 @@ TEMPLATE = app
 
 SOURCES += $$PWD/main.cpp \
            $$PWD/mainwindow.cpp \
+           $$PWD/dmdapplication.cpp \
            $$PWD/fx3process.cpp \
            $$PWD/dmddata.cpp \
            $$PWD/dmdwidget.cpp \
@@ -16,15 +17,18 @@ SOURCES += $$PWD/main.cpp \
            $$PWD/dmdoutputdevice.cpp \
            $$PWD/widgetoutputdevice.cpp \
            $$PWD/pindmd2outputdevice.cpp \
+           $$PWD/dmdanimationengine.cpp \
            $$PWD/dmdanimation.cpp \
            $$PWD/dmdanimationframe.cpp
 
 HEADERS += $$PWD/mainwindow.h \
-		   $$PWD/fx3process.h \
-		   $$PWD/dmddata.h \
+           $$PWD/dmdapplication.h \
+		       $$PWD/fx3process.h \
+		       $$PWD/dmddata.h \
            $$PWD/dmdwidget.h \
            $$PWD/dmdoutputdevice.h \
            $$PWD/widgetoutputdevice.h \
            $$PWD/pindmd2outputdevice.h \
+           $$PWD/dmdanimationengine.h \
            $$PWD/dmdanimation.h \
            $$PWD/dmdanimationframe.h

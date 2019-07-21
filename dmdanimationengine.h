@@ -1,3 +1,5 @@
+#pragma once
+
 /*
 MIT License
 
@@ -22,24 +24,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "mainwindow.h"
+#include <QString>
+#include <QMap>
 
-#include "dmdanimationengine.h"
-#include "dmdapplication.h"
-#include "widgetoutputdevice.h"
+class DMDAnimation;
 
-#include <QtWidgets>
-
-int main(int argc, char *argv[])
+class DMDAnimationEngine
 {
-    DMDApplication app(argc, argv);
-#if 1
-	DMDAnimationEngine animationEngine;
-	DMDOutputDevice* outputDevice = new WidgetOutputDevice(nullptr, 4);
-#else
+public:
+	DMDAnimationEngine();
 
-    MainWindow w;
-    w.showMaximized();
-#endif
-    return app.exec();
-}
+private:
+	void load_animation(const QString& animation_dir);
+
+private:
+	QString m_animation_path;
+	QMap<QString, DMDAnimation*> m_animations;
+};

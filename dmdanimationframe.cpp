@@ -24,17 +24,56 @@ SOFTWARE.
 
 #include "dmdanimationframe.h"
 
-DMDAnimationFrame::DMDAnimationFrame(const QImage& image, bool supports_color)
+#include <QImage>
+#include <assert.h>
+
+DMDAnimationFrame::DMDAnimationFrame(const QImage& image)
 {
-	m_dmd_frame.
+	parse_image(image);
+
 }
 
-const DMDData& DMDAnimationFrame::frame_data() const
+const uint8_t* const DMDAnimationFrame::grayscale_frame() const
 {
-	return m_dmd_frame;
+	return m_grayscale_frame;
+}
+
+const uint32_t* const DMDAnimationFrame::color_frame() const
+{
+	return m_color_frame;
 }
 
 void DMDAnimationFrame::parse_image(const QImage& image)
 {
+	uint32_t index = 0;
+	assert(image.width() == DMDData::DMDWIDTH);
+	assert(image.height() == DMDData::DMDHEIGHT);
 
+	for (int32_t y = 0; y < image.height(); ++y)
+	{
+		for (int32_t x = 0; x < image.width(); ++x)
+		{
+			const QRgb& pixel = image.pixel(x, y);
+			switch (m_grayscale_mode)
+			{
+			case AVERAGE:
+				m_grayscale_frame[index] = (qRed(pixel) + qGreen(pixel) + qBlue(pixel)) / 3;
+				break;
+
+			case RED_CHANNEL_ONLY:
+				m_grayscale_frame[index] = qRed(pixel);
+				break;
+
+			case GREEN_CHANNEL_ONLY:
+				m_grayscale_frame[index] = qGreen(pixel);
+				break;
+
+			case BLUE_CHANNEL_ONLY:
+				m_grayscale_frame[index] = qBlue(pixel);
+				break;
+			}
+			m_color_frame[index] = pixel;
+			++index;
+		}
+	}
 }

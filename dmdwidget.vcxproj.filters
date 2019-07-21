@@ -30,7 +30,13 @@
     <ClCompile Include="dmdanimation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="dmdanimationengine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="dmdanimationframe.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dmdapplication.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dmddata.cpp">
@@ -62,7 +68,13 @@
     <ClInclude Include="dmdanimation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="dmdanimationengine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="dmdanimationframe.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dmdapplication.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="dmddata.h">
