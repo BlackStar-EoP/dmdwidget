@@ -17,6 +17,7 @@ SOURCES += $$PWD/main.cpp \
            $$PWD/dmdoutputdevice.cpp \
            $$PWD/widgetoutputdevice.cpp \
            $$PWD/pindmd2outputdevice.cpp \
+           $$PWD/pin2dmdoutputdevice.cpp \
            $$PWD/dmdanimationengine.cpp \
            $$PWD/dmdanimation.cpp \
            $$PWD/dmdanimationframe.cpp
@@ -29,6 +30,7 @@ HEADERS += $$PWD/mainwindow.h \
            $$PWD/dmdoutputdevice.h \
            $$PWD/widgetoutputdevice.h \
            $$PWD/pindmd2outputdevice.h \
+           $$PWD/pin2dmdoutputdevice.h \
            $$PWD/dmdanimationengine.h \
            $$PWD/dmdanimation.h \
            $$PWD/dmdanimationframe.h
