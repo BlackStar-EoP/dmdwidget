@@ -54,6 +54,8 @@ private slots:
 	void captureDMDButton_clicked();
 	void captureTimeout();
 	void findStringButton_clicked();
+	void recordButton_clicked();
+	void saveRecordingsButton_clicked();
 
 private:
 	bool findFX3();
@@ -88,4 +90,6 @@ private:
 	QTimer* captureTimer = nullptr;
 	QLineEdit* m_line_edit = nullptr;
 	QListWidget* m_list_widget = nullptr;
+	QVector<QImage> m_recorded_frames;
+	bool m_record_frames = false;
 };

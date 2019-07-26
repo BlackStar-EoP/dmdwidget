@@ -50,6 +50,15 @@ DMDWidget::DMDWidget(QWidget* parent)
 	openFX3Button->setGeometry(10, 60, 120, 20);
 	connect(openFX3Button, SIGNAL(clicked()), this, SLOT(captureDMDButton_clicked()));
 
+	QPushButton* recordButton = new QPushButton("Record", this);
+	recordButton->setGeometry(135, 60, 120, 20);
+	connect(recordButton, SIGNAL(clicked()), this, SLOT(recordButton_clicked()));
+
+	QPushButton* saveRecordingsButton = new QPushButton("Save recorded", this);
+	saveRecordingsButton->setGeometry(260, 60, 120, 20);
+	connect(saveRecordingsButton, SIGNAL(clicked()), this, SLOT(saveRecordingsButton_clicked()));
+
+
 	m_DMD_label = new QLabel(this);
 	m_DMD_label->setGeometry(10, 120, DMDWIDTH * DMDSIZE, DMDHEIGHT * DMDSIZE);
 
@@ -309,6 +318,29 @@ void DMDWidget::captureDMD()
 				bytepos++;
 			}
 		}
+
+		if (m_record_frames)
+		{
+			QImage recframe(DMDWIDTH, DMDHEIGHT, QImage::Format_RGBA8888);
+			QPainter rec(&recframe);
+			rec.fillRect(QRect(0, 0, DMDWIDTH, DMDHEIGHT), Qt::black);
+			bytepos = 0;
+			for (int y = 0; y < DMDHEIGHT; ++y)
+			{
+				for (int x = 0; x < DMDWIDTH; ++x)
+				{
+					uint8_t c = rawDMD[bytepos];
+					float col = c / 255.0f;
+					rec.setPen(QColor(c * m_DMD_r, c * m_DMD_g, c * m_DMD_b));
+					rec.drawPoint(x, y);
+					bytepos++;
+				}
+			}
+
+			m_recorded_frames.push_back(recframe);
+
+		}
+
 	}
 
 	m_DMD_label->setPixmap(QPixmap::fromImage(image).scaled(QSize(DMDWIDTH * DMDSIZE, DMDHEIGHT * DMDSIZE)));
@@ -497,4 +529,23 @@ bool DMDWidget::isEqual(const uint8_t* DMD1, const uint8_t* DMD2)
 			return false;
 	}
 	return true;
+}
+
+void DMDWidget::recordButton_clicked()
+{
+	m_record_frames = true;
+}
+
+void DMDWidget::saveRecordingsButton_clicked()
+{
+	m_record_frames = false;
+
+
+	for (int i = 0; i < m_recorded_frames.size(); ++i)
+	{
+		QString fileName = QString("recordings/") + QString::number(i).rightJustified(4, '0') + ".png";
+		m_recorded_frames[i].save(fileName);
+	}
+
+	m_recorded_frames.clear();
 }

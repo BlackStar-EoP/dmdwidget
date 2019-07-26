@@ -33,7 +33,7 @@ SOFTWARE.
 int main(int argc, char *argv[])
 {
     DMDApplication app(argc, argv);
-#if 1
+#if 0
 	DMDAnimationEngine animationEngine;
 	DMDOutputDevice* outputDevice = new WidgetOutputDevice(nullptr, 4);
 #else
