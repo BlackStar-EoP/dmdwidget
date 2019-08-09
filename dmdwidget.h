@@ -41,8 +41,6 @@ class DMDWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	static const uint32_t DMDWIDTH = 128;
-	static const uint32_t DMDHEIGHT = 32;
 	static const uint32_t DMDSIZE = 2;
 
 

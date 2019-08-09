@@ -28,6 +28,7 @@ SOFTWARE.
 #include <QWidget>
 #include <stdint.h>
 class QLabel;
+class DMDFrame;
 
 class WidgetOutputDevice : public DMDOutputDevice, public QWidget
 {
@@ -35,9 +36,11 @@ public:
 	WidgetOutputDevice(QWidget* parent, uint32_t size);
 	~WidgetOutputDevice();
 
+	void set_use_RGB(bool use_RGB);
+
 	bool isDeviceAvailable() override;
 	void clearDMD() override;
-	void sendFrame(const DMDData& frame) override;
+	void sendFrame(const DMDFrame& frame) override;
 
 	bool supportsColor() const override;
 	void setColor(float r, float g, float b) override;
@@ -51,5 +54,7 @@ private:
 
 	uint32_t m_DMD_width = 0;
 	uint32_t m_DMD_height = 0;
+
+	bool m_use_RGB = false;
 
 };

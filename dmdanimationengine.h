@@ -33,6 +33,7 @@ class DMDAnimationEngine
 {
 public:
 	DMDAnimationEngine();
+	~DMDAnimationEngine();
 
 private:
 	void load_animation(const QString& animation_dir);

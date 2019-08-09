@@ -22,58 +22,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "dmdanimationframe.h"
+#include "dmdframe.h"
 
-#include <QImage>
-#include <assert.h>
+#include <memory>
 
-DMDAnimationFrame::DMDAnimationFrame(const QImage& image)
+DMDFrame::DMDFrame(uint8_t* grayscale_frame, uint32_t* color_frame)
 {
-	parse_image(image);
-
+	memcpy(m_grayscale_frame, grayscale_frame, DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT);
+	memcpy(m_color_frame, color_frame, DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT * sizeof(uint32_t));
 }
 
-const uint8_t* const DMDAnimationFrame::grayscale_frame() const
+DMDFrame::DMDFrame()
+{
+	memset(m_grayscale_frame, 0, sizeof(m_grayscale_frame));
+	memset(m_color_frame, 0, sizeof(m_color_frame));
+}
+
+const uint8_t* const DMDFrame::const_grayscale_frame() const
 {
 	return m_grayscale_frame;
 }
 
-const uint32_t* const DMDAnimationFrame::color_frame() const
+const uint32_t* const DMDFrame::const_color_frame() const
 {
 	return m_color_frame;
 }
 
-void DMDAnimationFrame::parse_image(const QImage& image)
+uint8_t* const DMDFrame::grayscale_frame()
 {
-	uint32_t index = 0;
-	assert(image.width() == DMDData::DMDWIDTH);
-	assert(image.height() == DMDData::DMDHEIGHT);
+	return m_grayscale_frame;
+}
 
-	for (int32_t y = 0; y < image.height(); ++y)
-	{
-		for (int32_t x = 0; x < image.width(); ++x)
-		{
-			const QRgb& pixel = image.pixel(x, y);
-			switch (m_grayscale_mode)
-			{
-			case AVERAGE:
-				m_grayscale_frame[index] = (qRed(pixel) + qGreen(pixel) + qBlue(pixel)) / 3;
-				break;
-
-			case RED_CHANNEL_ONLY:
-				m_grayscale_frame[index] = qRed(pixel);
-				break;
-
-			case GREEN_CHANNEL_ONLY:
-				m_grayscale_frame[index] = qGreen(pixel);
-				break;
-
-			case BLUE_CHANNEL_ONLY:
-				m_grayscale_frame[index] = qBlue(pixel);
-				break;
-			}
-			m_color_frame[index] = pixel;
-			++index;
-		}
-	}
+uint32_t* const DMDFrame::color_frame()
+{
+	return m_color_frame;
 }

@@ -26,26 +26,23 @@ SOFTWARE.
 
 #include <stdint.h>
 
-/* TODO rename this to FX3DMDFrame */
-class DMDData
+#include "dmdconfig.h"
+
+class DMDFrame
 {
 public:
-	static const uint32_t DMDWIDTH = 128;
-	static const uint32_t DMDHEIGHT = 32;
+	DMDFrame(uint8_t* grayscale_frame, uint32_t* color_frame);
+	DMDFrame();
+	~DMDFrame() = default;
 
-public:
-	const uint8_t* const frameData() const;
+	const uint8_t* const const_grayscale_frame() const;
+	const uint32_t* const const_color_frame() const;
 
-private:
-	bool isGarbage(const uint8_t* rawDMD) const;
-	bool isWilliamsDMD(const uint8_t* rawDMD) const;
-	bool isEmpty(const uint8_t* rawDMD) const;
-	bool isEqual(const uint8_t* DMD1, const uint8_t* DMD2);
-	void correctWilliamsDMD(uint8_t* rawDMD);
-	void normalizeZenDMD(uint8_t* rawDMD);
-	void normalizeWilliamsDMD(uint8_t* rawDMD);
+	uint8_t* const grayscale_frame();
+	uint32_t* const color_frame();
+
 
 private:
-	uint8_t m_current_frame[DMDWIDTH * DMDHEIGHT];
-	uint8_t m_previous_frame[DMDWIDTH * DMDHEIGHT];
+	uint8_t m_grayscale_frame[DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT];
+	uint32_t m_color_frame[DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT];
 };

@@ -27,19 +27,22 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="animationthread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="dmdanimation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dmdanimationengine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dmdanimationframe.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="dmdapplication.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dmddata.cpp">
+    <ClCompile Include="dmdconfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dmdframe.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dmdoutputdevice.cpp">
@@ -48,13 +51,22 @@
     <ClCompile Include="dmdwidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="fx3animation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="fx3process.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="imageanimation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="mainwindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pin2dmdoutputdevice.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pindmd2outputdevice.cpp">
@@ -65,19 +77,22 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="animationthread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="dmdanimation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="dmdanimationengine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dmdanimationframe.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="dmdapplication.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dmddata.h">
+    <ClInclude Include="dmdconfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dmdframe.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="dmdoutputdevice.h">
@@ -86,10 +101,19 @@
     <CustomBuild Include="dmdwidget.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <ClInclude Include="fx3animation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="fx3process.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="imageanimation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="mainwindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pin2dmdoutputdevice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pindmd2outputdevice.h">

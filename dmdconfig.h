@@ -1,3 +1,5 @@
+#pragma once
+
 /*
 MIT License
 
@@ -22,5 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "dmdanimation.h"
+#include <stdint.h>
 
+class DMDConfig
+{
+public:
+	static const uint32_t DMDWIDTH = 128;
+	static const uint32_t DMDHEIGHT = 32;
+
+};

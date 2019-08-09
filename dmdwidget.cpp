@@ -27,6 +27,7 @@ SOFTWARE.
 #include <Windows.h>
 #include <tlhelp32.h>
 #include <psapi.h>
+#include "dmdconfig.h"
 
 #include <QPushButton>
 #include <QLabel>
@@ -60,7 +61,7 @@ DMDWidget::DMDWidget(QWidget* parent)
 
 
 	m_DMD_label = new QLabel(this);
-	m_DMD_label->setGeometry(10, 120, DMDWIDTH * DMDSIZE, DMDHEIGHT * DMDSIZE);
+	m_DMD_label->setGeometry(10, 120, DMDConfig::DMDWIDTH * DMDSIZE, DMDConfig::DMDHEIGHT * DMDSIZE);
 
 	m_line_edit = new QLineEdit(this);
 	m_line_edit->setGeometry(10, 85, 120, 20);
@@ -263,19 +264,19 @@ void DMDWidget::captureDMD()
 	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr + 0xF0),          &ptr, sizeof(uint32_t), NULL);
 	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr + 0x34),          &ptr, sizeof(uint32_t), NULL);
 
-	QImage image(DMDWIDTH * 2, DMDHEIGHT * 2, QImage::Format_RGBA8888);
+	QImage image(DMDConfig::DMDWIDTH * 2, DMDConfig::DMDHEIGHT * 2, QImage::Format_RGBA8888);
 	QPainter p(&image);
 
 	if (ptr == 0)
 	{
-		p.fillRect(QRect(0, 0, DMDWIDTH * 2, DMDHEIGHT * 2), Qt::black);
+		p.fillRect(QRect(0, 0, DMDConfig::DMDWIDTH * 2, DMDConfig::DMDHEIGHT * 2), Qt::black);
 		m_DMD_color_found = false;
 		memset(m_previous_DMD, 0, sizeof(m_previous_DMD));
 	}
 	else
 	{
 		// valid DMD address
-		uint8_t rawDMD[DMDWIDTH * DMDHEIGHT];
+		uint8_t rawDMD[DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT];
 		ReadProcessMemory(m_FX3_process_handle, (void*)(ptr), rawDMD, sizeof(rawDMD), NULL);
 		
 		if (isGarbage(rawDMD))
@@ -305,11 +306,11 @@ void DMDWidget::captureDMD()
 		}
 
 		// Fill DMD with colors
-		p.fillRect(QRect(0, 0, DMDWIDTH * 2, DMDHEIGHT * 2), Qt::black);
+		p.fillRect(QRect(0, 0, DMDConfig::DMDWIDTH * 2, DMDConfig::DMDHEIGHT * 2), Qt::black);
 		uint32_t bytepos = 0;
-		for (int y = 0; y < DMDHEIGHT; ++y)
+		for (int y = 0; y < DMDConfig::DMDHEIGHT; ++y)
 		{
-			for (int x = 0; x < DMDWIDTH; ++x)
+			for (int x = 0; x < DMDConfig::DMDWIDTH; ++x)
 			{
 				uint8_t c = rawDMD[bytepos];
 				float col = c / 255.0f;
@@ -321,13 +322,13 @@ void DMDWidget::captureDMD()
 
 		if (m_record_frames)
 		{
-			QImage recframe(DMDWIDTH, DMDHEIGHT, QImage::Format_RGBA8888);
+			QImage recframe(DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT, QImage::Format_RGBA8888);
 			QPainter rec(&recframe);
-			rec.fillRect(QRect(0, 0, DMDWIDTH, DMDHEIGHT), Qt::black);
+			rec.fillRect(QRect(0, 0, DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT), Qt::black);
 			bytepos = 0;
-			for (int y = 0; y < DMDHEIGHT; ++y)
+			for (int y = 0; y < DMDConfig::DMDHEIGHT; ++y)
 			{
-				for (int x = 0; x < DMDWIDTH; ++x)
+				for (int x = 0; x < DMDConfig::DMDWIDTH; ++x)
 				{
 					uint8_t c = rawDMD[bytepos];
 					float col = c / 255.0f;
@@ -343,7 +344,7 @@ void DMDWidget::captureDMD()
 
 	}
 
-	m_DMD_label->setPixmap(QPixmap::fromImage(image).scaled(QSize(DMDWIDTH * DMDSIZE, DMDHEIGHT * DMDSIZE)));
+	m_DMD_label->setPixmap(QPixmap::fromImage(image).scaled(QSize(DMDConfig::DMDWIDTH * DMDSIZE, DMDConfig::DMDHEIGHT * DMDSIZE)));
 }
 
 
@@ -412,7 +413,7 @@ uint32_t DMDWidget::findDMDMemoryOffset(uint8_t* buffer, SIZE_T buffer_size)
 
 bool DMDWidget::isGarbage(const uint8_t* rawDMD) const
 {
-	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
+	const uint32_t pixelCount = DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT;
 
 	for (uint32_t i = 0; i < pixelCount; ++i)
 	{
@@ -425,7 +426,7 @@ bool DMDWidget::isGarbage(const uint8_t* rawDMD) const
 
 bool DMDWidget::isWilliamsDMD(const uint8_t* rawDMD) const
 {
-	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
+	const uint32_t pixelCount = DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT;
 
 #ifdef FAST_CHECK
 	for (uint32_t i = 0; i < pixelCount; ++i)
@@ -465,7 +466,7 @@ bool DMDWidget::isWilliamsDMD(const uint8_t* rawDMD) const
 
 void DMDWidget::correctWilliamsDMD(uint8_t* rawDMD)
 {
-	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
+	const uint32_t pixelCount = DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT;
 	for (uint32_t i = 0; i < pixelCount; ++i)
 	{
 		rawDMD[i] -= 3;
@@ -474,7 +475,7 @@ void DMDWidget::correctWilliamsDMD(uint8_t* rawDMD)
 
 void DMDWidget::normalizeDMD(uint8_t* rawDMD)
 {
-	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
+	const uint32_t pixelCount = DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT;
 	for (uint32_t i = 0; i < pixelCount; ++i)
 	{
 		switch (rawDMD[i])
@@ -491,11 +492,14 @@ void DMDWidget::normalizeDMD(uint8_t* rawDMD)
 
 void DMDWidget::normalizeWilliamsDMD(uint8_t* rawDMD)
 {
-	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
+	const uint32_t pixelCount = DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT;
 	for (uint32_t i = 0; i < pixelCount; ++i)
 	{
 		switch (rawDMD[i])
 		{
+		case 0:
+			rawDMD[i] = 0;
+			break;
 		case 1:
 			rawDMD[i] = 85;
 			break;
@@ -511,7 +515,7 @@ void DMDWidget::normalizeWilliamsDMD(uint8_t* rawDMD)
 
 bool DMDWidget::isEmpty(const uint8_t* rawDMD) const
 {
-	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
+	const uint32_t pixelCount = DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT;
 	for (uint32_t i = 0; i < pixelCount; ++i)
 	{
 		if (rawDMD[i] != 0)
@@ -522,7 +526,7 @@ bool DMDWidget::isEmpty(const uint8_t* rawDMD) const
 
 bool DMDWidget::isEqual(const uint8_t* DMD1, const uint8_t* DMD2)
 {
-	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
+	const uint32_t pixelCount = DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT;
 	for (uint32_t i = 0; i < pixelCount; ++i)
 	{
 		if (DMD1[i] != DMD2[i])

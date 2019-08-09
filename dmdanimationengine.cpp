@@ -24,9 +24,8 @@ SOFTWARE.
 
 #include "dmdanimationengine.h"
 
-#include "dmdanimation.h"
-#include "dmdanimationframe.h"
-#include "dmddata.h"
+#include "imageanimation.h"
+#include "dmdconfig.h"
 
 #include <QCoreApplication>
 #include <QVector>
@@ -42,64 +41,17 @@ DMDAnimationEngine::DMDAnimationEngine()
 	animation_directory.setFilter(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
 	QStringList animation_dir_list = animation_directory.entryList();
 
-	for (QString animation_dir : animation_dir_list)
+	for (const QString& animation_dir : animation_dir_list)
 	{
-		load_animation(animation_dir);
+		ImageAnimation* animation = new ImageAnimation(m_animation_path, animation_dir);
+		if (!animation->is_valid())
+			delete animation;
+		else
+			m_animations[animation_dir] = animation;
 	}
-
 }
 
-void DMDAnimationEngine::load_animation(const QString& animation_dir)
+DMDAnimationEngine::~DMDAnimationEngine()
 {
-	QDir dir = m_animation_path + animation_dir;
-	dir.setNameFilters(QStringList("*.png"));
-	dir.setFilter(QDir::Files | QDir::NoDotAndDotDot | QDir::NoSymLinks);
-
-	QStringList filelist = dir.entryList();
-	filelist.sort();
-
-	if (filelist.count() == 0)
-	{
-		//qWarning() << "Animation has 0 frames: " << dir.path();
-		return;
-	}
-
-	for (int32_t i = 0; i < filelist.count(); ++i)
-	{
-		QString frame_string = QString::number(i).rightJustified(4, '0');
-		const QString& filename = filelist[i];
-		if (!filename.contains(frame_string))
-		{
-			//qWarning() << "Could not load animation: " << dir.path();
-			return;
-		}
-	}
-	
-	QVector<DMDAnimationFrame*> frames;
-	for (int32_t i = 0; i < filelist.count(); ++i)
-	{
-		QImage frame_img(dir.absolutePath() + QString("/") + filelist[i]);
-		if (frame_img.width() != DMDData::DMDWIDTH)
-		{
-			qDeleteAll(frames);
-			//qWarning() << "Animation frame width problem: " << dir.path();
-			return;
-		}
-		
-		if (frame_img.height() != DMDData::DMDHEIGHT)
-		{
-			qDeleteAll(frames);
-			//qWarning() << "Animation frame height problem: " << dir.path();
-			return;
-		}
-
-		DMDAnimationFrame* frame = new DMDAnimationFrame(frame_img);
-		frames.push_back(frame);
-	}
-	
-	m_animations[animation_dir] = new DMDAnimation(frames);
-
-	// TODO add animation parameter support
-	//dir.setNameFilters(QStringList("*.anm"));
-	//dir.setFilter(QDir::Files | QDir::NoDotAndDotDot | QDir::NoSymLinks);
+	qDeleteAll(m_animations);
 }

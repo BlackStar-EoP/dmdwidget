@@ -135,25 +135,30 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="animationthread.cpp" />
     <ClCompile Include="dmdanimation.cpp" />
     <ClCompile Include="dmdanimationengine.cpp" />
-    <ClCompile Include="dmdanimationframe.cpp" />
     <ClCompile Include="dmdapplication.cpp" />
-    <ClCompile Include="dmddata.cpp" />
+    <ClCompile Include="dmdconfig.cpp" />
+    <ClCompile Include="dmdframe.cpp" />
     <ClCompile Include="dmdoutputdevice.cpp" />
     <ClCompile Include="dmdwidget.cpp" />
+    <ClCompile Include="fx3animation.cpp" />
     <ClCompile Include="fx3process.cpp" />
+    <ClCompile Include="imageanimation.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mainwindow.cpp" />
+    <ClCompile Include="pin2dmdoutputdevice.cpp" />
     <ClCompile Include="pindmd2outputdevice.cpp" />
     <ClCompile Include="widgetoutputdevice.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="animationthread.h" />
     <ClInclude Include="dmdanimation.h" />
     <ClInclude Include="dmdanimationengine.h" />
-    <ClInclude Include="dmdanimationframe.h" />
     <ClInclude Include="dmdapplication.h" />
-    <ClInclude Include="dmddata.h" />
+    <ClInclude Include="dmdconfig.h" />
+    <ClInclude Include="dmdframe.h" />
     <ClInclude Include="dmdoutputdevice.h" />
     <CustomBuild Include="dmdwidget.h">
       <AdditionalInputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">dmdwidget.h;release\moc_predefs.h;D:\Qt\5.9.2\msvc2017_64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>
@@ -165,8 +170,11 @@
       <Message Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">MOC dmdwidget.h</Message>
       <Outputs Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">debug\moc_dmdwidget.cpp;%(Outputs)</Outputs>
     </CustomBuild>
+    <ClInclude Include="fx3animation.h" />
     <ClInclude Include="fx3process.h" />
+    <ClInclude Include="imageanimation.h" />
     <ClInclude Include="mainwindow.h" />
+    <ClInclude Include="pin2dmdoutputdevice.h" />
     <ClInclude Include="pindmd2outputdevice.h" />
     <ClInclude Include="widgetoutputdevice.h" />
   </ItemGroup>

@@ -24,13 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "dmddata.h"
+#include "dmdanimation.h"
 
-#include <stdint.h>
-
-class QImage;
-
-class DMDAnimationFrame
+class ImageAnimation : public DMDAnimation
 {
 public:
 	enum EGrayScaleMode
@@ -42,17 +38,10 @@ public:
 	};
 
 public:
-	DMDAnimationFrame(const QImage& image);
-	~DMDAnimationFrame() = default;
-
-	const uint8_t* const grayscale_frame() const;
-	const uint32_t* const color_frame() const;
+	ImageAnimation(const QString& path, const QString& directory);
+	bool is_valid() const;
 
 private:
-	void parse_image(const QImage& image);
-
-private:
-	uint8_t m_grayscale_frame[DMDData::DMDWIDTH * DMDData::DMDHEIGHT];
-	uint32_t m_color_frame[DMDData::DMDWIDTH * DMDData::DMDHEIGHT];
-	EGrayScaleMode m_grayscale_mode = RED_CHANNEL_ONLY;
+	void load_animation(const QString& path, const QString& directory);
+	bool m_valid = false;
 };

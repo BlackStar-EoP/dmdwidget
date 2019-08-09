@@ -22,5 +22,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include "animationthread.h"
+
 #include "dmdanimation.h"
 
+AnimationThread::AnimationThread(DMDOutputDevice* output_device)
+{
+
+}
+
+void AnimationThread::run()
+{
+	const unsigned long ANIMATION_THREAD_SLEEP_MS = 16;
+	bool run = true;
+
+	while (run)
+	{
+		//m_animation->
+		msleep(ANIMATION_THREAD_SLEEP_MS);
+	}
+}
+
+void AnimationThread::set_animation(DMDAnimation* animation)
+{
+	QMutexLocker lock(&m_animation_mutex);
+}

@@ -1,3 +1,5 @@
+#pragma once
+
 /*
 MIT License
 
@@ -24,3 +26,7 @@ SOFTWARE.
 
 #include "dmdanimation.h"
 
+class FX3Animation : public DMDAnimation
+{
+public:
+};

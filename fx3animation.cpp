@@ -22,14 +22,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "dmddata.h"
+#include "fx3animation.h"
 
-const uint8_t* const DMDData::frameData() const
+
+
+/*
+FROM FX3Frame:
+
+
+const uint8_t* const FX3DMDFrame::frameData() const
 {
 	return m_current_frame;
 }
 
-bool DMDData::isGarbage(const uint8_t* rawDMD) const
+bool FX3DMDFrame::isGarbage(const uint8_t* rawDMD) const
 {
 	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
 
@@ -42,7 +48,7 @@ bool DMDData::isGarbage(const uint8_t* rawDMD) const
 	return false;
 }
 
-bool DMDData::isWilliamsDMD(const uint8_t* rawDMD) const
+bool FX3DMDFrame::isWilliamsDMD(const uint8_t* rawDMD) const
 {
 	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
 
@@ -82,22 +88,16 @@ bool DMDData::isWilliamsDMD(const uint8_t* rawDMD) const
 #endif
 }
 
-void DMDData::correctWilliamsDMD(uint8_t* rawDMD)
-{
-	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
-	for (uint32_t i = 0; i < pixelCount; ++i)
-	{
-		rawDMD[i] -= 3;
-	}
-}
-
-void DMDData::normalizeZenDMD(uint8_t* rawDMD)
+void FX3DMDFrame::normalizeZenDMD(uint8_t* rawDMD)
 {
 	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
 	for (uint32_t i = 0; i < pixelCount; ++i)
 	{
 		switch (rawDMD[i])
 		{
+		case 0:
+			rawDMD[i] = 0;
+			break;
 		case 1:
 			rawDMD[i] = 128;
 			break;
@@ -108,13 +108,16 @@ void DMDData::normalizeZenDMD(uint8_t* rawDMD)
 	}
 }
 
-void DMDData::normalizeWilliamsDMD(uint8_t* rawDMD)
+void FX3DMDFrame::normalizeWilliamsDMD(uint8_t* rawDMD)
 {
 	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
 	for (uint32_t i = 0; i < pixelCount; ++i)
 	{
 		switch (rawDMD[i])
 		{
+		case 0:
+			rawDMD[i] = 0;
+			break;
 		case 1:
 			rawDMD[i] = 85;
 			break;
@@ -128,7 +131,7 @@ void DMDData::normalizeWilliamsDMD(uint8_t* rawDMD)
 	}
 }
 
-bool DMDData::isEmpty(const uint8_t* rawDMD) const
+bool FX3DMDFrame::isEmpty(const uint8_t* rawDMD) const
 {
 	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
 	for (uint32_t i = 0; i < pixelCount; ++i)
@@ -139,7 +142,7 @@ bool DMDData::isEmpty(const uint8_t* rawDMD) const
 	return true;
 }
 
-bool DMDData::isEqual(const uint8_t* DMD1, const uint8_t* DMD2)
+bool FX3DMDFrame::isEqual(const uint8_t* DMD1, const uint8_t* DMD2)
 {
 	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
 	for (uint32_t i = 0; i < pixelCount; ++i)
@@ -149,3 +152,6 @@ bool DMDData::isEqual(const uint8_t* DMD1, const uint8_t* DMD2)
 	}
 	return true;
 }
+
+
+*/

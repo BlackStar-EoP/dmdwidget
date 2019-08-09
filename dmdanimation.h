@@ -31,9 +31,8 @@ class DMDAnimationFrame;
 class DMDAnimation
 {
 public:
-	DMDAnimation(const QVector<DMDAnimationFrame*> frames);
-	~DMDAnimation();
+	DMDAnimation() = default;
+	virtual ~DMDAnimation() = default;
 
 private:
-	QVector<DMDAnimationFrame*> m_frames;
 };

@@ -26,12 +26,14 @@ SOFTWARE.
 
 #include <widgetoutputdevice.h>
 
-#include "dmddata.h"
+#include "dmdconfig.h"
+#include "dmdframe.h"
 
 #include <QLabel>
 #include <QImage>
 #include <QPainter>
 #include <QPoint>
+#include <QColor>
 
 
 WidgetOutputDevice::WidgetOutputDevice(QWidget* parent, uint32_t size)
@@ -39,8 +41,8 @@ WidgetOutputDevice::WidgetOutputDevice(QWidget* parent, uint32_t size)
 {
 	m_DMD_label = new QLabel(this);
 
-	m_DMD_width = DMDData::DMDWIDTH * size;
-	m_DMD_height = DMDData::DMDHEIGHT * size;
+	m_DMD_width = DMDConfig::DMDWIDTH * size;
+	m_DMD_height = DMDConfig::DMDHEIGHT * size;
 
 	m_DMD_label->setGeometry(0, 0, m_DMD_width, m_DMD_height);
 	clearDMD();
@@ -51,6 +53,11 @@ WidgetOutputDevice::~WidgetOutputDevice()
 {
 }
 
+void WidgetOutputDevice::set_use_RGB(bool use_RGB)
+{
+	m_use_RGB = use_RGB;
+}
+
 bool WidgetOutputDevice::isDeviceAvailable()
 {
 	return true;
@@ -58,30 +65,49 @@ bool WidgetOutputDevice::isDeviceAvailable()
 
 void WidgetOutputDevice::clearDMD()
 {
-	QImage image(DMDData::DMDWIDTH * 2, DMDData::DMDHEIGHT * 2, QImage::Format_RGBA8888);
+	QImage image(DMDConfig::DMDWIDTH * 2, DMDConfig::DMDHEIGHT * 2, QImage::Format_RGBA8888);
 	QPainter p(&image);
-	p.fillRect(QRect(0, 0, DMDData::DMDWIDTH * 2, DMDData::DMDHEIGHT * 2), Qt::black);
+	p.fillRect(QRect(0, 0, DMDConfig::DMDWIDTH * 2, DMDConfig::DMDHEIGHT * 2), Qt::black);
 	m_DMD_label->setPixmap(QPixmap::fromImage(image).scaled(QSize(m_DMD_width, m_DMD_height)));
 }
 
-void WidgetOutputDevice::sendFrame(const DMDData& frame)
+void WidgetOutputDevice::sendFrame(const DMDFrame& frame)
 {
-	const uint8_t* const frameData = frame.frameData();
 
-	QImage image(DMDData::DMDWIDTH * 2, DMDData::DMDHEIGHT * 2, QImage::Format_RGBA8888);
+	QImage image(DMDConfig::DMDWIDTH * 2, DMDConfig::DMDHEIGHT * 2, QImage::Format_RGBA8888);
 	QPainter p(&image);
 
-	// Fill DMD with colors
-	uint32_t bytepos = 0;
-	for (int y = 0; y < DMDData::DMDHEIGHT; ++y)
+	if (m_use_RGB)
 	{
-		for (int x = 0; x < DMDData::DMDWIDTH; ++x)
+		const uint32_t* const frameData = frame.const_color_frame();
+
+		uint32_t pos = 0;
+		for (int y = 0; y < DMDConfig::DMDHEIGHT; ++y)
 		{
-			uint8_t c = frameData[bytepos];
-			float col = c / 255.0f;
-			p.setPen(QColor(c * m_r, c * m_g, c * m_b));
-			p.drawPoint(x * 2, y * 2);
-			bytepos++;
+			for (int x = 0; x < DMDConfig::DMDWIDTH; ++x)
+			{
+				uint32_t col = frameData[pos];
+				p.setPen(QColor(qRed(col), qGreen(col), qBlue(col)));
+				p.drawPoint(x * 2, y * 2);
+				pos++;
+			}
+		}
+	}
+	else
+	{
+		const uint8_t* const frameData = frame.const_grayscale_frame();
+
+		uint32_t bytepos = 0;
+		for (int y = 0; y < DMDConfig::DMDHEIGHT; ++y)
+		{
+			for (int x = 0; x < DMDConfig::DMDWIDTH; ++x)
+			{
+				uint8_t c = frameData[bytepos];
+				float col = c / 255.0f;
+				p.setPen(QColor(c * m_r, c * m_g, c * m_b));
+				p.drawPoint(x * 2, y * 2);
+				bytepos++;
+			}
 		}
 	}
 

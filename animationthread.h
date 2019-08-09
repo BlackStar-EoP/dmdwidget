@@ -1,3 +1,5 @@
+#pragma once
+
 /*
 MIT License
 
@@ -22,5 +24,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "dmdanimation.h"
+#include <QThread>
+#include <QMutex>
+
+class DMDOutputDevice;
+class DMDAnimation;
+
+class AnimationThread : public QThread
+{
+public:
+	AnimationThread(DMDOutputDevice* output_device);
+
+	void run() override;
+
+	void set_animation(DMDAnimation* animation);
+
+private:
+	DMDOutputDevice* m_output_device = nullptr;
+	DMDAnimation* m_animation = nullptr;
+	QMutex m_animation_mutex;
+};
 
