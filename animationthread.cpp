@@ -25,8 +25,10 @@ SOFTWARE.
 #include "animationthread.h"
 
 #include "dmdanimation.h"
+#include "dmdoutputdevice.h"
 
 AnimationThread::AnimationThread(DMDOutputDevice* output_device)
+: m_output_device(output_device)
 {
 
 }
@@ -38,7 +40,12 @@ void AnimationThread::run()
 
 	while (run)
 	{
-		//m_animation->
+		DMDFrame* frame;
+		{
+			QMutexLocker lock(&m_animation_mutex);
+			frame = m_animation->current_frame();
+		}
+		m_output_device->sendFrame(*frame);
 		msleep(ANIMATION_THREAD_SLEEP_MS);
 	}
 }
@@ -46,4 +53,5 @@ void AnimationThread::run()
 void AnimationThread::set_animation(DMDAnimation* animation)
 {
 	QMutexLocker lock(&m_animation_mutex);
+	m_animation = animation;
 }

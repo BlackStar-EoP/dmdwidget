@@ -24,21 +24,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include "animationthread.h"
+
 #include <QString>
 #include <QMap>
 
 class DMDAnimation;
+class DMDOutputDevice;
+class ImageAnimation;
 
 class DMDAnimationEngine
 {
 public:
-	DMDAnimationEngine();
+	DMDAnimationEngine(DMDOutputDevice* output_device);
 	~DMDAnimationEngine();
 
 private:
-	void load_animation(const QString& animation_dir);
+	void create_internal_animations();
 
-private:
 	QString m_animation_path;
 	QMap<QString, DMDAnimation*> m_animations;
+	AnimationThread m_animation_thread;
+	ImageAnimation* m_loading_animation = nullptr;
+	ImageAnimation* m_waiting_for_fx3_animation = nullptr;
 };

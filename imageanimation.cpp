@@ -36,6 +36,32 @@ ImageAnimation::ImageAnimation(const QString& path, const QString& directory)
 	load_animation(path, directory);
 }
 
+ImageAnimation::ImageAnimation(const QVector<QImage>& images, EColorMode color_mode)
+{
+	for (const QImage& img : images)
+	{
+		m_frames.push_back(parse_image(img, color_mode));
+	}
+
+	m_valid = true;
+}
+
+ImageAnimation::~ImageAnimation()
+{
+	qDeleteAll(m_frames);
+}
+
+DMDFrame* ImageAnimation::current_frame()
+{
+	// TODO implement animationmode repeat etc
+	if (m_current_frame_number >= m_frames.size())
+		m_current_frame_number = 0;
+
+	DMDFrame* frame = m_frames[m_current_frame_number];
+	m_current_frame_number++;
+	return frame;
+}
+
 bool ImageAnimation::is_valid() const
 {
 	return m_valid;
@@ -147,27 +173,27 @@ void ImageAnimation::load_animation(const QString& path, const QString& director
 
 	EColorMode color_mode = determine_animation_color_mode(dir.absolutePath(), filelist);
 
-	QVector<DMDFrame*> frames;
 	for (int32_t i = 0; i < filelist.count(); ++i)
 	{
 		QImage frame_img(dir.absolutePath() + QString("/") + filelist[i]);
 		if (frame_img.width() != DMDConfig::DMDWIDTH)
 		{
-			qDeleteAll(frames);
+			qDeleteAll(m_frames);
 			//qWarning() << "Animation frame width problem: " << dir.path();
 			return;
 		}
 
 		if (frame_img.height() != DMDConfig::DMDHEIGHT)
 		{
-			qDeleteAll(frames);
+			qDeleteAll(m_frames);
 			//qWarning() << "Animation frame height problem: " << dir.path();
 			return;
 		}
 
 		DMDFrame* frame = parse_image(frame_img, color_mode);
-		frames.push_back(frame);
+		m_frames.push_back(frame);
 	}
+	m_valid = true;
 }
 
 DMDFrame* ImageAnimation::parse_image(const QImage& image, ImageAnimation::EColorMode color_mode)
@@ -188,9 +214,10 @@ DMDFrame* ImageAnimation::parse_image(const QImage& image, ImageAnimation::EColo
 			switch (color_mode)
 			{
 				case FULL_COLOR:
-					grayscale_frame[index] = (qRed(pixel) + qGreen(pixel) + qBlue(pixel)) / 3;
+					grayscale_frame[index] = (qRed(pixel) + qGreen(pixel) + qBlue(pixel)) / 3; // TODO add a multiplication factor here
 					break;
-
+				
+				case GRAYSCALE: // Grayscale frames have the exact same values for each channel
 				case RED_CHANNEL_ONLY:
 					grayscale_frame[index] = qRed(pixel);
 					break;
@@ -202,6 +229,8 @@ DMDFrame* ImageAnimation::parse_image(const QImage& image, ImageAnimation::EColo
 				case BLUE_CHANNEL_ONLY:
 					grayscale_frame[index] = qBlue(pixel);
 					break;
+
+				
 			}
 			color_frame[index] = pixel;
 			++index;

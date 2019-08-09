@@ -26,13 +26,15 @@ SOFTWARE.
 
 #include <QVector>
 
-class DMDAnimationFrame;
+class DMDFrame;
 
 class DMDAnimation
 {
 public:
 	DMDAnimation() = default;
 	virtual ~DMDAnimation() = default;
+
+	virtual DMDFrame* current_frame() = 0;
 
 private:
 };

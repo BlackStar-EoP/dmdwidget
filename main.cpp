@@ -33,11 +33,10 @@ SOFTWARE.
 int main(int argc, char *argv[])
 {
     DMDApplication app(argc, argv);
-#if 0
-	DMDAnimationEngine animationEngine;
+#if 1
 	DMDOutputDevice* outputDevice = new WidgetOutputDevice(nullptr, 4);
+	DMDAnimationEngine animationEngine(outputDevice);
 #else
-
     MainWindow w;
     w.showMaximized();
 #endif

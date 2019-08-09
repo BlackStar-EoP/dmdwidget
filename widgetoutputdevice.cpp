@@ -76,6 +76,7 @@ void WidgetOutputDevice::sendFrame(const DMDFrame& frame)
 
 	QImage image(DMDConfig::DMDWIDTH * 2, DMDConfig::DMDHEIGHT * 2, QImage::Format_RGBA8888);
 	QPainter p(&image);
+	p.fillRect(0, 0, DMDConfig::DMDWIDTH * 2, DMDConfig::DMDHEIGHT * 2, Qt::black);
 
 	if (m_use_RGB)
 	{

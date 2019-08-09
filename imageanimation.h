@@ -44,6 +44,11 @@ public:
 
 public:
 	ImageAnimation(const QString& path, const QString& directory);
+	ImageAnimation(const QVector<QImage>& images, EColorMode color_mode);
+	~ImageAnimation();
+
+	DMDFrame* current_frame() override;
+
 	bool is_valid() const;
 
 private:
@@ -54,4 +59,6 @@ private:
 	DMDFrame* parse_image(const QImage& image, EColorMode color_mode);
 
 	bool m_valid = false;
+	QVector<DMDFrame*> m_frames;
+	int32_t m_current_frame_number = 0;
 };
