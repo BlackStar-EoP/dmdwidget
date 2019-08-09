@@ -25,9 +25,32 @@ SOFTWARE.
 */
 
 #include <QApplication>
+#include <QTimer>
+
+#include "fx3animation.h"
+
+class DMDAnimationEngine;
+class FX3Process;
 
 class DMDApplication : public QApplication
 {
+	Q_OBJECT
 public:
-	DMDApplication(int argc, char *argv[]);
+	DMDApplication(int argc, char *argv[], FX3Process* fx3_process);
+
+	void set_animation_engine(DMDAnimationEngine* animation_engine);
+	void start_polling();
+
+private slots:
+	void find_FX3_executable_timeout();
+	void find_DMD_timeout();
+
+private:
+	QTimer m_find_fx3_timer;
+	QTimer m_find_DMD_timer;
+	DMDAnimationEngine* m_animation_engine = nullptr;
+	FX3Process* m_fx3_process = nullptr;
+	FX3Animation m_fx3_animation;
+
+	bool m_valid_DMD = false;
 };

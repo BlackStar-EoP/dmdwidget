@@ -23,21 +23,77 @@ SOFTWARE.
 */
 
 #include "fx3animation.h"
+#include "fx3process.h"
 
-
-
-/*
-FROM FX3Frame:
-
-
-const uint8_t* const FX3DMDFrame::frameData() const
+FX3Animation::FX3Animation(FX3Process* fx3_process)
+: m_fx3_process(fx3_process)
 {
-	return m_current_frame;
+
 }
 
-bool FX3DMDFrame::isGarbage(const uint8_t* rawDMD) const
+DMDFrame* FX3Animation::current_frame()
 {
-	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
+	bool valid_DMD = m_fx3_process->captureDMD(m_RAW_DMD);
+	if (!valid_DMD)
+	{
+		m_DMD_color_found = false;
+		// TODO notify animation engine here that it needs to clear or do something
+		return nullptr;
+	}
+
+	if (isGarbage(m_RAW_DMD))
+	{
+		memset(m_RAW_DMD, 0, sizeof(m_RAW_DMD));
+		memset(m_previous_RAW_DMD, 0, sizeof(m_previous_RAW_DMD));
+	}
+	else
+	{
+		if (!m_DMD_color_found)
+		{
+			m_DMD_color = m_fx3_process->getDMDColor();
+			m_DMD_color_found = true;
+		}
+	}
+
+	if (isEqual(m_RAW_DMD, m_previous_RAW_DMD))
+		return nullptr;
+	else
+		memcpy(m_previous_RAW_DMD, m_RAW_DMD, sizeof(m_RAW_DMD));
+
+	if (isWilliamsDMD(m_RAW_DMD))
+	{
+		normalizeWilliamsDMD(m_RAW_DMD);
+	}
+	else
+	{
+		normalizeZenDMD(m_RAW_DMD);
+	}
+
+	uint8_t* const grayscale_frame = m_DMD_frame.grayscale_frame();
+	uint32_t* const color_frame = m_DMD_frame.color_frame();
+
+	const uint32_t NUM_PIXELS = DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT;
+	for (uint32_t i = 0; i < NUM_PIXELS; ++i)
+	{
+		uint8_t c = m_RAW_DMD[i];
+		float col = c / 255.0f;
+
+		int32_t r = col * m_DMD_color.red();
+		int32_t g = col * m_DMD_color.green();
+		int32_t b = col * m_DMD_color.blue();
+
+		QRgb color = qRgb(r, g, b);
+		
+		grayscale_frame[i] = c;
+		color_frame[i] = color;
+
+	}
+	return &m_DMD_frame;
+}
+
+bool FX3Animation::isGarbage(const uint8_t* rawDMD) const
+{
+	const uint32_t pixelCount = DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT;
 
 	for (uint32_t i = 0; i < pixelCount; ++i)
 	{
@@ -48,9 +104,9 @@ bool FX3DMDFrame::isGarbage(const uint8_t* rawDMD) const
 	return false;
 }
 
-bool FX3DMDFrame::isWilliamsDMD(const uint8_t* rawDMD) const
+bool FX3Animation::isWilliamsDMD(const uint8_t* rawDMD) const
 {
-	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
+	const uint32_t pixelCount = DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT;
 
 #ifdef FAST_WILLIAMS_CHECK
 	for (uint32_t i = 0; i < pixelCount; ++i)
@@ -88,9 +144,9 @@ bool FX3DMDFrame::isWilliamsDMD(const uint8_t* rawDMD) const
 #endif
 }
 
-void FX3DMDFrame::normalizeZenDMD(uint8_t* rawDMD)
+void FX3Animation::normalizeZenDMD(uint8_t* rawDMD)
 {
-	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
+	const uint32_t pixelCount = DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT;
 	for (uint32_t i = 0; i < pixelCount; ++i)
 	{
 		switch (rawDMD[i])
@@ -108,32 +164,32 @@ void FX3DMDFrame::normalizeZenDMD(uint8_t* rawDMD)
 	}
 }
 
-void FX3DMDFrame::normalizeWilliamsDMD(uint8_t* rawDMD)
+void FX3Animation::normalizeWilliamsDMD(uint8_t* rawDMD)
 {
-	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
+	const uint32_t pixelCount = DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT;
 	for (uint32_t i = 0; i < pixelCount; ++i)
 	{
 		switch (rawDMD[i])
 		{
-		case 0:
+		case 3:
 			rawDMD[i] = 0;
 			break;
-		case 1:
+		case 4:
 			rawDMD[i] = 85;
 			break;
-		case 2:
+		case 5:
 			rawDMD[i] = 170;
 			break;
-		case 3:
+		case 6:
 			rawDMD[i] = 255;
 			break;
 		}
 	}
 }
 
-bool FX3DMDFrame::isEmpty(const uint8_t* rawDMD) const
+bool FX3Animation::isEmpty(const uint8_t* rawDMD) const
 {
-	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
+	const uint32_t pixelCount = DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT;
 	for (uint32_t i = 0; i < pixelCount; ++i)
 	{
 		if (rawDMD[i] != 0)
@@ -142,9 +198,9 @@ bool FX3DMDFrame::isEmpty(const uint8_t* rawDMD) const
 	return true;
 }
 
-bool FX3DMDFrame::isEqual(const uint8_t* DMD1, const uint8_t* DMD2)
+bool FX3Animation::isEqual(const uint8_t* DMD1, const uint8_t* DMD2)
 {
-	const uint32_t pixelCount = DMDWIDTH * DMDHEIGHT;
+	const uint32_t pixelCount = DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT;
 	for (uint32_t i = 0; i < pixelCount; ++i)
 	{
 		if (DMD1[i] != DMD2[i])
@@ -152,6 +208,3 @@ bool FX3DMDFrame::isEqual(const uint8_t* DMD1, const uint8_t* DMD2)
 	}
 	return true;
 }
-
-
-*/

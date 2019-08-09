@@ -144,6 +144,31 @@ QColor FX3Process::getDMDColor()
 	return QColor(r, g, b);
 }
 
+bool FX3Process::is_valid_DMD() const
+{
+	return get_DMD_ptr() != 0;
+}
+
+bool FX3Process::captureDMD(uint8_t* buffer)
+{
+	uint32_t ptr = get_DMD_ptr();
+
+	if (ptr == 0)
+		return false;
+
+	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr), buffer, DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT, NULL);
+	return true;
+}
+
+uint32_t FX3Process::get_DMD_ptr() const
+{
+	uint32_t ptr = 0;
+	ReadProcessMemory(m_FX3_process_handle, (void*)(m_DMD_memory_offset), &ptr, sizeof(uint32_t), NULL);
+	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr + 0xF0), &ptr, sizeof(uint32_t), NULL);
+	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr + 0x34), &ptr, sizeof(uint32_t), NULL);
+	return ptr;
+}
+
 uint32_t FX3Process::findDMDMemoryOffset(uint8_t* buffer, SIZE_T buffer_size)
 {
 	uint8_t DMDSIGNATURE[] = { 0x8B, 0x81, 0xFF, 0xFF, 0xFF, 0xFF, 0x89, 0x44, 0x24, 0xFF, 0x8B, 0x81, 0xFF, 0xFF, 0xFF, 0xFF, 0x89, 0x44, 0x24, 0xFF, 0xA1 };

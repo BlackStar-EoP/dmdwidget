@@ -55,7 +55,7 @@ DMDAnimationEngine::DMDAnimationEngine(DMDOutputDevice* output_device)
 		else
 			m_animations[animation_dir] = animation;
 	}
-	m_animation_thread.set_animation(m_loading_animation);
+	m_animation_thread.set_animation(m_waiting_for_fx3_animation);
 }
 
 DMDAnimationEngine::~DMDAnimationEngine()
@@ -84,7 +84,7 @@ void DMDAnimationEngine::create_internal_animations()
 	QPainter loading_painter(&loading_image);
 	loading_painter.fillRect(QRect(0, 0, DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT), Qt::black);
 	loading_painter.setPen(Qt::white);
-	QFont font("Bauhaus 93 Regular");
+	QFont font("Courier New");
 	font.setPixelSize(10);
 	loading_painter.setFont(font);
 	loading_painter.drawText(8, 21, "LOADING ANIMATIONS");
@@ -108,7 +108,6 @@ void DMDAnimationEngine::create_internal_animations()
 		waiting_frames.push_back(waiting_for_fx3_image);
 	for (uint32_t i = 0; i < NUM_FRAME_DUPLICATES; ++i)
 		waiting_frames.push_back(empty_image);
-
 
 	m_loading_animation = new ImageAnimation(loading_frames, ImageAnimation::GRAYSCALE);
 	m_waiting_for_fx3_animation = new ImageAnimation(waiting_frames, ImageAnimation::GRAYSCALE);

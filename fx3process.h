@@ -28,8 +28,9 @@ SOFTWARE.
 #include <string>
 #include <vector>
 #include <Windows.h>
-
 #include <QColor>
+
+#include "dmdconfig.h"
 
 class FX3Process
 {
@@ -37,8 +38,11 @@ public:
 	bool findFX3();
 	bool findDMD();
 	QColor getDMDColor();
+	bool is_valid_DMD() const;
+	bool captureDMD(uint8_t* buffer);
 
 private:
+	uint32_t get_DMD_ptr() const;
 	uint32_t findDMDMemoryOffset(uint8_t* buffer, SIZE_T buffer_size);
 
 private:

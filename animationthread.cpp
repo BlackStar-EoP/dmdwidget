@@ -45,7 +45,10 @@ void AnimationThread::run()
 			QMutexLocker lock(&m_animation_mutex);
 			frame = m_animation->current_frame();
 		}
-		m_output_device->sendFrame(*frame);
+		
+		if (frame != nullptr)
+			m_output_device->sendFrame(*frame);
+
 		msleep(ANIMATION_THREAD_SLEEP_MS);
 	}
 }

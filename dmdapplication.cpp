@@ -24,8 +24,57 @@ SOFTWARE.
 
 #include "dmdapplication.h"
 
-DMDApplication::DMDApplication(int argc, char *argv[])
-: QApplication(argc, argv)
-{
+#include "fx3process.h"
+#include "dmdanimationengine.h"
 
+#include <assert.h>
+
+DMDApplication::DMDApplication(int argc, char *argv[], FX3Process* fx3_process)
+: QApplication(argc, argv)
+, m_fx3_process(fx3_process)
+, m_fx3_animation(fx3_process)
+{
+	connect(&m_find_fx3_timer, SIGNAL(timeout()), this, SLOT(find_FX3_executable_timeout()));
+	connect(&m_find_DMD_timer, SIGNAL(timeout()), this, SLOT(find_DMD_timeout()));
+}
+
+void DMDApplication::set_animation_engine(DMDAnimationEngine* animation_engine)
+{
+	m_animation_engine = animation_engine;
+}
+
+void DMDApplication::start_polling()
+{
+	assert(m_animation_engine != nullptr);
+	assert(m_fx3_process != nullptr);
+
+	m_find_fx3_timer.start(500);
+}
+
+void DMDApplication::find_FX3_executable_timeout()
+{
+	if (m_fx3_process->findFX3())
+	{
+		m_find_fx3_timer.stop();
+		m_find_DMD_timer.start(100);
+	}
+}
+
+void DMDApplication::find_DMD_timeout()
+{
+	if (m_fx3_process->findDMD())
+	{
+		if (m_fx3_process->is_valid_DMD())
+		{
+			if (!m_valid_DMD)
+			{
+				m_animation_engine->show_animation(&m_fx3_animation);
+				m_valid_DMD = true;
+			}
+		}
+		else
+		{
+			m_valid_DMD = false;
+		}
+	}
 }

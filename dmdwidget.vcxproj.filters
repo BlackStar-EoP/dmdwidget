@@ -92,9 +92,9 @@
     <ClInclude Include="dmdanimationengine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dmdapplication.h">
+    <CustomBuild Include="dmdapplication.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
+    </CustomBuild>
     <ClInclude Include="dmdconfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -134,6 +134,12 @@
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="release\moc_animationwindow.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="debug\moc_dmdapplication.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="release\moc_dmdapplication.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="debug\moc_dmdwidget.cpp">

@@ -24,9 +24,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include <QColor>
+
 #include "dmdanimation.h"
+
+#include "dmdframe.h"
+
+class FX3Process;
 
 class FX3Animation : public DMDAnimation
 {
 public:
+	FX3Animation(FX3Process* fx3_process);
+	DMDFrame* current_frame() override;
+
+private:
+	bool isGarbage(const uint8_t* rawDMD) const;
+	bool isWilliamsDMD(const uint8_t* rawDMD) const;
+	void normalizeZenDMD(uint8_t* rawDMD);
+	void normalizeWilliamsDMD(uint8_t* rawDMD);
+	bool isEmpty(const uint8_t* rawDMD) const;
+	bool isEqual(const uint8_t* DMD1, const uint8_t* DMD2);
+
+private:
+	FX3Process* m_fx3_process = nullptr;
+	DMDFrame m_DMD_frame;
+	uint8_t m_RAW_DMD[DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT];
+	uint8_t m_previous_RAW_DMD[DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT];
+	
+	bool m_DMD_color_found = false;
+	QColor m_DMD_color;
 };

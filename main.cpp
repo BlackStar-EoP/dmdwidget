@@ -27,22 +27,22 @@ SOFTWARE.
 #include "dmdanimationengine.h"
 #include "dmdapplication.h"
 #include "widgetoutputdevice.h"
-
+#include "fx3process.h"
 #include "animationwindow.h"
 
 #include <QtWidgets>
 
 int main(int argc, char *argv[])
 {
-    DMDApplication app(argc, argv);
-#if 1
-	DMDOutputDevice* outputDevice = new WidgetOutputDevice(nullptr, 4);
-	DMDAnimationEngine animationEngine(outputDevice);
+	FX3Process fx3_process;
+	DMDApplication app(argc, argv, &fx3_process);
 
-	AnimationWindow animation_window(nullptr, &animationEngine);
-#else
-    MainWindow w;
-    w.showMaximized();
-#endif
+	DMDOutputDevice* outputDevice = new WidgetOutputDevice(nullptr, 4);
+	DMDAnimationEngine animation_engine(outputDevice);
+	app.set_animation_engine(&animation_engine);
+
+	AnimationWindow animation_window(nullptr, &animation_engine);
+	app.start_polling();
+	
     return app.exec();
 }
