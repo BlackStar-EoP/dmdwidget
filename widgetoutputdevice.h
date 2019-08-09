@@ -43,18 +43,12 @@ public:
 	void sendFrame(const DMDFrame& frame) override;
 
 	bool supportsColor() const override;
-	void setColor(float r, float g, float b) override;
 
 private:
 	QLabel* m_DMD_label = nullptr;
 
-	float m_r = 1.0f;
-	float m_g = 1.0f;
-	float m_b = 1.0f;
-
 	uint32_t m_DMD_width = 0;
 	uint32_t m_DMD_height = 0;
 
-	bool m_use_RGB = false;
-
+	bool m_use_RGB = true;
 };

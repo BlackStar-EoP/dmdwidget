@@ -37,5 +37,4 @@ public:
 	virtual void sendFrame(const DMDFrame& frame) = 0;
 
 	virtual bool supportsColor() const = 0;
-	virtual void setColor(float r, float g, float b) = 0;
 };

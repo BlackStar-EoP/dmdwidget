@@ -141,7 +141,8 @@ QColor FX3Process::getDMDColor()
 	uint8_t g = (col >> 8) & 0x000000FF;
 	uint8_t b = col & 0x000000FF;
 
-	return QColor(r, g, b);
+	// 0x33 * 5 = 0xFF
+	return QColor(r * 5, g * 5, b * 5);
 }
 
 bool FX3Process::is_valid_DMD() const

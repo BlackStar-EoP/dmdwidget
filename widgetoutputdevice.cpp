@@ -102,8 +102,7 @@ void WidgetOutputDevice::sendFrame(const DMDFrame& frame)
 			for (int x = 0; x < DMDConfig::DMDWIDTH; ++x)
 			{
 				uint8_t c = frameData[bytepos];
-				float col = c / 255.0f;
-				p.setPen(QColor(c * m_r, c * m_g, c * m_b));
+				p.setPen(QColor(c, c, c));
 				p.drawPoint(x * 2, y * 2);
 				bytepos++;
 			}
@@ -116,11 +115,4 @@ void WidgetOutputDevice::sendFrame(const DMDFrame& frame)
 bool WidgetOutputDevice::supportsColor() const
 {
 	return true;
-}
-
-void WidgetOutputDevice::setColor(float r, float g, float b)
-{
-	m_r = r;
-	m_g = g;
-	m_b = b;
 }
