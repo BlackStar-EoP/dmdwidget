@@ -30,6 +30,9 @@
     <ClCompile Include="animationthread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="animationwindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="dmdanimation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -80,6 +83,9 @@
     <ClInclude Include="animationthread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <CustomBuild Include="animationwindow.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
     <ClInclude Include="dmdanimation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -124,6 +130,12 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="debug\moc_animationwindow.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="release\moc_animationwindow.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
     <ClCompile Include="debug\moc_dmdwidget.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>

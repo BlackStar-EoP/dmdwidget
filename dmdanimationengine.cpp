@@ -55,14 +55,23 @@ DMDAnimationEngine::DMDAnimationEngine(DMDOutputDevice* output_device)
 		else
 			m_animations[animation_dir] = animation;
 	}
-
-	m_animation_thread.set_animation(m_waiting_for_fx3_animation);
+	m_animation_thread.set_animation(m_loading_animation);
 }
 
 DMDAnimationEngine::~DMDAnimationEngine()
 {
 	m_animation_thread.terminate();
 	qDeleteAll(m_animations);
+}
+
+void DMDAnimationEngine::show_animation(DMDAnimation* animation)
+{
+	m_animation_thread.set_animation(animation);
+}
+
+const QMap<QString, DMDAnimation*>& DMDAnimationEngine::animations() const
+{
+	return m_animations;
 }
 
 void DMDAnimationEngine::create_internal_animations()

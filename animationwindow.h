@@ -1,3 +1,5 @@
+#pragma once
+
 /*
 MIT License
 
@@ -22,27 +24,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "mainwindow.h"
+#include <QWidget>
 
-#include "dmdanimationengine.h"
-#include "dmdapplication.h"
-#include "widgetoutputdevice.h"
+class DMDAnimationEngine;
+class QListWidget;
 
-#include "animationwindow.h"
-
-#include <QtWidgets>
-
-int main(int argc, char *argv[])
+class AnimationWindow : public QWidget
 {
-    DMDApplication app(argc, argv);
-#if 1
-	DMDOutputDevice* outputDevice = new WidgetOutputDevice(nullptr, 4);
-	DMDAnimationEngine animationEngine(outputDevice);
+	Q_OBJECT
+public:
+	AnimationWindow(QWidget* parent, DMDAnimationEngine* animation_engine);
 
-	AnimationWindow animation_window(nullptr, &animationEngine);
-#else
-    MainWindow w;
-    w.showMaximized();
-#endif
-    return app.exec();
-}
+private slots:
+	void show_animation_button_clicked();
+
+private:
+	void initUI();
+
+private:
+	DMDAnimationEngine* m_animation_engine = nullptr;
+	QListWidget* m_animation_list = nullptr;
+};

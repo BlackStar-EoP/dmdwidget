@@ -24,6 +24,7 @@ SOURCES += $$PWD/main.cpp \
            $$PWD/imageanimation.cpp \
            $$PWD/imageanimation.cpp \
            $$PWD/dmdframe.cpp \
+           $$PWD/animationwindow.cpp \
            $$PWD/dmdconfig.cpp
 
 HEADERS += $$PWD/mainwindow.h \
@@ -40,4 +41,5 @@ HEADERS += $$PWD/mainwindow.h \
            $$PWD/fx3animation.h \
            $$PWD/imageanimation.h \
            $$PWD/dmdframe.h \
+           $$PWD/animationwindow.h \
            $$PWD/dmdconfig.h

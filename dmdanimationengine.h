@@ -38,6 +38,8 @@ class DMDAnimationEngine
 public:
 	DMDAnimationEngine(DMDOutputDevice* output_device);
 	~DMDAnimationEngine();
+	void show_animation(DMDAnimation* animation);
+	const QMap<QString, DMDAnimation*>& animations() const;
 
 private:
 	void create_internal_animations();
