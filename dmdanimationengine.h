@@ -40,6 +40,7 @@ public:
 	~DMDAnimationEngine();
 	void show_animation(DMDAnimation* animation);
 	const QMap<QString, DMDAnimation*>& animations() const;
+	void set_DMD_invalid();
 
 private:
 	void create_internal_animations();
@@ -49,4 +50,5 @@ private:
 	AnimationThread m_animation_thread;
 	ImageAnimation* m_loading_animation = nullptr;
 	ImageAnimation* m_waiting_for_fx3_animation = nullptr;
+	ImageAnimation* m_select_table_animation = nullptr;
 };

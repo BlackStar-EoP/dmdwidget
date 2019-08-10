@@ -49,7 +49,7 @@ DMDAnimationEngine::DMDAnimationEngine(DMDOutputDevice* output_device)
 
 	for (const QString& animation_dir : animation_dir_list)
 	{
-		ImageAnimation* animation = new ImageAnimation(m_animation_path, animation_dir);
+		ImageAnimation* animation = new ImageAnimation(m_animation_path, animation_dir, 5);
 		if (!animation->is_valid())
 			delete animation;
 		else
@@ -62,6 +62,11 @@ DMDAnimationEngine::~DMDAnimationEngine()
 {
 	m_animation_thread.terminate();
 	qDeleteAll(m_animations);
+
+	delete m_loading_animation;
+	delete m_waiting_for_fx3_animation;
+	delete m_select_table_animation;
+
 }
 
 void DMDAnimationEngine::show_animation(DMDAnimation* animation)
@@ -74,12 +79,18 @@ const QMap<QString, DMDAnimation*>& DMDAnimationEngine::animations() const
 	return m_animations;
 }
 
+void DMDAnimationEngine::set_DMD_invalid()
+{
+	m_animation_thread.set_animation(m_select_table_animation);
+}
+
 void DMDAnimationEngine::create_internal_animations()
 {
 	QImage empty_image(DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT, QImage::Format_RGBA8888);
 	QPainter empty_painter(&empty_image);
 	empty_painter.fillRect(QRect(0, 0, DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT), Qt::black);
 
+	/* this is crap TODO refactor this, either fixed PNG, or function */
 	QImage loading_image(DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT, QImage::Format_RGBA8888);
 	QPainter loading_painter(&loading_image);
 	loading_painter.fillRect(QRect(0, 0, DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT), Qt::black);
@@ -96,19 +107,28 @@ void DMDAnimationEngine::create_internal_animations()
 	waiting_for_fx3_painter.setFont(font);
 	waiting_for_fx3_painter.drawText(20, 21, "WAITING FOR FX3");
 
+	QImage select_table_image(DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT, QImage::Format_RGBA8888);
+	QPainter select_table_painter(&select_table_image);
+	select_table_painter.fillRect(QRect(0, 0, DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT), Qt::black);
+	select_table_painter.setPen(Qt::white);
+	select_table_painter.setFont(font);
+	select_table_painter.drawText(30, 21, "SELECT TABLE");
+
+
 	QVector<QImage> loading_frames;
-	const uint32_t NUM_FRAME_DUPLICATES = 2;
-	for (uint32_t i = 0; i < NUM_FRAME_DUPLICATES; ++i)
-		loading_frames.push_back(loading_image);
-	for (uint32_t i = 0; i < NUM_FRAME_DUPLICATES; ++i)
-		loading_frames.push_back(empty_image);
+	loading_frames.push_back(loading_image);
+	loading_frames.push_back(empty_image);
 
 	QVector<QImage> waiting_frames;
-	for (uint32_t i = 0; i < NUM_FRAME_DUPLICATES; ++i)
-		waiting_frames.push_back(waiting_for_fx3_image);
-	for (uint32_t i = 0; i < NUM_FRAME_DUPLICATES; ++i)
-		waiting_frames.push_back(empty_image);
+	waiting_frames.push_back(waiting_for_fx3_image);
+	waiting_frames.push_back(empty_image);
 
-	m_loading_animation = new ImageAnimation(loading_frames, ImageAnimation::GRAYSCALE);
-	m_waiting_for_fx3_animation = new ImageAnimation(waiting_frames, ImageAnimation::GRAYSCALE);
+	QVector<QImage> select_frames;
+	select_frames.push_back(select_table_image);
+	select_frames.push_back(empty_image);
+
+
+	m_loading_animation = new ImageAnimation(loading_frames, ImageAnimation::GRAYSCALE, 5);
+	m_waiting_for_fx3_animation = new ImageAnimation(waiting_frames, ImageAnimation::GRAYSCALE, 5);
+	m_select_table_animation = new ImageAnimation(select_frames, ImageAnimation::GRAYSCALE, 5);
 }

@@ -75,6 +75,7 @@ void DMDApplication::find_DMD_timeout()
 		else
 		{
 			m_valid_DMD = false;
+			m_animation_engine->set_DMD_invalid();
 		}
 	}
 }

@@ -43,8 +43,8 @@ public:
 	};
 
 public:
-	ImageAnimation(const QString& path, const QString& directory);
-	ImageAnimation(const QVector<QImage>& images, EColorMode color_mode);
+	ImageAnimation(const QString& path, const QString& directory, uint8_t animation_speed);
+	ImageAnimation(const QVector<QImage>& images, EColorMode color_mode, uint8_t animation_speed);
 	~ImageAnimation();
 
 	DMDFrame* current_frame() override;
@@ -61,4 +61,6 @@ private:
 	bool m_valid = false;
 	QVector<DMDFrame*> m_frames;
 	int32_t m_current_frame_number = 0;
+	uint8_t m_animation_speed = 0;
+	uint8_t m_animation_speed_tick = 0;
 };

@@ -31,12 +31,14 @@ SOFTWARE.
 #include <QImage>
 #include <assert.h>
 
-ImageAnimation::ImageAnimation(const QString& path, const QString& directory)
+ImageAnimation::ImageAnimation(const QString& path, const QString& directory, uint8_t animation_speed)
+: m_animation_speed(animation_speed)
 {
 	load_animation(path, directory);
 }
 
-ImageAnimation::ImageAnimation(const QVector<QImage>& images, EColorMode color_mode)
+ImageAnimation::ImageAnimation(const QVector<QImage>& images, EColorMode color_mode, uint8_t animation_speed)
+: m_animation_speed(animation_speed)
 {
 	for (const QImage& img : images)
 	{
@@ -58,7 +60,19 @@ DMDFrame* ImageAnimation::current_frame()
 		m_current_frame_number = 0;
 
 	DMDFrame* frame = m_frames[m_current_frame_number];
-	m_current_frame_number++;
+	if (m_animation_speed > 1)
+	{
+		m_animation_speed_tick++;
+		if (m_animation_speed_tick >= m_animation_speed)
+		{
+			m_animation_speed_tick = 0;
+			m_current_frame_number++;
+		}
+	}
+	else
+	{
+		m_current_frame_number++;
+	}
 	return frame;
 }
 

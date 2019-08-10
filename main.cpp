@@ -31,6 +31,8 @@ SOFTWARE.
 #include "animationwindow.h"
 
 #include <QtWidgets>
+#include <QImage>
+#include <QFile>
 
 int main(int argc, char *argv[])
 {
