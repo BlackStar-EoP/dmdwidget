@@ -25,6 +25,8 @@ SOURCES += $$PWD/main.cpp \
            $$PWD/imageanimation.cpp \
            $$PWD/dmdframe.cpp \
            $$PWD/animationwindow.cpp \
+           $$PWD/deviceconfigwindow.cpp \
+           $$PWD/widgetoutputdeviceconfigtab.cpp \
            $$PWD/dmdconfig.cpp
 
 HEADERS += $$PWD/mainwindow.h \
@@ -42,4 +44,11 @@ HEADERS += $$PWD/mainwindow.h \
            $$PWD/imageanimation.h \
            $$PWD/dmdframe.h \
            $$PWD/animationwindow.h \
+           $$PWD/deviceconfigwindow.h \
+           $$PWD/widgetoutputdeviceconfigtab.h \
            $$PWD/dmdconfig.h
+
+include("vendor/Qt-Color-Widgets/color_widgets.pri");
+
+# Prevent lib/dll creation. We don't need that shit. Gives issues on win32
+DEFINES += QTCOLORWIDGETS_STATICALLY_LINKED=1

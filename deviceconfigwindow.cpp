@@ -22,32 +22,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "mainwindow.h"
-
-#include "dmdanimationengine.h"
-#include "dmdapplication.h"
-#include "widgetoutputdevice.h"
-#include "fx3process.h"
-#include "animationwindow.h"
 #include "deviceconfigwindow.h"
 
-#include <QtWidgets>
-#include <QImage>
-#include <QFile>
+#include <QPushButton>
+#include <QTabWidget>
 
-int main(int argc, char *argv[])
+DeviceConfigWindow::DeviceConfigWindow(QWidget* parent)
+: QWidget(parent, Qt::Window)
 {
-	FX3Process fx3_process;
-	DMDApplication app(argc, argv, &fx3_process);
+	setWindowTitle("Device configuration");
+	initUI();
+	this->setGeometry(0, 0, 1024, 768);
+	showNormal();
+}
 
-	DMDOutputDevice* outputDevice = new WidgetOutputDevice(nullptr, 4);
-	DMDAnimationEngine animation_engine(outputDevice);
-	app.set_animation_engine(&animation_engine);
+void DeviceConfigWindow::initUI()
+{
+	m_device_config_tab_widget = new QTabWidget(this);
 
-	AnimationWindow animation_window(nullptr, &animation_engine);
-	DeviceConfigWindow config_window(nullptr);
-
-	app.start_polling();
-	
-    return app.exec();
 }

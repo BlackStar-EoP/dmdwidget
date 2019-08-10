@@ -1,3 +1,5 @@
+#pragma once
+
 /*
 MIT License
 
@@ -22,32 +24,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "mainwindow.h"
+#include <QWidget>
 
-#include "dmdanimationengine.h"
-#include "dmdapplication.h"
-#include "widgetoutputdevice.h"
-#include "fx3process.h"
-#include "animationwindow.h"
-#include "deviceconfigwindow.h"
+class DMDAnimationEngine;
+class QListWidget;
+class QTabWidget;
 
-#include <QtWidgets>
-#include <QImage>
-#include <QFile>
-
-int main(int argc, char *argv[])
+class DeviceConfigWindow : public QWidget
 {
-	FX3Process fx3_process;
-	DMDApplication app(argc, argv, &fx3_process);
+	Q_OBJECT
+public:
+	DeviceConfigWindow(QWidget* parent);
 
-	DMDOutputDevice* outputDevice = new WidgetOutputDevice(nullptr, 4);
-	DMDAnimationEngine animation_engine(outputDevice);
-	app.set_animation_engine(&animation_engine);
+private:
+	void initUI();
 
-	AnimationWindow animation_window(nullptr, &animation_engine);
-	DeviceConfigWindow config_window(nullptr);
-
-	app.start_polling();
-	
-    return app.exec();
-}
+private:
+	QTabWidget* m_device_config_tab_widget = nullptr;
+};
