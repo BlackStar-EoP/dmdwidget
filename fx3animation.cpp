@@ -48,11 +48,20 @@ DMDFrame* FX3Animation::current_frame()
 	}
 	else
 	{
-		if (!m_DMD_color_found)
+#define SINGLE_COLOR_POLL
+#ifdef SINGLE_COLOR_POLL
+		if (!isEmpty(m_RAW_DMD))
 		{
-			m_DMD_color = m_fx3_process->getDMDColor();
-			m_DMD_color_found = true;
+			if (!m_DMD_color_found)
+			{
+				bool valid_color = m_fx3_process->getDMDColor(m_DMD_color);
+				if (valid_color)
+					m_DMD_color_found = true;
+			}
 		}
+#else
+		m_fx3_process->getDMDColor(m_DMD_color);
+#endif
 	}
 
 	if (isEqual(m_RAW_DMD, m_previous_RAW_DMD))

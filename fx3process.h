@@ -37,7 +37,7 @@ class FX3Process
 public:
 	bool findFX3();
 	bool findDMD();
-	QColor getDMDColor();
+	bool getDMDColor(QColor& color);
 	bool is_valid_DMD() const;
 	bool captureDMD(uint8_t* buffer);
 
