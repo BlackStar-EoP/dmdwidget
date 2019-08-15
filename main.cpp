@@ -67,7 +67,7 @@ void floyd_steinberg_dither(const QString& filename)
 			uint8_t oldVal = qRed(source.pixel(x, y));
 			uint8_t newVal = find_closest_palette_color(oldVal);
 			source.setPixelColor(x, y, QColor(newVal, newVal, newVal));
-			uint32_t quant_error = oldVal - newVal;
+			int32_t quant_error = oldVal - newVal;
 			uint32_t px1 = qRed(source.pixel(x + 1, y    )) + (quant_error * 7 / 16);
 			uint32_t px2 = qRed(source.pixel(x - 1, y + 1)) + (quant_error * 3 / 16);
 			uint32_t px3 = qRed(source.pixel(x    , y + 1)) + (quant_error * 5 / 16);
