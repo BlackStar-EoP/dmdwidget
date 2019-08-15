@@ -49,26 +49,40 @@ void floyd_steinberg_dither(const QString& filename)
 	if (!source.load(filename))
 		return;
 
+	source = source.convertToFormat(QImage::Format_RGBA8888);
 	for (int y = 0; y < source.height(); ++y)
 	{
 		for (int x = 0; x < source.width(); ++x)
 		{
-			source.setPixel(x, y, qGray(source.pixel(x, y)));
+			int gray = qGray(source.pixel(x, y));
+			source.setPixelColor(x, y, QColor(gray, gray, gray));
 		}
 	}
 
-
-	QImage dest(source.width(), source.height(), QImage::Format_RGBX8888);
+	
 	for (int y = 0; y < source.height() - 1; ++y)
 	{
-		for (int x = 0; x < source.width() - 1; ++x)
+		for (int x = 1; x < source.width() - 1; ++x)
 		{
 			uint8_t oldVal = qRed(source.pixel(x, y));
 			uint8_t newVal = find_closest_palette_color(oldVal);
-
+			source.setPixelColor(x, y, QColor(newVal, newVal, newVal));
+			uint32_t quant_error = oldVal - newVal;
+			uint32_t px1 = qRed(source.pixel(x + 1, y    )) + (quant_error * 7 / 16);
+			uint32_t px2 = qRed(source.pixel(x - 1, y + 1)) + (quant_error * 3 / 16);
+			uint32_t px3 = qRed(source.pixel(x    , y + 1)) + (quant_error * 5 / 16);
+			uint32_t px4 = qRed(source.pixel(x + 1, y + 1)) + (quant_error * 1 / 16);
+			if (px1 > 255) px1 = 255;
+			if (px2 > 255) px2 = 255;
+			if (px3 > 255) px3 = 255;
+			if (px4 > 255) px4 = 255;
+			source.setPixelColor(x + 1, y    , QColor(px1, px1, px1));
+			source.setPixelColor(x - 1, y + 1, QColor(px2, px2, px2));
+			source.setPixelColor(x    , y + 1, QColor(px3, px3, px3));
+			source.setPixelColor(x + 1, y + 1, QColor(px4, px4, px4));
 		}
 	}
-
+	source.save(filename + "_dithered.png");
 	/*
 	for each y from top to bottom
 	for each x from left to right
@@ -85,6 +99,10 @@ void floyd_steinberg_dither(const QString& filename)
 
 int main(int argc, char *argv[])
 {
+	floyd_steinberg_dither("dott1.png");
+	floyd_steinberg_dither("dott2.png");
+	floyd_steinberg_dither("dott3.png");
+
 	FX3Process fx3_process;
 	DMDApplication app(argc, argv, &fx3_process);
 
