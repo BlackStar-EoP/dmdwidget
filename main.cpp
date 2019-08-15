@@ -35,6 +35,54 @@ SOFTWARE.
 #include <QImage>
 #include <QFile>
 
+uint8_t find_closest_palette_color(uint8_t val)
+{
+	if (val < 128)
+		return 0;
+
+	return 255;
+}
+
+void floyd_steinberg_dither(const QString& filename)
+{
+	QImage source;
+	if (!source.load(filename))
+		return;
+
+	for (int y = 0; y < source.height(); ++y)
+	{
+		for (int x = 0; x < source.width(); ++x)
+		{
+			source.setPixel(x, y, qGray(source.pixel(x, y)));
+		}
+	}
+
+
+	QImage dest(source.width(), source.height(), QImage::Format_RGBX8888);
+	for (int y = 0; y < source.height() - 1; ++y)
+	{
+		for (int x = 0; x < source.width() - 1; ++x)
+		{
+			uint8_t oldVal = qRed(source.pixel(x, y));
+			uint8_t newVal = find_closest_palette_color(oldVal);
+
+		}
+	}
+
+	/*
+	for each y from top to bottom
+	for each x from left to right
+	oldpixel  := pixel[x][y]
+	newpixel  := find_closest_palette_color(oldpixel)
+	pixel[x][y]  := newpixel
+	quant_error  := oldpixel - newpixel
+	pixel[x + 1][y    ] := pixel[x + 1][y    ] + quant_error * 7 / 16
+	pixel[x - 1][y + 1] := pixel[x - 1][y + 1] + quant_error * 3 / 16
+	pixel[x    ][y + 1] := pixel[x    ][y + 1] + quant_error * 5 / 16
+	pixel[x + 1][y + 1] := pixel[x + 1][y + 1] + quant_error * 1 / 16
+	*/
+}
+
 int main(int argc, char *argv[])
 {
 	FX3Process fx3_process;
