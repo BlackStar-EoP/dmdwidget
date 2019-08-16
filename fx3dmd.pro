@@ -27,6 +27,7 @@ SOURCES += $$PWD/main.cpp \
            $$PWD/animationwindow.cpp \
            $$PWD/deviceconfigwindow.cpp \
            $$PWD/widgetoutputdeviceconfigtab.cpp \
+           $$PWD/rominspectwindow.cpp \
            $$PWD/dmdconfig.cpp
 
 HEADERS += $$PWD/mainwindow.h \
@@ -46,6 +47,7 @@ HEADERS += $$PWD/mainwindow.h \
            $$PWD/animationwindow.h \
            $$PWD/deviceconfigwindow.h \
            $$PWD/widgetoutputdeviceconfigtab.h \
+           $$PWD/rominspectwindow.h \
            $$PWD/dmdconfig.h
 
 include("vendor/Qt-Color-Widgets/color_widgets.pri");

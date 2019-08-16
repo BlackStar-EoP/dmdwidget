@@ -30,6 +30,7 @@ SOFTWARE.
 #include "fx3process.h"
 #include "animationwindow.h"
 #include "deviceconfigwindow.h"
+#include "rominspectwindow.h"
 
 #include <QtWidgets>
 #include <QImage>
@@ -99,21 +100,22 @@ void floyd_steinberg_dither(const QString& filename)
 
 int main(int argc, char *argv[])
 {
-	floyd_steinberg_dither("dott1.png");
-	floyd_steinberg_dither("dott2.png");
-	floyd_steinberg_dither("dott3.png");
+	//floyd_steinberg_dither("dott1.png");
+	//floyd_steinberg_dither("dott2.png");
+	//floyd_steinberg_dither("dott3.png");
 
 	FX3Process fx3_process;
 	DMDApplication app(argc, argv, &fx3_process);
 
 	DMDOutputDevice* outputDevice = new WidgetOutputDevice(nullptr, 4);
-	DMDAnimationEngine animation_engine(outputDevice);
-	app.set_animation_engine(&animation_engine);
+	//DMDAnimationEngine animation_engine(outputDevice);
+	//app.set_animation_engine(&animation_engine);
 
-	AnimationWindow animation_window(nullptr, &animation_engine);
-	DeviceConfigWindow config_window(nullptr);
+	//AnimationWindow animation_window(nullptr, &animation_engine);
+	//DeviceConfigWindow config_window(nullptr);
+	ROMInspectWindow rom_window(nullptr, nullptr);
 
-	app.start_polling();
+	//app.start_polling();
 	
     return app.exec();
 }

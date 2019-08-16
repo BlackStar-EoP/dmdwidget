@@ -149,6 +149,9 @@
     <ClCompile Include="pindmd2outputdevice.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="rominspectwindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\src\swatch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -262,6 +265,9 @@
     <ClInclude Include="pindmd2outputdevice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <CustomBuild Include="rominspectwindow.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
     <CustomBuild Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\include\swatch.hpp">
       <Filter>Header Files</Filter>
     </CustomBuild>
@@ -393,6 +399,12 @@
     <CustomBuild Include="release\moc_predefs.h.cbt">
       <Filter>Generated Files</Filter>
     </CustomBuild>
+    <ClCompile Include="debug\moc_rominspectwindow.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="release\moc_rominspectwindow.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
     <ClCompile Include="debug\moc_swatch.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
