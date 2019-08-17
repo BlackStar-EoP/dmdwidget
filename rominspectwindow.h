@@ -39,6 +39,8 @@ private:
 	void initUI();
 	void parse_image();
 	void update_index();
+	void inc_rom_index(uint32_t amount);
+	void dec_rom_index(uint32_t amount);
 
 private slots:
 	void file_open_button_clicked();
@@ -50,6 +52,8 @@ private slots:
 	void pgup_rom_index_button_clicked();
 	void inc_rom_index_button_clicked();
 	void inc_line_rom_index_button_clicked();
+	void inc_bank_rom_index_button_clicked();
+	void dec_bank_rom_index_button_clicked();
 
 private:
 	DMDAnimationEngine* m_animation_engine = nullptr;
@@ -59,4 +63,5 @@ private:
 	QLabel* m_file_name_label = nullptr;
 	QLabel* m_image_label = nullptr;
 	uint8_t* m_rom_content = nullptr;
+	uint32_t m_rom_size = 0;
 };

@@ -92,6 +92,15 @@ void ROMInspectWindow::initUI()
 	inc_rom_index_button->setGeometry(250, 160, 40, 20);
 	connect(inc_rom_index_button, SIGNAL(clicked()), this, SLOT(inc_rom_index_button_clicked()));
 
+	QPushButton* inc_bank_index_button = new QPushButton("BNK+", this);
+	inc_bank_index_button->setGeometry(290, 160, 40, 20);
+	connect(inc_bank_index_button, SIGNAL(clicked()), this, SLOT(inc_bank_rom_index_button_clicked()));
+
+	QPushButton* dec_bank_index_button = new QPushButton("BNK-", this);
+	dec_bank_index_button->setGeometry(330, 160, 40, 20);
+	connect(dec_bank_index_button, SIGNAL(clicked()), this, SLOT(dec_bank_rom_index_button_clicked()));
+
+
 	QLabel* rom_index = new QLabel("ROM index:", this);
 	rom_index->setGeometry(10, 185, 120, 20);
 
@@ -152,6 +161,28 @@ void ROMInspectWindow::update_index()
 	m_rom_index_label->setText(index_str);
 }
 
+void ROMInspectWindow::inc_rom_index(uint32_t amount)
+{
+	if (m_rom_index + amount + FRAME_SIZE < m_rom_size)
+		m_rom_index += amount;
+	else
+		m_rom_index = m_rom_size - FRAME_SIZE;
+
+	update_index();
+	parse_image();
+}
+
+void ROMInspectWindow::dec_rom_index(uint32_t amount)
+{
+	if (m_rom_index >= amount)
+		m_rom_index -= amount;
+	else
+		m_rom_index = 0;
+
+	update_index();
+	parse_image();
+}
+
 void ROMInspectWindow::file_open_button_clicked()
 {
 	QString filename = QFileDialog::getOpenFileName(this, tr("Open ROM"), "", tr("ROM (*.rom)"));
@@ -165,8 +196,11 @@ void ROMInspectWindow::file_open_button_clicked()
 			m_rom_content = new uint8_t[file.size()];
 			file.read(reinterpret_cast<char*>(m_rom_content), file.size());
 			m_file_name_label->setText(filename);
+
 			m_rom_index = 0;
+			m_rom_size = file.size();
 			update_index();
+			parse_image();
 		}
 	}
 }
@@ -180,47 +214,44 @@ void ROMInspectWindow::reset_rom_index_button_clicked()
 
 void ROMInspectWindow::dec_rom_index_button_clicked()
 {
-	if (m_rom_index != 0)
-		m_rom_index--;
-	update_index();
-	parse_image();
+	dec_rom_index(1);
 }
 
 void ROMInspectWindow::dec_line_rom_index_button_clicked()
 {
 	const uint32_t LINE_WIDTH = 128 / 8;
-	if (m_rom_index > LINE_WIDTH)
-		m_rom_index -= LINE_WIDTH;
-	update_index();
-	parse_image();
+	dec_rom_index(LINE_WIDTH);
 }
 
 void ROMInspectWindow::pgdn_rom_index_button_clicked()
 {
-	if (m_rom_index >= FRAME_SIZE)
-		m_rom_index -= FRAME_SIZE;
-	update_index();
-	parse_image();
+	dec_rom_index(FRAME_SIZE);
 }
 
 void ROMInspectWindow::pgup_rom_index_button_clicked()
 {
-	m_rom_index += FRAME_SIZE;
-	update_index();
-	parse_image();
+	inc_rom_index(FRAME_SIZE);
 }
 
 void ROMInspectWindow::inc_line_rom_index_button_clicked()
 {
 	const uint32_t LINE_WIDTH = 128 / 8;
-	m_rom_index += LINE_WIDTH;
-	update_index();
-	parse_image();
+	inc_rom_index(LINE_WIDTH);
 }
 
 void ROMInspectWindow::inc_rom_index_button_clicked()
 {
-	m_rom_index++;
-	update_index();
-	parse_image();
+	inc_rom_index(1);
+}
+
+void ROMInspectWindow::inc_bank_rom_index_button_clicked()
+{
+	const uint32_t BANK_SIZE = 65536;
+	inc_rom_index(BANK_SIZE);
+}
+
+void ROMInspectWindow::dec_bank_rom_index_button_clicked()
+{
+	const uint32_t BANK_SIZE = 65536;
+	dec_rom_index(BANK_SIZE);
 }
