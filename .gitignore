@@ -3,3 +3,5 @@ debug/
 release/
 recordings/
 *.rom
+*.png
+*.jpg

@@ -38,10 +38,21 @@ SOFTWARE.
 
 uint8_t find_closest_palette_color(uint8_t val)
 {
+#define ONE_BIT
+#ifdef ONE_BIT
 	if (val < 128)
 		return 0;
 
 	return 255;
+#else
+	if (val < (85 - 42))
+		return 0;
+	if (val < (170 - 42))
+		return 85;
+	if (val < (255 - 42))
+		return 170;
+	return 255;
+#endif
 }
 
 void floyd_steinberg_dither(const QString& filename)
@@ -100,22 +111,24 @@ void floyd_steinberg_dither(const QString& filename)
 
 int main(int argc, char *argv[])
 {
-	//floyd_steinberg_dither("dott1.png");
-	//floyd_steinberg_dither("dott2.png");
-	//floyd_steinberg_dither("dott3.png");
+
 
 	FX3Process fx3_process;
 	DMDApplication app(argc, argv, &fx3_process);
-
+	//floyd_steinberg_dither("01.JPG");
+	//floyd_steinberg_dither("02.JPG");
+	//floyd_steinberg_dither("03.JPG");
+	//floyd_steinberg_dither("04.JPG");
+	//floyd_steinberg_dither("05.JPG");
 	DMDOutputDevice* outputDevice = new WidgetOutputDevice(nullptr, 4);
-	//DMDAnimationEngine animation_engine(outputDevice);
-	//app.set_animation_engine(&animation_engine);
+	DMDAnimationEngine animation_engine(outputDevice);
+	app.set_animation_engine(&animation_engine);
 
 	//AnimationWindow animation_window(nullptr, &animation_engine);
 	//DeviceConfigWindow config_window(nullptr);
-	ROMInspectWindow rom_window(nullptr, nullptr);
+	//ROMInspectWindow rom_window(nullptr, nullptr);
 
-	//app.start_polling();
+	app.start_polling();
 	
     return app.exec();
 }

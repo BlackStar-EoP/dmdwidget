@@ -54,11 +54,17 @@ private slots:
 	void inc_line_rom_index_button_clicked();
 	void inc_bank_rom_index_button_clicked();
 	void dec_bank_rom_index_button_clicked();
+	void scan_rle_index_button_clicked();
+	void scan_sparse_index_button_clicked();
+	void scan_normal_index_button_clicked();
+	void bruteforce_table_button_clicked();
 
 private:
 	DMDAnimationEngine* m_animation_engine = nullptr;
 	uint32_t m_rom_index = 0;
-	const uint32_t FRAME_SIZE = 128 * 32 / 8;
+
+	static const uint32_t FRAME_IMAGE_HEIGHT = 128;
+	static const uint32_t FRAME_SIZE = 128 * FRAME_IMAGE_HEIGHT / 8;
 	QLabel* m_rom_index_label = nullptr;
 	QLabel* m_file_name_label = nullptr;
 	QLabel* m_image_label = nullptr;
