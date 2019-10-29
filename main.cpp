@@ -35,6 +35,7 @@ SOFTWARE.
 #include <QtWidgets>
 #include <QImage>
 #include <QFile>
+#include <QPainter>
 
 uint8_t find_closest_palette_color(uint8_t val)
 {
@@ -53,6 +54,27 @@ uint8_t find_closest_palette_color(uint8_t val)
 		return 170;
 	return 255;
 #endif
+}
+
+void dump_vertical_scroll(const QString& filename)
+{
+	QImage source;
+	if (!source.load(filename))
+		return;
+
+	if (source.height() < 32 || source.width() != 128)
+		return;
+
+	uint32_t frame_nr = 0;
+	for (int32_t y = 0; y < source.height() - 32; ++y)
+	{
+		QImage frame(128, 32, QImage::Format_RGBA8888);
+		QPainter p(&frame);
+		p.drawImage(QPoint(0,0), source.copy(QRect(0, frame_nr, 128, 32)));
+		QString fileName = QString("scroll/") + QString::number(frame_nr).rightJustified(4, '0') + ".png";
+		frame.save(fileName);
+		++frame_nr;
+	}
 }
 
 void floyd_steinberg_dither(const QString& filename)
@@ -111,7 +133,7 @@ void floyd_steinberg_dither(const QString& filename)
 
 int main(int argc, char *argv[])
 {
-
+	//dump_vertical_scroll("scroll.png");
 
 	FX3Process fx3_process;
 	DMDApplication app(argc, argv, &fx3_process);
