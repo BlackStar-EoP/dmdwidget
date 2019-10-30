@@ -45,6 +45,8 @@ private:
 	uint32_t get_DMD_ptr() const;
 	uint32_t findDMDMemoryOffset(uint8_t* buffer, SIZE_T buffer_size);
 	void DEBUG_FIND(uint8_t* buffer, SIZE_T buffer_size);
+	void DEBUG_BRUTEFORCE(uint8_t* buffer, SIZE_T buffer_size);
+	void DEBUG_DUMP(uint8_t* buffer, SIZE_T buffer_size);
 
 private:
 	std::wstring m_executable_name = L"Pinball FX3.exe";

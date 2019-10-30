@@ -435,7 +435,7 @@ bool DMDWidget::findDMDMemoryOffsetButton_clicked()
 			if (bytes_read == 0)
 				continue;
 
-			++count;
+			++count; 
 			totalmem += bytes_read;
 			buffer.resize(bytes_read);
 

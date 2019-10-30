@@ -133,7 +133,7 @@ bool FX3Process::getDMDColor(QColor& color)
 
 	ReadProcessMemory(m_FX3_process_handle, (void*)(m_DMD_memory_offset), &ptr, sizeof(uint32_t), NULL);
 	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr + 0xF0), &ptr, sizeof(uint32_t), NULL);
-	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr + 0x50), &ptr, sizeof(uint32_t), NULL);
+	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr + 0x58), &ptr, sizeof(uint32_t), NULL);
 	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr + 0x08), &col, sizeof(uint32_t), NULL);
 
 	// Color is fetched as ARGB, values seem to be either 0x11 or 0x33 per channel
@@ -178,17 +178,9 @@ uint32_t FX3Process::get_DMD_ptr() const
 
 uint32_t FX3Process::findDMDMemoryOffset(uint8_t* buffer, SIZE_T buffer_size)
 {
-	//uint8_t DMDSIGNATURE[] = { 0x8B, 0x81, 0xFF, 0xFF, 0xFF, 0xFF, 0x89, 0x44, 0x24, 0xFF, 0x8B, 0x81, 0xFF, 0xFF, 0xFF, 0xFF, 0x89, 0x44, 0x24, 0xFF, 0xA1 };
-	/*
-                            "  0x8B, 0x81, 0x0C, 0x01, 0x00, 0x00, 0x89, 0x44, 0x24, 0x18, 0x8B, 0x81, 0x10, 0x01, 0x00, 0x00, 0x89, 0x44, 0x24, 0x1C, 0x8D"
-                            ", 0x8B, 0x81, 0x68, 0x41, 0x00, 0x00, 0x89, 0x44, 0x24, 0x04, 0x8B, 0x81, 0x6C, 0x41, 0x00, 0x00, 0x89, 0x44, 0x24, 0x08, 0x66"
-		                    ", 0x8B, 0x81, 0x68, 0x41, 0x00, 0x00, 0x89, 0x44, 0x24, 0x20, 0x8B, 0x81, 0x6C, 0x41, 0x00, 0x00, 0x89, 0x44, 0x24, 0x24, 0x8D"
-		                    ", 0x8B, 0x81, 0xC0, 0x01, 0x00, 0x00, 0x89, 0x44, 0x24, 0x10, 0x8B, 0x81, 0xC4, 0x01, 0x00, 0x00, 0x89, 0x44, 0x24, 0x14, 0xEB"
-	*/
-	uint8_t DMDSIGNATURE[] = { 0x8B, 0x81, 0xFF, 0xFF, 0xFF, 0xFF, 0x89, 0x44, 0x24, 0xFF, 0x8B, 0x81, 0xFF, 0xFF, 0xFF, 0xFF, 0x89, 0x44, 0x24, 0xFF, 0xEB };
+	uint8_t DMDSIGNATURE[] = { 0x8B, 0x81, 0xFF, 0xFF, 0xFF, 0xFF, 0x89, 0x45, 0xFF, 0x8B, 0x81, 0xFF, 0xFF, 0xFF, 0xFF, 0x89, 0x45, 0xFF, 0xA1 };
 	uint32_t DMDSIGNATURELENGTH = sizeof(DMDSIGNATURE);
 
-	DEBUG_FIND(buffer, buffer_size);
 
 	for (SIZE_T i = 0; i < buffer_size - DMDSIGNATURELENGTH; ++i)
 	{
@@ -219,7 +211,9 @@ uint32_t FX3Process::findDMDMemoryOffset(uint8_t* buffer, SIZE_T buffer_size)
 void FX3Process::DEBUG_FIND(uint8_t* buffer, SIZE_T buffer_size)
 {
 	uint8_t HARD_VALUES = 11;
-	uint8_t DMDSIGNATURE[] = { 0x8B, 0x81, 0xFF, 0xFF, 0xFF, 0xFF, 0x89, 0x44, 0x24, 0xFF, 0x8B, 0x81, 0xFF, 0xFF, 0xFF, 0xFF, 0x89, 0x44, 0x24, 0xFF, 0xA1 };
+	uint8_t DMDSIGNATURE[] = { 0x8B, 0x81, 0xFF, 0xFF, 0xFF, 0xFF, 0x89, 0x45, 0xFF, 0x8B, 0x81, 0xFF, 0xFF, 0xFF, 0xFF, 0x89, 0x45, 0xFF, 0xA1 };
+						 
+
 	uint32_t DMDSIGNATURELENGTH = sizeof(DMDSIGNATURE);
 
 	class DEBUGMATCH
@@ -265,8 +259,14 @@ void FX3Process::DEBUG_FIND(uint8_t* buffer, SIZE_T buffer_size)
 		}
 
 		m.gen_string();
-		//if (m.matching_chars == 10)
+		if (m.matching_chars == 10)
+		{
+			char a1 = buffer[i + 22];
+			char a2 = buffer[i + 23];
+			char a3 = buffer[i + 24];
+			char a4 = buffer[i + 25];
 			debug_matches.push_back(m);
+		}
 
 	}
 
@@ -275,6 +275,47 @@ void FX3Process::DEBUG_FIND(uint8_t* buffer, SIZE_T buffer_size)
 	std::vector<std::string> matchstrings;
 	for (auto& match : debug_matches)
 		matchstrings.push_back(match.memorystring);
+}
 
-	printf("");
+void FX3Process::DEBUG_BRUTEFORCE(uint8_t* buffer, SIZE_T buffer_size)
+{
+	const uint32_t DMDBLOCKSIZE = 4096; // 128 * 32 bytes
+
+	std::vector<SIZE_T> hits;
+
+	for (SIZE_T i = 0; i < buffer_size - DMDBLOCKSIZE; ++i)
+	{
+		bool valid_dmd = true;
+		/* attempt to find a Zen table DMD block, blocksize is 4Kb and expected values are 0 1 or 2 */
+		for (uint32_t test = 0; test < DMDBLOCKSIZE; ++test)
+		{
+			if (test > 2)
+			{
+				valid_dmd = false;
+				break;
+			}
+
+		}
+
+		if (valid_dmd)
+			hits.push_back(i);
+
+	}
+}
+
+void FX3Process::DEBUG_DUMP(uint8_t* buffer, SIZE_T buffer_size)
+{
+	static bool dump_file = false;
+	static std::string filename = "dump1.dmp";
+
+	if (dump_file)
+	{
+		FILE* fp = fopen(filename.c_str(), "wb");
+		if (fp != nullptr)
+		{
+			fwrite(buffer, 1, buffer_size, fp);
+			fclose(fp);
+			dump_file = false;
+		}
+	}
 }
