@@ -27,6 +27,7 @@ SOFTWARE.
 #include "dmdanimationengine.h"
 #include "dmdapplication.h"
 #include "widgetoutputdevice.h"
+#include "pindmd2outputdevice.h"
 #include "fx3process.h"
 #include "animationwindow.h"
 #include "deviceconfigwindow.h"
@@ -142,7 +143,8 @@ int main(int argc, char *argv[])
 	//floyd_steinberg_dither("03.JPG");
 	//floyd_steinberg_dither("04.JPG");
 	//floyd_steinberg_dither("05.JPG");
-	DMDOutputDevice* outputDevice = new WidgetOutputDevice(nullptr, 4);
+	//DMDOutputDevice* outputDevice = new WidgetOutputDevice(nullptr, 4);
+	DMDOutputDevice* outputDevice = new PinDMD2OutputDevice();
 	DMDAnimationEngine animation_engine(outputDevice);
 	app.set_animation_engine(&animation_engine);
 
