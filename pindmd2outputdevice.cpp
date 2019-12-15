@@ -22,266 +22,121 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-//#include <lusb0_usb.h>
-//#include <stdio.h>
-//
-////define vendor id and product id
-//#define VID 0x0314
-//#define PID 0xe457
-//
-////configure and interface number
-////TODO figure out what these mean
-//#define MY_CONFIG 1
-//#define MY_INTF 0
-//
-////endpoints for communication
-//#define EP_IN 0x81
-//#define EP_OUT 0x01
-//
-////maximum packet size, 64 for full-speed, 512 for high-speed
-//#define BUF_SIZE 2052//64
-//
-////gets device handle
-//usb_dev_handle* open_dev(void);
-//
-//char writeBuffer[BUF_SIZE];
-//char readBuffer[1];
-////context handle for transfer and receive
-////think of them bit like session id:s
-//void* asyncReadContext = NULL;
-//void* asyncWriteContext = NULL;
-//
-//usb_dev_handle *device = NULL;
-//
-//
-//
-//
-//
-//
-////*****************************************************
-////* Name:			renderDMDFrame
-////* Purpose:
-////* In:
-////* Out:
-////*****************************************************
-//void renderDMDFrame(int width, int height, unsigned char *currbuffer) {
-//	int byteIdx = 4;
-//	int bd0, bd1, bd2, bd3;
-//	int pixel;
-//	int i, j, v;
-//	int ret = 0;
-//	unsigned char frame_buf[2052];
-//
-//	memset(frame_buf, 0, 2052);
-//	frame_buf[0] = 0x81;	// frame sync bytes
-//	frame_buf[1] = 0xC3;
-//	frame_buf[2] = 0xE7;
-//	frame_buf[3] = 0x0;		// command byte (not used)
-//
-//							// dmd height
-//	for (j = 0; j < height; j++) {
-//		// dmd width
-//		for (i = 0; i < width; i += 8) {
-//			bd0 = 0;
-//			bd1 = 0;
-//			bd2 = 0;
-//			bd3 = 0;
-//			for (v = 7; v >= 0; v--) {
-//				// pixel colour
-//				pixel = currbuffer[(j * 128) + (i + v)];
-//				// 16 color mode hue remapping for proper gradient
-//				bd0 <<= 1;
-//				bd1 <<= 1;
-//				bd2 <<= 1;
-//				bd3 <<= 1;
-//				//bd4 <<= 1;
-//				if (pixel & 1)
-//					bd0 |= 1;
-//				if (pixel & 2)
-//					bd1 |= 1;
-//				if (pixel & 4)
-//					bd2 |= 1;
-//				if (pixel & 8)
-//					bd3 |= 1;
-//			}
-//			frame_buf[byteIdx] = bd0;
-//			frame_buf[byteIdx + 512] = bd1;
-//			frame_buf[byteIdx + 1024] = bd2;
-//			frame_buf[byteIdx + 1536] = bd3;
-//			byteIdx++;
-//		}
-//	}
-//
-//	//writeBuffer[0]=0;
-//	//usb_bulk_write(device, EP_OUT, writeBuffer, 1, 5000);
-//	//usb_bulk_read(device, EP_IN, readBuffer, 1, 5000);
-//	memcpy(writeBuffer, frame_buf, 2052);
-//	usb_bulk_write(device, EP_OUT, writeBuffer, 2052, 5000);
-//	printf("frame sent: %s\n", usb_strerror());
-//
-//
-//	/*memcpy(writeBuffer,frame_buf,2048);
-//	ret = usb_submit_async( asyncWriteContext, writeBuffer, sizeof( writeBuffer ) );
-//	if( ret < 0 )
-//	printf("error usb_submit_async:\n%s\n", usb_strerror());
-//
-//	//wait for read and write transfers to complete or 5 seconds
-//	usb_reap_async( asyncWriteContext, 5000 );*/
-//}
-//
-//
-//
-//
-//
-//
-//
-//int main(int argc, char *argv[])
-//{
-//	//return value for various functions
-//	int ret = 0;
-//
-//	//init usb library
-//	usb_init();
-//	//find busses
-//	usb_find_busses();
-//	//find devices
-//	usb_find_devices();
-//
-//	//try to open our device
-//	if (!(device = open_dev())) {
-//		//if not successfull, print error message
-//		printf("error opening pinDMD2 device: \n");
-//		//and exit
-//		return_();
-//	}
-//	//else notify that device was opened
-//	else
-//		printf("pinDMD2 device opened\n");
-//
-//	//set configuration
-//	if (usb_set_configuration(device, MY_CONFIG) < 0) {
-//		//if not succesfull, notify
-//		printf("error setting configuration\n");
-//		//close device
-//		usb_close(device);
-//		//and exit
-//		return_();
-//	}
-//	//if successfull, notify
-//	else
-//		printf("configuration set\n");
-//
-//	//try to claim interface for use
-//	if (usb_claim_interface(device, MY_INTF) < 0) {
-//		//if failed, print error message
-//		printf("error claiming interface\n");
-//		//close device and exit
-//		usb_close(device);
-//		return_();
-//	}
-//	//if successfull, notify
-//	else
-//		printf("interface claimed\n");
-//
-//	//and transfer
-//	//ret = usb_bulk_setup_async( device, &asyncWriteContext, EP_OUT );
-//	//error handling
-//	/*if( ret < 0 )
-//	{
-//	printf("error setting up async writing:\n");
-//	//relese interface
-//	usb_release_interface( device, MY_INTF );
-//	//close device and exit
-//	usb_close( device );
-//	return 0;
-//	}
-//	//if successfull, notify
-//	else
-//	printf("asynchronous write set up\n");*/
-//
-//
-//	int cnt = 0;
-//	int i, j, z;
-//	int state = 0;
-//	unsigned char buf[32][128];
-//	while (1) {
-//		memset(buf, 0, 4096);
-//
-//		for (i = 0; i<8; i++) {
-//			for (j = 0; j<16; j++) {
-//				for (z = 0; z<7; z++)
-//					buf[i][(j * 8) + z] = j;
-//			}
-//		}
-//
-//		switch (state) {
-//		case 0:
-//			for (i = 0; i<32; i++) {
-//				for (j = 0; j<128; j++) {
-//					if (j == cnt)
-//						buf[i][j] = 15;
-//				}
-//			}
-//			cnt++;
-//			if (cnt == 128) {
-//				state = 1;
-//				cnt = 0;
-//			}
-//			break;
-//		case 1:
-//			for (i = 0; i<32; i++) {
-//				for (j = 0; j<128; j++) {
-//					if (i == cnt)
-//						buf[i][j] = 15;
-//				}
-//			}
-//			cnt++;
-//			if (cnt == 32) {
-//				state = 0;
-//				cnt = 0;
-//			}
-//			break;
-//		}
-//
-//		renderDMDFrame(128, 32, buf);
-//		Sleep(41);
-//	}
-//
-//	//clean up.
-//	//kitten dies every time you don't clean up after yourself.
-//	//free context handlers
-//	usb_free_async(&asyncWriteContext);
-//	//relese interface
-//	usb_release_interface(device, MY_INTF);
-//	//close device and exit
-//	usb_close(device);
-//
-//	return EXIT_SUCCESS;
-//}
-//
-//void return_(void) {
-//	while (1) {}
-//}
-//
-////gets device handle
-////@param none
-////@return device handle
-//usb_dev_handle* open_dev(void)
-//{
-//	//contains usb busses present on computer
-//	struct usb_bus *bus;
-//	//contains devices present on computer
-//	struct usb_device *dev;
-//	//used to skip first device
-//	//bool first = true;
-//	//loop through busses and devices
-//	for (bus = usb_get_busses(); bus; bus = bus->next) {
-//		for (dev = bus->devices; dev; dev = dev->next) {
-//			//if device vendor id and product id are match
-//			if (dev->descriptor.idVendor == VID && dev->descriptor.idProduct == PID)
-//				return usb_open(dev);
-//		}
-//	}
-//	//return null if no devices were found
-//	return NULL;
-//}
+#include "pindmd2outputdevice.h"
+
+#include <libusb/libusb.h>
+#include <stdio.h>
+#include <assert.h>
+#include <dmdframe.h>
+
+#pragma comment (lib, "libusb-1.0.lib")
+
+PinDMD2OutputDevice::PinDMD2OutputDevice()
+{
+	libusb_init(NULL);
+
+	m_PinDMD2 = find_PinDMD2();
+}
+
+PinDMD2OutputDevice::~PinDMD2OutputDevice()
+{
+	if (m_PinDMD2 != nullptr)
+		libusb_close(m_PinDMD2);
+}
+
+bool PinDMD2OutputDevice::isDeviceAvailable()
+{
+	return m_PinDMD2 != nullptr;
+}
+
+void PinDMD2OutputDevice::clearDMD()
+{
+	sendFrame(DMDFrame());
+}
+
+void PinDMD2OutputDevice::sendFrame(const DMDFrame& frame)
+{
+	assert(m_PinDMD2 != nullptr);
+	const uint32_t PINDMD2BUFFERSIZE = 2052;
+	unsigned char frame_buf[PINDMD2BUFFERSIZE];
+	memset(frame_buf, 0, PINDMD2BUFFERSIZE);
+	frame_buf[0] = 0x81;	// frame sync bytes
+	frame_buf[1] = 0xC3;
+	frame_buf[2] = 0xE7;
+	frame_buf[3] = 0x0;		// command byte (not used)
+	uint32_t frame_pixel_nr = 4;
+
+	const uint8_t* const framedata = frame.const_grayscale_frame();
+	for (uint32_t pixel = 0; pixel < DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT; pixel += 2)
+	{
+		uint8_t leftpixel = (framedata[pixel] >> 4) << 4;
+		uint8_t rightpixel = (framedata[pixel + 1] >> 4);
+		frame_buf[frame_pixel_nr++] = leftpixel | rightpixel;
+	}
+	
+	libusb_bulk_transfer(m_PinDMD2, ENDPOINT_OUT, (unsigned char*)frame_buf, PINDMD2BUFFERSIZE, NULL, 5000);
+}
+
+bool PinDMD2OutputDevice::supportsColor() const
+{
+	return false;
+}
+
+libusb_device_handle* PinDMD2OutputDevice::find_PinDMD2()
+{
+	// discover devices
+	libusb_device** list;
+	libusb_device_handle* pinDMD = NULL;
+	ssize_t cnt = libusb_get_device_list(NULL, &list);
+	ssize_t i = 0;
+	int err = 0;
+	//if (cnt < 0)
+	//	error();
+	for (i = 0; i < cnt; i++)
+	{
+		libusb_device *device = list[i];
+		libusb_device_descriptor dd;
+		libusb_get_device_descriptor(device, &dd);
+		if (dd.idVendor == PINDMD2_VENDOR_ID &&dd.idProduct == PINDMD2_PRODUCT_ID)
+		{
+			err = libusb_open(device, &pinDMD);
+			if (err)
+			{
+			}
+
+			break;
+		}
+	}
+
+	libusb_free_device_list(list, 1);
+
+
+	//set configuration 
+	const int32_t MY_CONFIG = 1;
+	const int32_t MY_INTF = 0;
+
+	if (libusb_set_configuration(pinDMD, MY_CONFIG) < 0) {
+		//if not succesfull, notify
+		printf("error setting configuration\n");
+		//close device
+		libusb_close(pinDMD);
+		return nullptr;
+	}
+	else
+		printf("configuration set\n");
+
+	//try to claim interface for use
+	if (libusb_claim_interface(pinDMD, MY_INTF) < 0) {
+		//if failed, print error message
+		printf("error claiming interface\n");
+		//close device and exit
+		libusb_close(pinDMD);
+		return nullptr;
+	}
+	//if successfull, notify
+	else
+		printf("interface claimed\n");
+
+
+	return pinDMD;
+}

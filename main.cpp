@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
 	DMDAnimationEngine animation_engine(outputDevice);
 	app.set_animation_engine(&animation_engine);
 
-	//AnimationWindow animation_window(nullptr, &animation_engine);
+	AnimationWindow animation_window(nullptr, &animation_engine);
 	//DeviceConfigWindow config_window(nullptr);
 	//ROMInspectWindow rom_window(nullptr, nullptr);
 

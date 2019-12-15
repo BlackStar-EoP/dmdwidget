@@ -1,5 +1,8 @@
 #pragma once
 
+#include <dmdoutputdevice.h>
+#include <stdint.h>
+
 /*
 MIT License
 
@@ -23,3 +26,30 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
+struct libusb_device_handle;
+
+class PinDMD2OutputDevice : public DMDOutputDevice
+{
+public:
+	static const uint16_t PINDMD2_VENDOR_ID = 0x0314;
+	static const uint16_t PINDMD2_PRODUCT_ID = 0xE457;
+	static const unsigned char ENDPOINT_IN = 0x81;
+	static const unsigned char ENDPOINT_OUT = 0x01;
+
+public:
+	PinDMD2OutputDevice();
+	~PinDMD2OutputDevice();
+
+	bool isDeviceAvailable() override;
+	void clearDMD() override;
+	void sendFrame(const DMDFrame& frame) override;
+
+	bool supportsColor() const override;
+
+private:
+	libusb_device_handle* find_PinDMD2();
+
+private:
+	libusb_device_handle* m_PinDMD2 = nullptr;
+};
