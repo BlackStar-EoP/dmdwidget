@@ -108,22 +108,22 @@ libusb_device_handle* PinDMD2OutputDevice::find_PinDMD2()
 		}
 	}
 	libusb_free_device_list(list, 1);
-
+	if (pinDMD == nullptr)
+		return nullptr;
 
 	//set configuration 
 	const int32_t MY_CONFIG = 1;
 	const int32_t MY_INTF = 0;
 
-	// ?!? TODO blackstar, doesn't work
-	//if (libusb_set_configuration(pinDMD, MY_CONFIG) < 0) {
-	//	//if not succesfull, notify
-	//	printf("error setting configuration\n");
-	//	//close device
-	//	libusb_close(pinDMD);
-	//	return nullptr;
-	//}
-	//else
-	//	printf("configuration set\n");
+	if (libusb_set_configuration(pinDMD, MY_CONFIG) < 0) {
+		//if not succesfull, notify
+		printf("error setting configuration\n");
+		//close device
+		libusb_close(pinDMD);
+		return nullptr;
+	}
+	else
+		printf("configuration set\n");
 
 	//try to claim interface for use
 	if (libusb_claim_interface(pinDMD, MY_INTF) < 0) {

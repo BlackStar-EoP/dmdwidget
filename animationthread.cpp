@@ -27,8 +27,8 @@ SOFTWARE.
 #include "dmdanimation.h"
 #include "dmdoutputdevice.h"
 
-AnimationThread::AnimationThread(DMDOutputDevice* output_device)
-: m_output_device(output_device)
+AnimationThread::AnimationThread(QVector<DMDOutputDevice*> output_devices)
+: m_output_devices(output_devices)
 {
 
 }
@@ -47,7 +47,13 @@ void AnimationThread::run()
 		}
 		
 		if (frame != nullptr)
-			m_output_device->sendFrame(*frame);
+		{
+			for (DMDOutputDevice* device : m_output_devices)
+			{
+				if (device->isDeviceAvailable())
+					device->sendFrame(*frame);
+			}
+		}
 
 		msleep(ANIMATION_THREAD_SLEEP_MS);
 	}

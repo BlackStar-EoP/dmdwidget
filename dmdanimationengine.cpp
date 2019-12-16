@@ -34,8 +34,8 @@ SOFTWARE.
 #include <QImage>
 #include <QPainter>
 
-DMDAnimationEngine::DMDAnimationEngine(DMDOutputDevice* output_device)
-: m_animation_thread(output_device)
+DMDAnimationEngine::DMDAnimationEngine(QVector<DMDOutputDevice*> output_devices)
+: m_animation_thread(output_devices)
 {
 	create_internal_animations();
 	m_animation_thread.start();

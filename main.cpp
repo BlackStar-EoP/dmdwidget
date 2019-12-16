@@ -143,9 +143,12 @@ int main(int argc, char *argv[])
 	//floyd_steinberg_dither("03.JPG");
 	//floyd_steinberg_dither("04.JPG");
 	//floyd_steinberg_dither("05.JPG");
-	//DMDOutputDevice* outputDevice = new WidgetOutputDevice(nullptr, 4);
-	DMDOutputDevice* outputDevice = new PinDMD2OutputDevice();
-	DMDAnimationEngine animation_engine(outputDevice);
+	
+	QVector<DMDOutputDevice*> output_devices;
+	output_devices.push_back(new PinDMD2OutputDevice());
+	output_devices.push_back(new WidgetOutputDevice(nullptr, 4));
+	
+	DMDAnimationEngine animation_engine(output_devices);
 	app.set_animation_engine(&animation_engine);
 
 	AnimationWindow animation_window(nullptr, &animation_engine);
@@ -154,5 +157,7 @@ int main(int argc, char *argv[])
 
 	app.start_polling();
 	
-    return app.exec();
+    int32_t ret = app.exec();
+	qDeleteAll(output_devices);
+	return ret;
 }

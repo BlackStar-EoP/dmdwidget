@@ -36,7 +36,7 @@ class ImageAnimation;
 class DMDAnimationEngine
 {
 public:
-	DMDAnimationEngine(DMDOutputDevice* output_device);
+	DMDAnimationEngine(QVector<DMDOutputDevice*> output_devices);
 	~DMDAnimationEngine();
 	void show_animation(DMDAnimation* animation);
 	const QMap<QString, DMDAnimation*>& animations() const;

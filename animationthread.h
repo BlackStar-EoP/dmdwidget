@@ -26,6 +26,7 @@ SOFTWARE.
 
 #include <QThread>
 #include <QMutex>
+#include <QVector>
 
 class DMDOutputDevice;
 class DMDAnimation;
@@ -33,14 +34,14 @@ class DMDAnimation;
 class AnimationThread : public QThread
 {
 public:
-	AnimationThread(DMDOutputDevice* output_device);
+	AnimationThread(QVector<DMDOutputDevice*> output_devices);
 
 	void run() override;
 
 	void set_animation(DMDAnimation* animation);
 
 private:
-	DMDOutputDevice* m_output_device = nullptr;
+	QVector<DMDOutputDevice*> m_output_devices;
 	DMDAnimation* m_animation = nullptr;
 	QMutex m_animation_mutex;
 };
