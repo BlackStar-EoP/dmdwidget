@@ -103,8 +103,21 @@ libusb_device_handle* PinDMD2OutputDevice::find_PinDMD2()
 			if (err)
 			{
 				printf("Error opening PinDMD2 device %d\n", err);
+				pinDMD = nullptr;
+			} 
+			else
+			{
+				const uint32_t MAX_DESCRIPTOR_LENGTH = 1024;
+				unsigned char manufacturer[MAX_DESCRIPTOR_LENGTH];
+				unsigned char product[MAX_DESCRIPTOR_LENGTH];
+				unsigned char serialnumber[MAX_DESCRIPTOR_LENGTH];
+				libusb_get_string_descriptor_ascii(pinDMD, dd.iManufacturer, manufacturer, MAX_DESCRIPTOR_LENGTH);
+				libusb_get_string_descriptor_ascii(pinDMD, dd.iProduct, product, MAX_DESCRIPTOR_LENGTH);
+				libusb_get_string_descriptor_ascii(pinDMD, dd.iSerialNumber, serialnumber, MAX_DESCRIPTOR_LENGTH);
+				printf("Manufacturer  = %s\n", manufacturer);
+				printf("Product       = %s\n", product);
+				printf("Serial number = %s\n", serialnumber);
 			}
-
 			break;
 		}
 	}
