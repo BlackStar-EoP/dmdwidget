@@ -54,3 +54,6 @@ include("vendor/Qt-Color-Widgets/color_widgets.pri");
 
 # Prevent lib/dll creation. We don't need that shit. Gives issues on win32
 DEFINES += QTCOLORWIDGETS_STATICALLY_LINKED=1
+
+INCLUDEPATH += "$$PWD/vendor/libusb"
+LIBS += "$$PWD/vendor/libusb/x64/Release/lib/libusb-1.0.lib"
