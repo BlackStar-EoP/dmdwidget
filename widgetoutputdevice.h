@@ -43,6 +43,7 @@ public:
 	void sendFrame(const DMDFrame& frame) override;
 
 	bool supportsColor() const override;
+	void setDotColor(const QColor& color);
 
 private:
 	QLabel* m_DMD_label = nullptr;
@@ -50,5 +51,6 @@ private:
 	uint32_t m_DMD_width = 0;
 	uint32_t m_DMD_height = 0;
 
-	bool m_use_RGB = true;
+	bool m_use_RGB = false;
+	QColor m_dot_color = QColor(255, 102, 0);
 };
