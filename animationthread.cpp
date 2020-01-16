@@ -30,7 +30,11 @@ SOFTWARE.
 AnimationThread::AnimationThread(QVector<DMDOutputDevice*> output_devices)
 : m_output_devices(output_devices)
 {
+}
 
+AnimationThread::~AnimationThread()
+{
+	qDeleteAll(m_output_devices);
 }
 
 void AnimationThread::run()

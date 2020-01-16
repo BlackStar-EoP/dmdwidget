@@ -35,6 +35,7 @@ class AnimationThread : public QThread
 {
 public:
 	AnimationThread(QVector<DMDOutputDevice*> output_devices);
+	~AnimationThread();
 
 	void run() override;
 

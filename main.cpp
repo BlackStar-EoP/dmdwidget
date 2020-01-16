@@ -158,6 +158,5 @@ int main(int argc, char *argv[])
 	app.start_polling();
 	
     int32_t ret = app.exec();
-	qDeleteAll(output_devices);
 	return ret;
 }
