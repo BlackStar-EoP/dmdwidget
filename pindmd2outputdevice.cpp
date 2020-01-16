@@ -102,6 +102,7 @@ libusb_device_handle* PinDMD2OutputDevice::find_PinDMD2()
 			err = libusb_open(device, &pinDMD);
 			if (err)
 			{
+				printf("Error opening PinDMD2 device %d\n", err);
 			}
 
 			break;
@@ -109,18 +110,30 @@ libusb_device_handle* PinDMD2OutputDevice::find_PinDMD2()
 	}
 	libusb_free_device_list(list, 1);
 	if (pinDMD == nullptr)
+	{
+		printf("Could not find PinDMD2!\n");
 		return nullptr;
+	}
 
 	//set configuration 
 	const int32_t MY_CONFIG = 1;
 	const int32_t MY_INTF = 0;
 
-	if (libusb_set_configuration(pinDMD, MY_CONFIG) < 0) {
+	int config_status;
+	if (libusb_get_configuration(pinDMD, &config_status) == 0)
+	{
+		printf("Set config on PinDMD2 = %d\n", config_status);
+	}
+	else
+		printf("Error fetching config status");
+	
+	config_status = libusb_set_configuration(pinDMD, MY_CONFIG);
+	if (config_status != 0) {
 		//if not succesfull, notify
-		printf("error setting configuration\n");
+		printf("error setting configuration, errorcode=%d\n", config_status);
 		//close device
-		libusb_close(pinDMD);
-		return nullptr;
+		//libusb_close(pinDMD);
+		//return nullptr;
 	}
 	else
 		printf("configuration set\n");
