@@ -41,8 +41,7 @@ DMDAnimationEngine::DMDAnimationEngine(QVector<DMDOutputDevice*> output_devices)
 	m_animation_thread.start();
 	m_animation_thread.set_animation(m_loading_animation);
 
-	m_animation_path = QCoreApplication::applicationDirPath() + "/animations/";
-
+	m_animation_path = QDir::currentPath() + "/animations/";
 	QDir animation_directory = m_animation_path;
 	animation_directory.setFilter(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
 	QStringList animation_dir_list = animation_directory.entryList();
