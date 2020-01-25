@@ -24,12 +24,138 @@ SOFTWARE.
 
 #include "pindmd2outputdevice.h"
 
-#include <libusb/libusb.h>
+///#include <libusb/libusb.h>
 #include <stdio.h>
 #include <assert.h>
 #include <dmdframe.h>
 
-#pragma comment (lib, "libusb-1.0.lib")
+//#pragma comment (lib, "libusb-1.0.lib")
+#include "lusb0_usb.h"
+//#pragma comment(lib, "C:/Users/BlackStar/Desktop/Edge of Panic/dmdwidget/vendor/libusb-win32-bin-1.2.6.0/lib/msvc_x64/libusb.lib")
+
+PinDMD2OutputDevice::PinDMD2OutputDevice()
+{
+	//init usb library
+	usb_init();
+	//find busses
+	usb_find_busses();
+	//find devices
+	usb_find_devices();
+
+	m_PinDMD2 = find_PinDMD2();
+}
+
+PinDMD2OutputDevice::~PinDMD2OutputDevice()
+{
+	if (m_PinDMD2 != nullptr)
+		usb_close(m_PinDMD2);
+}
+
+bool PinDMD2OutputDevice::isDeviceAvailable()
+{
+	return m_PinDMD2 != nullptr;
+}
+
+void PinDMD2OutputDevice::clearDMD()
+{
+	sendFrame(DMDFrame());
+}
+
+void PinDMD2OutputDevice::sendFrame(const DMDFrame& frame)
+{
+	assert(m_PinDMD2 != nullptr);
+	const uint32_t PINDMD2BUFFERSIZE = 2052;
+	unsigned char frame_buf[PINDMD2BUFFERSIZE];
+	memset(frame_buf, 0, PINDMD2BUFFERSIZE);
+	frame_buf[0] = 0x81;	// frame sync bytes
+	frame_buf[1] = 0xC3;
+	frame_buf[2] = 0xE7;
+	frame_buf[3] = 0x0;		// command byte (not used)
+	uint32_t frame_pixel_nr = 4;
+
+	const uint8_t* const framedata = frame.const_grayscale_frame();
+	for (uint32_t pixel = 0; pixel < DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT; pixel += 2)
+	{
+		uint8_t leftpixel = (framedata[pixel] >> 4) << 4;
+		uint8_t rightpixel = (framedata[pixel + 1] >> 4);
+		frame_buf[frame_pixel_nr++] = leftpixel | rightpixel;
+	}
+	//int bla = usb_bulk_transfer(m_PinDMD2, ENDPOINT_OUT, (unsigned char*)frame_buf, PINDMD2BUFFERSIZE, &written, 5000);
+	int bla = usb_bulk_write(m_PinDMD2, ENDPOINT_OUT, (char*)frame_buf, PINDMD2BUFFERSIZE, 5000);
+	
+	printf("");
+}
+
+bool PinDMD2OutputDevice::supportsColor() const
+{
+	return false;
+}
+
+//libusb_device_handle* PinDMD2OutputDevice::find_PinDMD2()
+usb_dev_handle* PinDMD2OutputDevice::find_PinDMD2()
+{
+	//contains usb busses present on computer
+	struct usb_bus *bus;
+	//contains devices present on computer
+	struct usb_device *dev;
+	//used to skip first device
+	//bool first = true;
+	//loop through busses and devices
+	
+	for (bus = usb_get_busses(); bus; bus = bus->next) {
+		for (dev = bus->devices; dev; dev = dev->next) {
+			//if device vendor id and product id are match
+			if (dev->descriptor.idVendor == PINDMD2_VENDOR_ID && dev->descriptor.idProduct == PINDMD2_PRODUCT_ID)
+			{
+				m_PinDMD2 =  usb_open(dev);
+				goto found;
+			}
+		}
+	}
+
+found:
+
+	if (m_PinDMD2 == nullptr)
+		return nullptr;
+
+	//set configuration
+	if (usb_set_configuration(m_PinDMD2, 1) < 0) {
+		//if not succesfull, notify
+		printf("error setting configuration\n");
+		//close device
+		usb_close(m_PinDMD2);
+		//and exit
+		//return_();
+	}
+	//if successfull, notify
+	else
+		printf("configuration set\n");
+
+	//try to claim interface for use
+	if (usb_claim_interface(m_PinDMD2, 0) < 0) {
+		//if failed, print error message
+		printf("error claiming interface\n");
+		//close device and exit
+		usb_close(m_PinDMD2);
+	}
+	//if successfull, notify
+	else
+		printf("interface claimed\n");
+
+	return m_PinDMD2;
+}
+
+/*
+
+#include "pindmd2outputdevice.h"
+
+///#include <libusb/libusb.h>
+#include <stdio.h>
+#include <assert.h>
+#include <dmdframe.h>
+
+//#pragma comment (lib, "libusb-1.0.lib")
+#include "C:/Users/BlackStar/Desktop/Edge of Panic/dmdwidget/vendor/libusb-win32-bin-1.2.6.0/include/lusb0_usb.h"
 
 PinDMD2OutputDevice::PinDMD2OutputDevice()
 {
@@ -73,8 +199,9 @@ void PinDMD2OutputDevice::sendFrame(const DMDFrame& frame)
 		uint8_t rightpixel = (framedata[pixel + 1] >> 4);
 		frame_buf[frame_pixel_nr++] = leftpixel | rightpixel;
 	}
-	
-	libusb_bulk_transfer(m_PinDMD2, ENDPOINT_OUT, (unsigned char*)frame_buf, PINDMD2BUFFERSIZE, NULL, 5000);
+	int written = -1;
+	int bla = libusb_bulk_transfer(m_PinDMD2, ENDPOINT_OUT, (unsigned char*)frame_buf, PINDMD2BUFFERSIZE, &written, 5000);
+	printf("");
 }
 
 bool PinDMD2OutputDevice::supportsColor() const
@@ -104,7 +231,7 @@ libusb_device_handle* PinDMD2OutputDevice::find_PinDMD2()
 			{
 				printf("Error opening PinDMD2 device %d\n", err);
 				pinDMD = nullptr;
-			} 
+			}
 			else
 			{
 				const uint32_t MAX_DESCRIPTOR_LENGTH = 1024;
@@ -139,7 +266,7 @@ libusb_device_handle* PinDMD2OutputDevice::find_PinDMD2()
 	}
 	else
 		printf("Error fetching config status");
-	
+
 	config_status = libusb_set_configuration(pinDMD, MY_CONFIG);
 	if (config_status != 0) {
 		//if not succesfull, notify
@@ -151,8 +278,14 @@ libusb_device_handle* PinDMD2OutputDevice::find_PinDMD2()
 	else
 		printf("configuration set\n");
 
+
+
+	void* asyncReadContext = NULL;
+	void* asyncWriteContext = NULL;
+
 	//try to claim interface for use
-	if (libusb_claim_interface(pinDMD, MY_INTF) < 0) {
+	int claim = libusb_claim_interface(pinDMD, MY_INTF);
+	if (claim < 0) {
 		//if failed, print error message
 		printf("error claiming interface\n");
 		//close device and exit
@@ -163,6 +296,6 @@ libusb_device_handle* PinDMD2OutputDevice::find_PinDMD2()
 	else
 		printf("interface claimed\n");
 
-
 	return pinDMD;
 }
+*/

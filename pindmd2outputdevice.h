@@ -28,6 +28,7 @@ SOFTWARE.
 */
 
 struct libusb_device_handle;
+struct usb_dev_handle;
 
 class PinDMD2OutputDevice : public DMDOutputDevice
 {
@@ -48,8 +49,10 @@ public:
 	bool supportsColor() const override;
 
 private:
-	libusb_device_handle* find_PinDMD2();
+	//libusb_device_handle* find_PinDMD2();
+	usb_dev_handle* find_PinDMD2();
 
 private:
-	libusb_device_handle* m_PinDMD2 = nullptr;
+	//libusb_device_handle* m_PinDMD2 = nullptr;
+	usb_dev_handle* m_PinDMD2 = nullptr;
 };

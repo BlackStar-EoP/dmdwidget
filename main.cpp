@@ -131,10 +131,25 @@ void floyd_steinberg_dither(const QString& filename)
 	pixel[x + 1][y + 1] := pixel[x + 1][y + 1] + quant_error * 1 / 16
 	*/
 }
-
 int main(int argc, char *argv[])
 {
 	//dump_vertical_scroll("scroll.png");
+
+	/*
+	*/
+	//QImage img(QDir::currentPath() + "/fx3.png");
+	//QImage mask(img.width(), img.height(), img.format());
+	//for (int y = 0; y < img.height(); ++y)
+	//	for (int x = 0; x < img.width(); ++x)
+	//	{
+	//		QRgb px = img.pixel(x, y);
+	//		int a = qAlpha(px);
+	//		mask.setPixel(x, y, qRgb(a, a, a));
+	//	}
+
+	//mask.save("fx3mask.png");
+	/*
+	*/
 
 	FX3Process fx3_process;
 	DMDApplication app(argc, argv, &fx3_process);
@@ -150,7 +165,6 @@ int main(int argc, char *argv[])
 	
 	DMDAnimationEngine animation_engine(output_devices);
 	app.set_animation_engine(&animation_engine);
-
 	AnimationWindow animation_window(nullptr, &animation_engine);
 	//DeviceConfigWindow config_window(nullptr);
 	//ROMInspectWindow rom_window(nullptr, nullptr);

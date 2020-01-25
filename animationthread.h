@@ -27,6 +27,7 @@ SOFTWARE.
 #include <QThread>
 #include <QMutex>
 #include <QVector>
+#include <QImage>
 
 class DMDOutputDevice;
 class DMDAnimation;
@@ -41,9 +42,16 @@ public:
 
 	void set_animation(DMDAnimation* animation);
 
+	void start_recording();
+	void stop_recording();
+	void clear_recordings();
+	const QVector<QImage>& recordings();
+
 private:
 	QVector<DMDOutputDevice*> m_output_devices;
 	DMDAnimation* m_animation = nullptr;
 	QMutex m_animation_mutex;
+	bool m_recording = false;
+	QVector<QImage> m_recordings;
 };
 

@@ -83,6 +83,26 @@ void DMDAnimationEngine::set_DMD_invalid()
 	m_animation_thread.set_animation(m_select_table_animation);
 }
 
+void DMDAnimationEngine::start_recording()
+{
+	m_animation_thread.start_recording();
+}
+
+void DMDAnimationEngine::stop_recording()
+{
+	m_animation_thread.stop_recording();
+}
+
+void DMDAnimationEngine::clear_recordings()
+{
+	m_animation_thread.clear_recordings();
+}
+
+const QVector<QImage>& DMDAnimationEngine::recordings()
+{
+	return m_animation_thread.recordings();
+}
+
 void DMDAnimationEngine::create_internal_animations()
 {
 	QImage empty_image(DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT, QImage::Format_RGBA8888);
@@ -127,7 +147,7 @@ void DMDAnimationEngine::create_internal_animations()
 	select_frames.push_back(empty_image);
 
 
-	m_loading_animation = new ImageAnimation(loading_frames, ImageAnimation::GRAYSCALE, 5);
-	m_waiting_for_fx3_animation = new ImageAnimation(waiting_frames, ImageAnimation::GRAYSCALE, 5);
-	m_select_table_animation = new ImageAnimation(select_frames, ImageAnimation::GRAYSCALE, 5);
+	m_loading_animation = new ImageAnimation(loading_frames, 5);
+	m_waiting_for_fx3_animation = new ImageAnimation(waiting_frames, 5);
+	m_select_table_animation = new ImageAnimation(select_frames, 5);
 }

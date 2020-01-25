@@ -62,4 +62,33 @@ void AnimationWindow::initUI()
 	QPushButton* show_animation_button = new QPushButton("Show animation", this);
 	show_animation_button->setGeometry(10, 440, 200, 20);
 	connect(show_animation_button, SIGNAL(clicked()), this, SLOT(show_animation_button_clicked()));
+
+	QPushButton* recordButton = new QPushButton("Record", this);
+	recordButton->setGeometry(10, 460, 200, 20);
+	connect(recordButton, SIGNAL(clicked()), this, SLOT(recordButton_clicked()));
+
+	QPushButton* saveRecordingsButton = new QPushButton("Save recorded", this);
+	saveRecordingsButton->setGeometry(10, 480, 200, 20);
+	connect(saveRecordingsButton, SIGNAL(clicked()), this, SLOT(saveRecordingsButton_clicked()));
+
+
+}
+
+void AnimationWindow::recordButton_clicked()
+{
+	m_animation_engine->start_recording();
+}
+
+void AnimationWindow::saveRecordingsButton_clicked()
+{
+	m_animation_engine->stop_recording();
+	const QVector<QImage>& recordings = m_animation_engine->recordings();
+	if (recordings.size() > 0)
+	for (int i = 0; i < recordings.size(); ++i)
+	{
+		QString fileName = QString("recordings/") + QString::number(i).rightJustified(4, '0') + ".png";
+		recordings[i].save(fileName);
+	}
+
+	m_animation_engine->clear_recordings();
 }

@@ -51,13 +51,6 @@ DMDWidget::DMDWidget(QWidget* parent)
 	openFX3Button->setGeometry(10, 60, 120, 20);
 	connect(openFX3Button, SIGNAL(clicked()), this, SLOT(captureDMDButton_clicked()));
 
-	QPushButton* recordButton = new QPushButton("Record", this);
-	recordButton->setGeometry(135, 60, 120, 20);
-	connect(recordButton, SIGNAL(clicked()), this, SLOT(recordButton_clicked()));
-
-	QPushButton* saveRecordingsButton = new QPushButton("Save recorded", this);
-	saveRecordingsButton->setGeometry(260, 60, 120, 20);
-	connect(saveRecordingsButton, SIGNAL(clicked()), this, SLOT(saveRecordingsButton_clicked()));
 
 
 	m_DMD_label = new QLabel(this);

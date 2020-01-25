@@ -37,6 +37,8 @@ public:
 
 private slots:
 	void show_animation_button_clicked();
+	void recordButton_clicked();
+	void saveRecordingsButton_clicked();
 
 private:
 	void initUI();
@@ -44,4 +46,5 @@ private:
 private:
 	DMDAnimationEngine* m_animation_engine = nullptr;
 	QListWidget* m_animation_list = nullptr;
+	bool m_record_frames = false;
 };

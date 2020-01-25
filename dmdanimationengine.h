@@ -41,6 +41,10 @@ public:
 	void show_animation(DMDAnimation* animation);
 	const QMap<QString, DMDAnimation*>& animations() const;
 	void set_DMD_invalid();
+	void start_recording();
+	void stop_recording();
+	void clear_recordings();
+	const QVector<QImage>& recordings();
 
 private:
 	void create_internal_animations();

@@ -26,6 +26,9 @@ SOFTWARE.
 
 #include "dmdanimation.h"
 #include "dmdoutputdevice.h"
+#include "dmdframe.h"
+
+#include <QPainter>
 
 AnimationThread::AnimationThread(QVector<DMDOutputDevice*> output_devices)
 : m_output_devices(output_devices)
@@ -39,7 +42,7 @@ AnimationThread::~AnimationThread()
 
 void AnimationThread::run()
 {
-	const unsigned long ANIMATION_THREAD_SLEEP_MS = 16;
+	const unsigned long ANIMATION_THREAD_SLEEP_US = 16667;
 	bool run = true;
 
 	while (run)
@@ -57,9 +60,31 @@ void AnimationThread::run()
 				if (device->isDeviceAvailable())
 					device->sendFrame(*frame);
 			}
+
+			if (m_recording)
+			{
+				uint8_t* grayscale_frame = frame->grayscale_frame();
+				QImage recframe(DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT, QImage::Format_RGBA8888);
+				QPainter rec(&recframe);
+				rec.fillRect(QRect(0, 0, DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT), Qt::black);
+				uint32_t bytepos = 0;
+				for (int y = 0; y < DMDConfig::DMDHEIGHT; ++y)
+				{
+					for (int x = 0; x < DMDConfig::DMDWIDTH; ++x)
+					{
+						uint8_t c = grayscale_frame[bytepos];
+						rec.setPen(QColor(c,c,c));
+						rec.drawPoint(x, y);
+						bytepos++;
+					}
+				}
+
+				m_recordings.push_back(recframe);
+
+			}
 		}
 
-		msleep(ANIMATION_THREAD_SLEEP_MS);
+		usleep(ANIMATION_THREAD_SLEEP_US);
 	}
 }
 
@@ -67,4 +92,24 @@ void AnimationThread::set_animation(DMDAnimation* animation)
 {
 	QMutexLocker lock(&m_animation_mutex);
 	m_animation = animation;
+}
+
+void AnimationThread::start_recording()
+{
+	m_recording = true;
+}
+
+void AnimationThread::stop_recording()
+{
+	m_recording = false;
+}
+
+void AnimationThread::clear_recordings()
+{
+	m_recordings.clear();
+}
+
+const QVector<QImage>& AnimationThread::recordings()
+{
+	return m_recordings;
 }

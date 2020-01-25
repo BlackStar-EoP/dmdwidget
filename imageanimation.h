@@ -33,18 +33,8 @@ class QStringList;
 class ImageAnimation : public DMDAnimation
 {
 public:
-	enum EColorMode
-	{
-		FULL_COLOR,
-		RED_CHANNEL_ONLY,
-		GREEN_CHANNEL_ONLY,
-		BLUE_CHANNEL_ONLY,
-		GRAYSCALE,
-	};
-
-public:
 	ImageAnimation(const QString& path, const QString& directory, uint8_t animation_speed);
-	ImageAnimation(const QVector<QImage>& images, EColorMode color_mode, uint8_t animation_speed);
+	ImageAnimation(const QVector<QImage>& images, uint8_t animation_speed);
 	~ImageAnimation();
 
 	DMDFrame* current_frame() override;
@@ -52,11 +42,8 @@ public:
 	bool is_valid() const;
 
 private:
-	EColorMode determine_animation_color_mode(const QString& path, const QStringList& filelist) const;
-	EColorMode determine_color_mode(const QImage& image) const;
-	bool is_largest(uint32_t l1, uint32_t r1, uint32_t r2, uint32_t r3, uint32_t r4) const;
 	void load_animation(const QString& path, const QString& directory);
-	DMDFrame* parse_image(const QImage& image, EColorMode color_mode);
+	DMDFrame* parse_image(const QImage& image);
 
 	bool m_valid = false;
 	QVector<DMDFrame*> m_frames;
