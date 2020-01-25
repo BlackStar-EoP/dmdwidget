@@ -63,6 +63,7 @@ void PinDMD2OutputDevice::clearDMD()
 
 void PinDMD2OutputDevice::sendFrame(const DMDFrame& frame)
 {
+	/*
 	assert(m_PinDMD2 != nullptr);
 	const uint32_t PINDMD2BUFFERSIZE = 2052;
 	unsigned char frame_buf[PINDMD2BUFFERSIZE];
@@ -76,14 +77,73 @@ void PinDMD2OutputDevice::sendFrame(const DMDFrame& frame)
 	const uint8_t* const framedata = frame.const_grayscale_frame();
 	for (uint32_t pixel = 0; pixel < DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT; pixel += 2)
 	{
-		uint8_t leftpixel = (framedata[pixel] >> 4) << 4;
-		uint8_t rightpixel = (framedata[pixel + 1] >> 4);
+		//uint8_t leftpixel = (framedata[pixel] >> 4) << 4;
+		//uint8_t rightpixel = (framedata[pixel + 1] >> 4);
+
+		uint8_t rightpixel = (framedata[pixel] >> 4) << 4;
+		uint8_t leftpixel = (framedata[pixel + 1] >> 4);
+
 		frame_buf[frame_pixel_nr++] = leftpixel | rightpixel;
 	}
 	//int bla = usb_bulk_transfer(m_PinDMD2, ENDPOINT_OUT, (unsigned char*)frame_buf, PINDMD2BUFFERSIZE, &written, 5000);
 	int bla = usb_bulk_write(m_PinDMD2, ENDPOINT_OUT, (char*)frame_buf, PINDMD2BUFFERSIZE, 5000);
 	
 	printf("");
+	*/
+
+	int byteIdx = 4;
+	int bd0, bd1, bd2, bd3;
+	int pixel;
+	int i, j, v;
+	int ret = 0;
+	unsigned char frame_buf[2052];
+
+	memset(frame_buf, 0, 2052);
+	frame_buf[0] = 0x81;	// frame sync bytes
+	frame_buf[1] = 0xC3;
+	frame_buf[2] = 0xE7;
+	frame_buf[3] = 0x0;		// command byte (not used)
+
+							// dmd height
+	for (j = 0; j < 32; j++) {
+		// dmd width
+		for (i = 0; i < 128; i += 8) {
+			bd0 = 0;
+			bd1 = 0;
+			bd2 = 0;
+			bd3 = 0;
+			for (v = 7; v >= 0; v--) {
+				// pixel colour
+				pixel = frame.const_grayscale_frame()[(j * 128) + (i + v)];
+				// 16 color mode hue remapping for proper gradient
+				bd0 <<= 1;
+				bd1 <<= 1;
+				bd2 <<= 1;
+				bd3 <<= 1;
+				//bd4 <<= 1;
+				if (pixel & 1)
+					bd0 |= 1;
+				if (pixel & 2)
+					bd1 |= 1;
+				if (pixel & 4)
+					bd2 |= 1;
+				if (pixel & 8)
+					bd3 |= 1;
+			}
+			frame_buf[byteIdx] = bd0;
+			frame_buf[byteIdx + 512] = bd1;
+			frame_buf[byteIdx + 1024] = bd2;
+			frame_buf[byteIdx + 1536] = bd3;
+			byteIdx++;
+		}
+	}
+
+	//writeBuffer[0]=0;
+	//usb_bulk_write(device, EP_OUT, writeBuffer, 1, 5000);
+	//usb_bulk_read(device, EP_IN, readBuffer, 1, 5000);
+	//memcpy(writeBuffer, frame_buf, 2052);
+	usb_bulk_write(m_PinDMD2, 0x01, (char*) frame_buf, 2052, 5000);
+	//printf("frame sent: %s\n", usb_strerror());
 }
 
 bool PinDMD2OutputDevice::supportsColor() const
