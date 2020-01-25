@@ -164,7 +164,7 @@ void FX3Animation::normalizeZenDMD(uint8_t* rawDMD)
 			rawDMD[i] = 0;
 			break;
 		case 1:
-			rawDMD[i] = 128;
+			rawDMD[i] = 170;
 			break;
 		case 2:
 			rawDMD[i] = 255;
