@@ -66,6 +66,10 @@ private:
 	QLabel* m_file_name_label = nullptr;
 	QLabel* m_image_label = nullptr;
 	QLabel* m_dmd_label = nullptr;
+	QLabel* m_dmd_stride_label = nullptr;
+	QLabel* m_dmd_stretched_label = nullptr;
+	QLabel* m_dmd_hacked_label = nullptr;
+	QLabel* m_dmd_cropped_label = nullptr;
 	uint32_t m_current_file_nr = 0;
 	QMap<uint32_t, std::set<uint32_t>> pixels;
 	bool m_debug_colors = true;

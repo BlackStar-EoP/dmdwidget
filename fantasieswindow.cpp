@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 #include "fantasieswindow.h"
+#include "dmdconfig.h"
 
 #include <QPushButton>
 #include <QLabel>
@@ -93,6 +94,20 @@ void FantasiesWindow::initUI()
 
 	m_dmd_label = new QLabel(this);
 	m_dmd_label->setGeometry(440, 30, FANTASIES_DMD_WIDTH, FANTASIES_DMD_HEIGHT);
+
+	m_dmd_stride_label = new QLabel(this);
+	m_dmd_stride_label->setGeometry(440, 50, DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT);
+
+	m_dmd_stretched_label = new QLabel(this);
+	m_dmd_stretched_label->setGeometry(440, 90, DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT);
+
+	m_dmd_hacked_label = new QLabel(this);
+	m_dmd_hacked_label->setGeometry(440, 130, DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT);
+
+	m_dmd_cropped_label = new QLabel(this);
+	m_dmd_cropped_label->setGeometry(440, 170, DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT);
+
+
 }
 
 void FantasiesWindow::update_image()
@@ -206,6 +221,48 @@ void FantasiesWindow::update_image()
 		}
 		m_dmd_label->setPixmap(QPixmap::fromImage(dmd));
 
+		// Stride fix
+		QImage strideDMD(DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT, QImage::Format_RGBA8888);
+		uint32_t dest_x = 0;
+		uint32_t dest_y = 8;
+		uint32_t skipped = 0;
+		for (uint32_t y = 0; y < FANTASIES_DMD_HEIGHT; ++y)
+		{
+			for (uint32_t x = 0; x < FANTASIES_DMD_WIDTH; ++x)
+			{
+				if (x % 5 == 0)
+					continue;
+
+				strideDMD.setPixel(dest_x, dest_y, dmd.pixel(x, y));
+				dest_x++;
+			}
+
+			dest_x = 0;
+			dest_y++;
+		}
+		m_dmd_stride_label->setPixmap(QPixmap::fromImage(strideDMD));
+
+		// Stretched fix
+		QImage stretchedDMD = dmd.scaledToWidth(DMDConfig::DMDWIDTH, Qt::FastTransformation);
+		//        FastTransformation,
+		//SmoothTransformation
+		m_dmd_stretched_label->setPixmap(QPixmap::fromImage(stretchedDMD));
+
+		// Hacked fix
+		//m_dmd_hacked_label
+
+		// Cropped fix
+		dest_y = 8;
+		QImage croppedDMD(DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT, QImage::Format_RGBA8888);
+		for (uint32_t y = 0; y < FANTASIES_DMD_HEIGHT; ++y)
+		{
+			for (uint32_t x = 16; x < DMDConfig::DMDWIDTH + 16; ++x)
+			{
+				croppedDMD.setPixel(x - 16, dest_y, dmd.pixel(x, y));
+			}
+			dest_y++;
+		}
+		m_dmd_cropped_label->setPixmap(QPixmap::fromImage(croppedDMD));
 	}
 }
 
