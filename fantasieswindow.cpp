@@ -36,6 +36,8 @@ SOFTWARE.
 
 #include <assert.h>
 
+#define RAWPIXEL(x,y) rawDMD[y * FANTASIES_DMD_WIDTH + x]
+
 FantasiesWindow::FantasiesWindow(QWidget* parent, DMDAnimationEngine* animation_engine)
 : QWidget(parent, Qt::Window)
 {
@@ -110,8 +112,25 @@ void FantasiesWindow::initUI()
 
 }
 
+bool FantasiesWindow::is_column_candidate(uint32_t column)
+{
+	if (column >= FANTASIES_DMD_WIDTH)
+		return false;
+
+	for (uint32_t y = 0; y < FANTASIES_DMD_HEIGHT; ++y)
+	{
+		if (RAWPIXEL(column, y) != 0)
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
 void FantasiesWindow::update_image()
 {
+	memset(rawDMD, 0, sizeof(rawDMD));
+
 	QString filename = QString("D:/pf/shots/shot") + QString::number(m_current_file_nr) + ".bsr";
 	m_file_name_label->setText(filename);
 
@@ -211,6 +230,7 @@ void FantasiesWindow::update_image()
 					break;
 				case 0xfff3b245:
 					dmd.setPixel(x, y, qRgba(255, 255, 255, 255));
+					rawDMD[y * FANTASIES_DMD_WIDTH + x] = 255;
 					break;
 				}
 
@@ -249,7 +269,70 @@ void FantasiesWindow::update_image()
 		m_dmd_stretched_label->setPixmap(QPixmap::fromImage(stretchedDMD));
 
 		// Hacked fix
+		QVector<uint32_t> candidate_columns;
+
 		//m_dmd_hacked_label
+		for (uint32_t x = 0; x < FANTASIES_DMD_WIDTH; ++x)
+		{
+			bool prevcandidate = is_column_candidate(x - 1);
+			bool candidate = is_column_candidate(x);
+			bool nextcandidate = is_column_candidate(x + 1);
+
+			// FIXME, can be sped up by saving column candidate states, can't be bothered now since this is an unproven concept....
+
+			if (prevcandidate && candidate && nextcandidate)
+				candidate_columns.push_back(x);
+
+		}
+		
+		QImage hackedDMD(DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT, QImage::Format_RGBA8888);
+		uint32_t skipped_column_count = 0;
+		uint32_t current_column = 0;
+		/////
+		///// RAW TEST
+		//dest_y = 8;
+		//QImage rawwDMD(DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT, QImage::Format_RGBA8888);
+		//for (uint32_t y = 0; y < FANTASIES_DMD_HEIGHT; ++y)
+		//{
+		//	for (uint32_t x = 16; x < DMDConfig::DMDWIDTH + 16; ++x)
+		//	{
+		//		uint32_t val = RAWPIXEL(x, y);
+		//		rawwDMD.setPixel(x - 16, dest_y, qRgba(val, val, val, 255));
+		//	}
+		//	dest_y++;
+		//}
+		//m_dmd_hacked_label->setPixmap(QPixmap::fromImage(rawwDMD));
+		/////
+
+
+		for (uint32_t x = 0; x < FANTASIES_DMD_WIDTH; ++x)
+		{
+			if (current_column == DMDConfig::DMDWIDTH)
+				break;
+
+			if (skipped_column_count < 32 && candidate_columns.contains(x))
+			{
+				++skipped_column_count;
+				continue;
+			}
+
+			for (uint32_t y = 0; y < FANTASIES_DMD_HEIGHT; ++y)
+			{
+				uint32_t val = RAWPIXEL(x, y);
+				if (val == 255)
+				{
+					hackedDMD.setPixel(current_column, y + 8, qRgba(255, 255, 255, 255));
+				}
+				else
+				{
+					hackedDMD.setPixel(current_column, y + 8, qRgba(0, 0, 0, 255));
+				}
+			}
+
+			++current_column;
+		}
+
+		m_dmd_hacked_label->setPixmap(QPixmap::fromImage(hackedDMD));
 
 		// Cropped fix
 		dest_y = 8;

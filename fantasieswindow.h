@@ -48,6 +48,7 @@ public:
 	~FantasiesWindow();
 private:
 	void initUI();
+	bool is_column_candidate(uint32_t column);
 	void update_image();
 
 private slots:
@@ -73,4 +74,6 @@ private:
 	uint32_t m_current_file_nr = 0;
 	QMap<uint32_t, std::set<uint32_t>> pixels;
 	bool m_debug_colors = true;
+
+	uint8_t rawDMD[FANTASIES_DMD_WIDTH * FANTASIES_DMD_HEIGHT];
 };
