@@ -37,6 +37,8 @@ public:
 	static const uint16_t PINDMD2_PRODUCT_ID = 0xE457;
 	static const unsigned char ENDPOINT_IN = 0x81;
 	static const unsigned char ENDPOINT_OUT = 0x01;
+	static const int32_t PINDMD2_CONFIGURATION = 1;
+	static const int32_t PINDMD2_INTERFACE = 0;
 
 public:
 	PinDMD2OutputDevice();

@@ -32,6 +32,7 @@ SOFTWARE.
 #include "animationwindow.h"
 #include "deviceconfigwindow.h"
 #include "rominspectwindow.h"
+#include "fantasieswindow.h"
 
 #include <QtWidgets>
 #include <QImage>
@@ -168,6 +169,7 @@ int main(int argc, char *argv[])
 	AnimationWindow animation_window(nullptr, &animation_engine);
 	//DeviceConfigWindow config_window(nullptr);
 	//ROMInspectWindow rom_window(nullptr, nullptr);
+	FantasiesWindow fantasies_window(nullptr, nullptr);
 
 	app.start_polling();
 	

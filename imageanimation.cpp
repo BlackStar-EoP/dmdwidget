@@ -151,13 +151,13 @@ DMDFrame* ImageAnimation::parse_image(const QImage& image)
 			const QRgb& pixel = image.pixel(x, y);
 			
 			uint8_t avg = (qRed(pixel) + qGreen(pixel) + qBlue(pixel)) / 3;
-			uint8_t col = 0;
-			if (avg > 212)
-				col = 255;
-			else if (avg > 127)
-				col = 170;
-			else if (avg > 42)
-				col = 85;
+			uint8_t col = avg;
+			//if (avg > 212)
+			//	col = 255;
+			//else if (avg > 127)
+			//	col = 170;
+			//else if (avg > 42)
+			//	col = 85;
 
 			grayscale_frame[index] = col;
 			color_frame[index] = pixel;

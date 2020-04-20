@@ -151,6 +151,18 @@ bool FX3Process::getDMDColor(QColor& color)
 	return  true;
 }
 
+bool FX3Process::fx3_alive() const
+{
+	DWORD exit_code = 0;
+	if (m_FX3_process_handle == nullptr)
+		return false;
+
+	if (GetExitCodeProcess(m_FX3_process_handle, &exit_code))
+		return exit_code == STILL_ACTIVE;
+
+	return false;
+}
+
 bool FX3Process::is_valid_DMD() const
 {
 	return get_DMD_ptr() != 0;
@@ -158,6 +170,9 @@ bool FX3Process::is_valid_DMD() const
 
 bool FX3Process::captureDMD(uint8_t* buffer)
 {
+	if (!fx3_alive())
+		return false;
+
 	uint32_t ptr = get_DMD_ptr();
 
 	if (ptr == 0)

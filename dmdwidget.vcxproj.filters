@@ -122,6 +122,9 @@
     <ClCompile Include="dmdwidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="fantasieswindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="fx3animation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -239,6 +242,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <CustomBuild Include="dmdwidget.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="fantasieswindow.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
     <ClInclude Include="fx3animation.h">
@@ -379,6 +385,12 @@
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="release\moc_dmdwidget.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="debug\moc_fantasieswindow.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="release\moc_fantasieswindow.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="debug\moc_gradient_slider.cpp">

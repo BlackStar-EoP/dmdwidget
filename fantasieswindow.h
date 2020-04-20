@@ -24,37 +24,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <stdint.h>
-#include <string>
-#include <vector>
-#include <Windows.h>
-#include <QColor>
+#include <QWidget>
 
-#include "dmdconfig.h"
+class DMDAnimationEngine;
+class QLabel;
 
-class FX3Process
+class FantasiesWindow : public QWidget
 {
+	Q_OBJECT
 public:
-	bool findFX3();
-	bool findDMD();
-	bool getDMDColor(QColor& color);
-	bool fx3_alive() const;
-	bool is_valid_DMD() const;
-	bool captureDMD(uint8_t* buffer);
+	static const uint32_t FANTASIES_WIDTH = 320;
+	static const uint32_t FANTASIES_HEIGHT = 608;
+
+public:
+	FantasiesWindow(QWidget* parent, DMDAnimationEngine* animation_engine);
+	~FantasiesWindow();
+private:
+	void initUI();
+	void update_image();
+
+private slots:
+	void inc_img_button_clicked();
+	void dec_img_button_clicked();
+
+	void inc_img10_button_clicked();
+	void dec_img10_button_clicked();
+
+	void inc_img100_button_clicked();
+	void dec_img100_button_clicked();
 
 private:
-	uint32_t get_DMD_ptr() const;
-	uint32_t findDMDMemoryOffset(uint8_t* buffer, SIZE_T buffer_size);
-	void DEBUG_FIND(uint8_t* buffer, SIZE_T buffer_size);
-	void DEBUG_BRUTEFORCE(uint8_t* buffer, SIZE_T buffer_size);
-	void DEBUG_DUMP(uint8_t* buffer, SIZE_T buffer_size);
-
-private:
-	std::wstring m_executable_name = L"Pinball FX3.exe";
-	DWORD m_FX3_process_id = 0;
-	HANDLE m_FX3_process_handle = nullptr;
-	uint32_t m_FX3_base_offset = 0;
-	uint32_t m_DMD_memory_offset = 0;
-	bool m_DMD_found = false;
-	bool m_DMD_color_found = false;
+	QLabel* m_file_name_label = nullptr;
+	QLabel* m_image_label = nullptr;
+	uint32_t m_current_file_nr = 0;
 };
