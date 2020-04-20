@@ -25,6 +25,10 @@ SOFTWARE.
 */
 
 #include <QWidget>
+#include <QSet>
+#include <QMap>
+#include <QVector>
+#include <set>
 
 class DMDAnimationEngine;
 class QLabel;
@@ -35,6 +39,9 @@ class FantasiesWindow : public QWidget
 public:
 	static const uint32_t FANTASIES_WIDTH = 320;
 	static const uint32_t FANTASIES_HEIGHT = 608;
+
+	static const uint32_t FANTASIES_DMD_WIDTH = 160;
+	static const uint32_t FANTASIES_DMD_HEIGHT = 16;
 
 public:
 	FantasiesWindow(QWidget* parent, DMDAnimationEngine* animation_engine);
@@ -52,9 +59,14 @@ private slots:
 
 	void inc_img100_button_clicked();
 	void dec_img100_button_clicked();
+	void auto_button_clicked();
+	void debug_button_clicked();
 
 private:
 	QLabel* m_file_name_label = nullptr;
 	QLabel* m_image_label = nullptr;
+	QLabel* m_dmd_label = nullptr;
 	uint32_t m_current_file_nr = 0;
+	QMap<uint32_t, std::set<uint32_t>> pixels;
+	bool m_debug_colors = true;
 };

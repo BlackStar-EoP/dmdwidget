@@ -31,13 +31,14 @@ SOFTWARE.
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QPainter>
+#include <QSet>
 
 #include <assert.h>
 
 FantasiesWindow::FantasiesWindow(QWidget* parent, DMDAnimationEngine* animation_engine)
 : QWidget(parent, Qt::Window)
 {
-	setWindowTitle("ROM Inspector");
+	setWindowTitle("Pinball Fantasies DMD analyzer");
 	initUI();
 	this->setGeometry(0, 0, 1024, 768);
 
@@ -78,9 +79,20 @@ void FantasiesWindow::initUI()
 	dec_img100_button->setGeometry(10, 155, 100, 20);
 	connect(dec_img100_button, SIGNAL(clicked()), this, SLOT(dec_img100_button_clicked()));
 
+	QPushButton* auto_button = new QPushButton("AUTO", this);
+	auto_button->setGeometry(10, 180, 100, 20);
+	connect(auto_button, SIGNAL(clicked()), this, SLOT(auto_button_clicked()));
+
+	QPushButton* debug_button = new QPushButton("DEBUG", this);
+	debug_button->setGeometry(10, 205, 100, 20);
+	connect(debug_button, SIGNAL(clicked()), this, SLOT(debug_button_clicked()));
+
 
 	m_image_label = new QLabel(this);
 	m_image_label->setGeometry(100, 30, FANTASIES_WIDTH, FANTASIES_HEIGHT);
+
+	m_dmd_label = new QLabel(this);
+	m_dmd_label->setGeometry(440, 30, FANTASIES_DMD_WIDTH, FANTASIES_DMD_HEIGHT);
 }
 
 void FantasiesWindow::update_image()
@@ -96,6 +108,12 @@ void FantasiesWindow::update_image()
 		const char* pixeldata = data.constData();
 		file.close();
 		int pos = 0;
+		int pixelnr = 0;
+
+		// Grab DMD
+		const int startpos = 2560;
+		uint32_t* dmddata = (uint32_t*)(pixeldata + startpos);
+
 		for (uint32_t y = 0; y < FANTASIES_HEIGHT; ++y)
 		{
 			for (uint32_t x = 0; x < FANTASIES_WIDTH; ++x)
@@ -105,12 +123,89 @@ void FantasiesWindow::update_image()
 				int r = pixeldata[pos++];
 				int a = pixeldata[pos++];
 
+				if (m_debug_colors)
+				{
+					if (y < 34)
+					{
+						uint32_t px = dmddata[pixelnr++];
+						switch (px)
+						{
+						case 0xff000000:
+							img.setPixel(x, y, qRgba(0, 0, 0, 255));
+							break;
+						case 0xff515151:
+							img.setPixel(x, y, qRgba(255, 0, 0, 255));
+							break;
+						case 0xff555555:
+							img.setPixel(x, y, qRgba(0, 255, 0, 255));
+							break;
+						case 0xfff3b245:
+							img.setPixel(x, y, qRgba(0, 0, 255, 255));
+							break;
+						}
+					}
+					else
+					{
+						img.setPixel(x, y, qRgba(r, g, b, a));
+					}
+				}
+				else
+				{
+					img.setPixel(x, y, qRgba(r, g, b, a));
+				}
 
-				img.setPixel(x, y, qRgba(r, g, b, a));
+
+
 			}
 		}
 
 		m_image_label->setPixmap(QPixmap::fromImage(img));
+
+		pixelnr = 0;
+		// Debug colors to set
+		for (uint32_t line = 0; line < FANTASIES_DMD_HEIGHT; ++line)
+		{
+			for (uint32_t px = 0; px < FANTASIES_DMD_WIDTH; ++px)
+			{
+				uint32_t pixel = dmddata[pixelnr++];
+				pixels[pixel].insert(m_current_file_nr);
+				//pixels.insert(pixel);
+				//(0xFFF3B245)
+			}
+		}
+
+
+		// de-dot DMD
+		pixelnr = 0;
+		QImage dmd(FANTASIES_DMD_WIDTH, FANTASIES_DMD_HEIGHT, QImage::Format_RGBA8888);
+		for (uint32_t y = 0; y < FANTASIES_DMD_HEIGHT; ++y)
+		{
+			for (uint32_t x = 0; x < FANTASIES_DMD_WIDTH; ++x)
+			{
+				uint32_t pixel = dmddata[pixelnr++];
+				switch (pixel)
+				{
+				case 0xff000000:
+					dmd.setPixel(x, y, qRgba(0, 0, 0, 255));
+					break;
+				case 0xff515151:
+					dmd.setPixel(x, y, qRgba(0, 0, 0, 255));
+					break;
+				case 0xff555555:
+					dmd.setPixel(x, y, qRgba(0, 0, 0, 255));
+					break;
+				case 0xfff3b245:
+					dmd.setPixel(x, y, qRgba(255, 255, 255, 255));
+					break;
+				}
+
+				pixelnr++; // Extra stride
+			}
+
+			pixelnr += 320; // Skip a complete line
+		}
+		m_dmd_label->setPixmap(QPixmap::fromImage(dmd));
+
 	}
 }
 
@@ -155,3 +250,19 @@ void FantasiesWindow::dec_img100_button_clicked()
 	update_image();
 }
 
+void FantasiesWindow::auto_button_clicked()
+{
+	m_current_file_nr = 1;
+	while (m_current_file_nr < 1000)
+	{
+		update_image();
+		++m_current_file_nr;
+	}
+	printf("");
+}
+
+void FantasiesWindow::debug_button_clicked()
+{
+	m_debug_colors = !m_debug_colors;
+	update_image();
+}
