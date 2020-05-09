@@ -3,7 +3,7 @@
 /*
 MIT License
 
-Copyright (c) 2019 BlackStar
+Copyright (c) 2020 BlackStar
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,8 @@ SOFTWARE.
 */
 
 #include <stdint.h>
-
+#include <assert.h>
+#include <memory>
 #include "dmdconfig.h"
 
 class DMDFrame
@@ -41,6 +42,31 @@ public:
 	uint8_t* const grayscale_frame();
 	uint32_t* const color_frame();
 
+	inline void set_pixel(uint32_t x, uint32_t y, uint8_t grayscale)
+	{
+		assert(x < DMDConfig::DMDWIDTH);
+		assert(y < DMDConfig::DMDHEIGHT);
+		m_grayscale_frame[y * DMDConfig::DMDWIDTH + x] = grayscale;
+	}
+
+	inline void set_pixel(uint32_t x, uint32_t y, uint32_t color)
+	{
+		assert(x < DMDConfig::DMDWIDTH);
+		assert(y < DMDConfig::DMDHEIGHT);
+		m_color_frame[y * DMDConfig::DMDWIDTH + x] = color;
+	}
+
+	inline void set_pixel(uint32_t x, uint32_t y, uint8_t grayscale, uint32_t color)
+	{
+		set_pixel(x, y, grayscale);
+		set_pixel(x, y, color);
+	}
+
+	inline void clear()
+	{
+		memset(m_grayscale_frame, 0, sizeof(m_grayscale_frame));
+		memset(m_color_frame, 0, sizeof(m_color_frame));
+	}
 
 private:
 	uint8_t m_grayscale_frame[DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT];

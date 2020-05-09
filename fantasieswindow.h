@@ -3,7 +3,7 @@
 /*
 MIT License
 
-Copyright (c) 2019 BlackStar
+Copyright (c) 2020 BlackStar
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -51,6 +51,13 @@ private:
 	bool is_column_candidate(uint32_t column);
 	void update_image();
 
+	void stride_fix(const QImage& dmd);
+	void stretched_fix(const QImage& dmd);
+	void hacked_fix();
+	void cropped_fix(const QImage& dmd);
+	void span_fix(const QImage& dmd);
+
+
 private slots:
 	void inc_img_button_clicked();
 	void dec_img_button_clicked();
@@ -71,9 +78,11 @@ private:
 	QLabel* m_dmd_stretched_label = nullptr;
 	QLabel* m_dmd_hacked_label = nullptr;
 	QLabel* m_dmd_cropped_label = nullptr;
+	QLabel* m_dmd_span_label = nullptr;
 	uint32_t m_current_file_nr = 0;
 	QMap<uint32_t, std::set<uint32_t>> pixels;
-	bool m_debug_colors = true;
+	bool m_debug_colors = false;
 
 	uint8_t rawDMD[FANTASIES_DMD_WIDTH * FANTASIES_DMD_HEIGHT];
+	DMDAnimationEngine* m_animation_engine = nullptr;
 };

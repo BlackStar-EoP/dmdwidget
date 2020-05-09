@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/">
+        <file>sfx//wms_cancel.wav</file>
+        <file>sfx//wms_down.wav</file>
+        <file>sfx//wms_menu_enter.wav</file>
+        <file>sfx//wms_post.wav</file>
+        <file>sfx//wms_save.wav</file>
+        <file>sfx//wms_save_done.wav</file>
+        <file>sfx//wms_up.wav</file>
+    </qresource>
+</RCC>

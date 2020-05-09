@@ -113,7 +113,13 @@
     <ClCompile Include="dmdconfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="dmdeventfilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="dmdframe.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dmdkeys.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dmdoutputdevice.cpp">
@@ -235,7 +241,13 @@
     <ClInclude Include="dmdconfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="dmdeventfilter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="dmdframe.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dmdkeys.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="dmdoutputdevice.h">
@@ -429,6 +441,12 @@
     <ClCompile Include="release\qrc_color_widgets.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
+    <ClCompile Include="debug\qrc_dmdwidget.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="release\qrc_dmdwidget.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
     <ClInclude Include="ui_color_dialog.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
@@ -454,7 +472,31 @@
     <CustomBuild Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\src\color_widgets.qrc">
       <Filter>Resource Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="dmdwidget.qrc">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
     <None Include="of">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="sfx\wms_cancel.wav">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="sfx\wms_down.wav">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="sfx\wms_menu_enter.wav">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="sfx\wms_post.wav">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="sfx\wms_save.wav">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="sfx\wms_save_done.wav">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="sfx\wms_up.wav">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

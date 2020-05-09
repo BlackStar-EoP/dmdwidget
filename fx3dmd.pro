@@ -1,4 +1,4 @@
-QT       += core gui widgets
+QT       += core gui widgets multimedia
 
 INCLUDEPATH += $$PWD/src
 
@@ -29,6 +29,8 @@ SOURCES += $$PWD/main.cpp \
            $$PWD/widgetoutputdeviceconfigtab.cpp \
            $$PWD/rominspectwindow.cpp \
            $$PWD/fantasieswindow.cpp \
+           $$PWD/dmdeventfilter.cpp \
+           $$PWD/dmdkeys.cpp \
            $$PWD/dmdconfig.cpp
 
 HEADERS += $$PWD/mainwindow.h \
@@ -50,7 +52,12 @@ HEADERS += $$PWD/mainwindow.h \
            $$PWD/widgetoutputdeviceconfigtab.h \
            $$PWD/rominspectwindow.h \
            $$PWD/fantasieswindow.h \
+           $$PWD/dmdeventfilter.h \
+           $$PWD/dmdkeys.h \
            $$PWD/dmdconfig.h
+
+RESOURCES += \
+    dmdwidget.qrc
 
 include("vendor/Qt-Color-Widgets/color_widgets.pri");
 

@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2019 BlackStar
+Copyright (c) 2020 BlackStar
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -169,7 +169,7 @@ int main(int argc, char *argv[])
 	AnimationWindow animation_window(nullptr, &animation_engine);
 	//DeviceConfigWindow config_window(nullptr);
 	//ROMInspectWindow rom_window(nullptr, nullptr);
-	FantasiesWindow fantasies_window(nullptr, nullptr);
+	FantasiesWindow fantasies_window(nullptr, &animation_engine);
 
 	app.start_polling();
 	

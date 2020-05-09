@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2019 BlackStar
+Copyright (c) 2020 BlackStar
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,8 +34,7 @@ DMDFrame::DMDFrame(uint8_t* grayscale_frame, uint32_t* color_frame)
 
 DMDFrame::DMDFrame()
 {
-	memset(m_grayscale_frame, 0, sizeof(m_grayscale_frame));
-	memset(m_color_frame, 0, sizeof(m_color_frame));
+	clear();
 }
 
 const uint8_t* const DMDFrame::const_grayscale_frame() const

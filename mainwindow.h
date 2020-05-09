@@ -3,7 +3,7 @@
 /*
 MIT License
 
-Copyright (c) 2019 BlackStar
+Copyright (c) 2020 BlackStar
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

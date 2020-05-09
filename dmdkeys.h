@@ -1,5 +1,3 @@
-#pragma once
-
 /*
 MIT License
 
@@ -24,27 +22,35 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <QWidget>
-
-class DMDAnimationEngine;
-class QListWidget;
-
-class AnimationWindow : public QWidget
+namespace DMDKeys
 {
-	Q_OBJECT
-public:
-	AnimationWindow(QWidget* parent, DMDAnimationEngine* animation_engine);
+#ifdef WIN32
+	const uint32_t SHIFT = 16;
+	const uint32_t CTRL = 17;
+	const uint32_t LSHIFT_MODIFIER = 1;
+	const uint32_t RSHIFT_MODIFIER = 16;
+	const uint32_t LCTRL_MODIFIER = 2;
+	const uint32_t RCTRL_MODIFIER = 17;
+#else
+#error Needs implementation of native keys
+#endif
 
-private slots:
-	void show_animation_button_clicked();
-	void recordButton_clicked();
-	void saveRecordingsButton_clicked();
-
-private:
-	void initUI();
-
-private:
-	DMDAnimationEngine* m_animation_engine = nullptr;
-	QListWidget* m_animation_list = nullptr;
-	bool m_record_frames = false;
-};
+	enum Button : uint32_t
+	{
+		LEFT_FLIPPER, // Left shift
+		RIGHT_FLIPPER, // Right shift
+		LEFT_MAGNA_SAVE, // Left control
+		RIGHT_MAGNA_SAVE, // Right control
+		LAUNCH_BALL, // Enter
+		SERVICE_MENU_CANCEL, // 7
+		SERVICE_MENU_DOWN,  // 8
+		SERVICE_MENU_UP, // 9
+		SERVICE_MENU_ENTER, // 0
+		COIN, // 5
+		COINDOOR, // END
+		START, // 1
+		BUYIN, // 2
+		EXIT, // Q
+		UNKNOWN
+	};
+}

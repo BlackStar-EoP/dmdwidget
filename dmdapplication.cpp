@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2019 BlackStar
+Copyright (c) 2020 BlackStar
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ SOFTWARE.
 
 #include "fx3process.h"
 #include "dmdanimationengine.h"
+#include "dmdeventfilter.h"
 
 #include <assert.h>
 
@@ -34,6 +35,7 @@ DMDApplication::DMDApplication(int argc, char *argv[], FX3Process* fx3_process)
 , m_fx3_process(fx3_process)
 , m_fx3_animation(fx3_process)
 {
+	installEventFilter(new DMDEventFilter());
 	connect(&m_find_fx3_timer, SIGNAL(timeout()), this, SLOT(find_FX3_executable_timeout()));
 	connect(&m_find_DMD_timer, SIGNAL(timeout()), this, SLOT(find_DMD_timeout()));
 }

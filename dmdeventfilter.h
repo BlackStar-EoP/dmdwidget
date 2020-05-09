@@ -1,5 +1,3 @@
-#pragma once
-
 /*
 MIT License
 
@@ -24,27 +22,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <QWidget>
+#include <QObject>
 
-class DMDAnimationEngine;
-class QListWidget;
+#include "dmdkeys.h"
 
-class AnimationWindow : public QWidget
+class DMDEventFilter : public QObject
 {
-	Q_OBJECT
-public:
-	AnimationWindow(QWidget* parent, DMDAnimationEngine* animation_engine);
-
-private slots:
-	void show_animation_button_clicked();
-	void recordButton_clicked();
-	void saveRecordingsButton_clicked();
-
 private:
-	void initUI();
-
-private:
-	DMDAnimationEngine* m_animation_engine = nullptr;
-	QListWidget* m_animation_list = nullptr;
-	bool m_record_frames = false;
+	bool eventFilter(QObject *watched, QEvent *event) override;
+	bool is_shift(uint32_t native_key) const;
+	bool is_ctrl(uint32_t native_key) const;
+	DMDKeys::Button flipper(uint32_t native_key, uint32_t native_modifier) const;
+	DMDKeys::Button magna_save(uint32_t native_key, uint32_t native_modifier) const;
+	DMDKeys::Button DMDEventFilter::button_for_key(int keycode) const;
+	void fire_button_pressed(DMDKeys::Button button);
+	void fire_button_released(DMDKeys::Button button);
 };
