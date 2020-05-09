@@ -38,7 +38,7 @@ class FantasiesWindow : public QWidget
 	Q_OBJECT
 public:
 	static const uint32_t FANTASIES_WIDTH = 320;
-	static const uint32_t FANTASIES_HEIGHT = 608;
+	static const uint32_t FANTASIES_HEIGHT = 34;
 
 	static const uint32_t FANTASIES_DMD_WIDTH = 160;
 	static const uint32_t FANTASIES_DMD_HEIGHT = 16;
@@ -51,10 +51,6 @@ private:
 	bool is_column_candidate(uint32_t column);
 	void update_image();
 
-	void stride_fix(const QImage& dmd);
-	void stretched_fix(const QImage& dmd);
-	void hacked_fix();
-	void cropped_fix(const QImage& dmd);
 	void span_fix(const QImage& dmd);
 
 
@@ -74,14 +70,8 @@ private:
 	QLabel* m_file_name_label = nullptr;
 	QLabel* m_image_label = nullptr;
 	QLabel* m_dmd_label = nullptr;
-	QLabel* m_dmd_stride_label = nullptr;
-	QLabel* m_dmd_stretched_label = nullptr;
-	QLabel* m_dmd_hacked_label = nullptr;
-	QLabel* m_dmd_cropped_label = nullptr;
 	QLabel* m_dmd_span_label = nullptr;
 	uint32_t m_current_file_nr = 0;
-	QMap<uint32_t, std::set<uint32_t>> pixels;
-	bool m_debug_colors = false;
 
 	uint8_t rawDMD[FANTASIES_DMD_WIDTH * FANTASIES_DMD_HEIGHT];
 	DMDAnimationEngine* m_animation_engine = nullptr;

@@ -49,7 +49,7 @@ bool DMDEventFilter::eventFilter(QObject* watched, QEvent* event)
 		if (event->type() == QEvent::KeyPress)
 		{
 			fire_button_pressed(button);
-			QSound::play(":/sfx/wms_save.wav");
+		//	QSound::play(":/sfx/wms_save.wav");
 		}
 		else if (event->type() == QEvent::KeyRelease)
 			fire_button_released(button);

@@ -102,21 +102,8 @@ void FantasiesWindow::initUI()
 	m_dmd_label = new QLabel(this);
 	m_dmd_label->setGeometry(440, 30, FANTASIES_DMD_WIDTH, FANTASIES_DMD_HEIGHT);
 
-	m_dmd_stride_label = new QLabel(this);
-	m_dmd_stride_label->setGeometry(440, 50, DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT);
-
-	m_dmd_stretched_label = new QLabel(this);
-	m_dmd_stretched_label->setGeometry(440, 90, DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT);
-
-	m_dmd_hacked_label = new QLabel(this);
-	m_dmd_hacked_label->setGeometry(440, 130, DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT);
-
-	m_dmd_cropped_label = new QLabel(this);
-	m_dmd_cropped_label->setGeometry(440, 170, DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT);
-
 	m_dmd_span_label = new QLabel(this);
-	m_dmd_span_label->setGeometry(440, 210, DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT);
-
+	m_dmd_span_label->setGeometry(440, 50, DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT);
 }
 
 bool FantasiesWindow::is_column_candidate(uint32_t column)
@@ -143,206 +130,47 @@ void FantasiesWindow::update_image()
 
 	QImage img(filenamepng);
 
-	for (uint32_t y = 0; y < 34; ++y)
-	{
-		for (uint32_t x = 0; x < FANTASIES_WIDTH; ++x)
-		{
-			if (m_debug_colors)
-			{
-				uint32_t px = img.pixel(x, y);
-				switch (px)
-				{
-				case 0xff000000:
-					img.setPixel(x, y, qRgba(0, 0, 0, 255));
-					break;
-				case 0xff515151:
-					img.setPixel(x, y, qRgba(255, 0, 0, 255));
-					break;
-				case 0xff555555:
-					img.setPixel(x, y, qRgba(0, 255, 0, 255));
-					break;
-				case 0xfff3b245:
-					img.setPixel(x, y, qRgba(0, 0, 255, 255));
-					break;
-				}
-			}
-		}
-	}
-
 	m_image_label->setPixmap(QPixmap::fromImage(img));
 
 	int pixelnr = 0;
-	// Debug colors to set
-	for (uint32_t line = 0; line < FANTASIES_DMD_HEIGHT; ++line)
-	{
-		for (uint32_t px = 0; px < FANTASIES_DMD_WIDTH; ++px)
-		{
-			uint32_t pixel = img.pixel(px, line);
-			pixels[pixel].insert(m_current_file_nr);
-			//pixels.insert(pixel);
-			//(0xFFF3B245)
-		}
-	}
 
 
 	// de-dot DMD
-	pixelnr = 0;
 	QImage dmd(FANTASIES_DMD_WIDTH, FANTASIES_DMD_HEIGHT, QImage::Format_RGBA8888);
-	for (uint32_t y = 2; y < FANTASIES_DMD_HEIGHT; ++y)
+	int desty = 0;
+	for (uint32_t y = 1; y < FANTASIES_DMD_HEIGHT + 1; ++y)
 	{
 		for (uint32_t x = 0; x < FANTASIES_DMD_WIDTH; ++x)
 		{
+			assert(x * 2 < img.width());
+			assert(y * 2 < img.height());
 			uint32_t pixel = img.pixel(x * 2, y * 2);
 			switch (pixel)
 			{
 			case 0xff000000:
-				dmd.setPixel(x, y, qRgba(0, 0, 0, 255));
+				dmd.setPixel(x, desty, qRgba(0, 0, 0, 255));
 				break;
 			case 0xff515151:
-				dmd.setPixel(x, y, qRgba(0, 0, 0, 255));
+				dmd.setPixel(x, desty, qRgba(0, 0, 0, 255));
 				break;
 			case 0xff555555:
-				dmd.setPixel(x, y, qRgba(0, 0, 0, 255));
+				dmd.setPixel(x, desty, qRgba(0, 0, 0, 255));
 				break;
 			case 0xfff3b245:
-				dmd.setPixel(x, y, qRgba(255, 255, 255, 255));
-				rawDMD[y * FANTASIES_DMD_WIDTH + x] = 255;
+				dmd.setPixel(x, desty, qRgba(255, 255, 255, 255));
+				rawDMD[desty * FANTASIES_DMD_WIDTH + x] = 255;
 				break;
 			}
-
-			pixelnr++; // Extra stride
 		}
-
-		pixelnr += 320; // Skip a complete line
+		++desty;
 	}
 	m_dmd_label->setPixmap(QPixmap::fromImage(dmd));
-	stride_fix(dmd);
-	stretched_fix(dmd);
-	hacked_fix();
-	cropped_fix(dmd);
 	span_fix(dmd);
-}
-
-void FantasiesWindow::stride_fix(const QImage& dmd)
-{
-	// Stride fix
-	QImage strideDMD(DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT, QImage::Format_RGBA8888);
-	uint32_t dest_x = 0;
-	uint32_t dest_y = 8;
-	uint32_t skipped = 0;
-	for (uint32_t y = 0; y < FANTASIES_DMD_HEIGHT; ++y)
-	{
-		for (uint32_t x = 0; x < FANTASIES_DMD_WIDTH; ++x)
-		{
-			if (x % 5 == 0)
-				continue;
-
-			strideDMD.setPixel(dest_x, dest_y, dmd.pixel(x, y));
-			dest_x++;
-		}
-
-		dest_x = 0;
-		dest_y++;
-	}
-	m_dmd_stride_label->setPixmap(QPixmap::fromImage(strideDMD));
-}
-
-void FantasiesWindow::stretched_fix(const QImage& dmd)
-{
-	// Stretched fix
-	QImage stretchedDMD = dmd.scaledToWidth(DMDConfig::DMDWIDTH, Qt::FastTransformation);
-	//        FastTransformation,
-	//SmoothTransformation
-	m_dmd_stretched_label->setPixmap(QPixmap::fromImage(stretchedDMD));
-}
-
-void FantasiesWindow::hacked_fix()
-{
-	// Hacked fix
-	QVector<uint32_t> candidate_columns;
-
-	//m_dmd_hacked_label
-	for (uint32_t x = 0; x < FANTASIES_DMD_WIDTH; ++x)
-	{
-		bool prevcandidate = is_column_candidate(x - 1);
-		bool candidate = is_column_candidate(x);
-		bool nextcandidate = is_column_candidate(x + 1);
-
-		// FIXME, can be sped up by saving column candidate states, can't be bothered now since this is an unproven concept....
-
-		if (prevcandidate && candidate && nextcandidate)
-			candidate_columns.push_back(x);
-
-	}
-
-	QImage hackedDMD(DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT, QImage::Format_RGBA8888);
-	uint32_t skipped_column_count = 0;
-	uint32_t current_column = 0;
-	/////
-	///// RAW TEST
-	//dest_y = 8;
-	//QImage rawwDMD(DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT, QImage::Format_RGBA8888);
-	//for (uint32_t y = 0; y < FANTASIES_DMD_HEIGHT; ++y)
-	//{
-	//	for (uint32_t x = 16; x < DMDConfig::DMDWIDTH + 16; ++x)
-	//	{
-	//		uint32_t val = RAWPIXEL(x, y);
-	//		rawwDMD.setPixel(x - 16, dest_y, qRgba(val, val, val, 255));
-	//	}
-	//	dest_y++;
-	//}
-	//m_dmd_hacked_label->setPixmap(QPixmap::fromImage(rawwDMD));
-	/////
-
-
-	for (uint32_t x = 0; x < FANTASIES_DMD_WIDTH; ++x)
-	{
-		if (current_column == DMDConfig::DMDWIDTH)
-			break;
-
-		if (skipped_column_count < 32 && candidate_columns.contains(x))
-		{
-			++skipped_column_count;
-			continue;
-		}
-
-		for (uint32_t y = 0; y < FANTASIES_DMD_HEIGHT; ++y)
-		{
-			uint32_t val = RAWPIXEL(x, y);
-			if (val == 255)
-			{
-				hackedDMD.setPixel(current_column, y + 8, qRgba(255, 255, 255, 255));
-			}
-			else
-			{
-				hackedDMD.setPixel(current_column, y + 8, qRgba(0, 0, 0, 255));
-			}
-		}
-
-		++current_column;
-	}
-
-	m_dmd_hacked_label->setPixmap(QPixmap::fromImage(hackedDMD));
-}
-
-void FantasiesWindow::cropped_fix(const QImage& dmd)
-{
-	// Cropped fix
-	int dest_y = 8;
-	QImage croppedDMD(DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT, QImage::Format_RGBA8888);
-	for (uint32_t y = 0; y < FANTASIES_DMD_HEIGHT; ++y)
-	{
-		for (uint32_t x = 16; x < DMDConfig::DMDWIDTH + 16; ++x)
-		{
-			croppedDMD.setPixel(x - 16, dest_y, dmd.pixel(x, y));
-		}
-		dest_y++;
-	}
-	m_dmd_cropped_label->setPixmap(QPixmap::fromImage(croppedDMD));
 }
 
 void FantasiesWindow::span_fix(const QImage& dmd)
 {
+	return;
 	// Span fix
 	bool in_span = false;
 	uint32_t span_start = 0;
@@ -423,7 +251,6 @@ void FantasiesWindow::span_fix(const QImage& dmd)
 	int dest_y = 8;
 	QImage spanDMD(DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT, QImage::Format_RGBA8888);
 	spanDMD.fill(Qt::black);
-	DMDFrame frame;
 
 	int current_column = 0;
 	for (uint32_t x = 0; x < FANTASIES_DMD_WIDTH; ++x)
@@ -445,8 +272,6 @@ void FantasiesWindow::span_fix(const QImage& dmd)
 	frames.push_back(spanDMD);
 	ImageAnimation* anim = new ImageAnimation(frames, 1);
 	m_animation_engine->show_animation(anim);
-
-	printf("");
 }
 
 
@@ -499,7 +324,7 @@ void FantasiesWindow::auto_button_clicked()
 		QString filename = QString("D:/pf/shots/shot") + QString::number(i) + ".bsr";
 		QString filenamepng = QString("D:/pf/shots/shot") + QString::number(i) + ".png";
 
-		QImage img(FANTASIES_WIDTH, 34, QImage::Format_RGBA8888);
+		QImage img(FANTASIES_WIDTH, FANTASIES_HEIGHT, QImage::Format_RGBA8888);
 		QFile file(filename);
 		if (file.open(QIODevice::ReadOnly))
 		{
@@ -513,7 +338,7 @@ void FantasiesWindow::auto_button_clicked()
 			const int startpos = 2560;
 			uint32_t* dmddata = (uint32_t*)(pixeldata + startpos);
 
-			for (uint32_t y = 0; y < 34; ++y)
+			for (uint32_t y = 0; y < FANTASIES_HEIGHT; ++y)
 			{
 				for (uint32_t x = 0; x < FANTASIES_WIDTH; ++x)
 				{
@@ -533,6 +358,4 @@ void FantasiesWindow::auto_button_clicked()
 
 void FantasiesWindow::debug_button_clicked()
 {
-	m_debug_colors = !m_debug_colors;
-	update_image();
 }
