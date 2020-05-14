@@ -43,6 +43,8 @@ public:
 	static const uint32_t FANTASIES_DMD_WIDTH = 160;
 	static const uint32_t FANTASIES_DMD_HEIGHT = 16;
 
+	static const uint32_t REMOVE_COLUMN_COUNT = 32;
+
 public:
 	FantasiesWindow(QWidget* parent, DMDAnimationEngine* animation_engine);
 	~FantasiesWindow();
@@ -51,7 +53,8 @@ private:
 	bool is_column_candidate(uint32_t column);
 	void update_image();
 
-	void span_fix(const QImage& dmd);
+	QImage span_fix();
+	QImage dedot_dmd(const QImage& img);
 
 
 private slots:

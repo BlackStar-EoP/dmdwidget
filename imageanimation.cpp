@@ -55,6 +55,7 @@ ImageAnimation::~ImageAnimation()
 
 DMDFrame* ImageAnimation::current_frame()
 {
+	assert(m_frames.size() > 0);
 	// TODO implement animationmode repeat etc
 	if (m_current_frame_number >= m_frames.size())
 		m_current_frame_number = 0;

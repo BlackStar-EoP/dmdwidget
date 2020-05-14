@@ -42,6 +42,50 @@ SOFTWARE.
 
 #define RAWPIXEL(x,y) rawDMD[y * FANTASIES_DMD_WIDTH + x]
 
+class Span
+{
+public:
+
+	Span(uint32_t start_column, uint32_t end_column)
+	{
+		m_start_column = start_column;
+		m_end_column = end_column;
+	}
+
+	uint32_t width() const
+	{
+		return m_end_column - m_start_column + 1;
+	}
+
+	bool is_big_span() const
+	{
+		return width() >= FantasiesWindow::REMOVE_COLUMN_COUNT;
+	}
+
+	uint32_t start_column() const
+	{
+		return m_start_column;
+	}
+
+	uint32_t end_column() const
+	{
+		return m_end_column;
+	}
+
+	bool is_left_span() const
+	{
+		return m_start_column == 0;
+	}
+
+	bool is_right_span() const
+	{
+		return m_end_column == FantasiesWindow::FANTASIES_DMD_WIDTH - 1;
+	}
+
+	uint32_t m_start_column = 0;
+	uint32_t m_end_column = 0;
+};
+
 FantasiesWindow::FantasiesWindow(QWidget* parent, DMDAnimationEngine* animation_engine)
 : QWidget(parent, Qt::Window)
 , m_animation_engine(animation_engine)
@@ -124,17 +168,241 @@ bool FantasiesWindow::is_column_candidate(uint32_t column)
 void FantasiesWindow::update_image()
 {
 	memset(rawDMD, 0, sizeof(rawDMD));
-
+#undef USE_PNGS
+#ifdef USE_PNGS
 	QString filenamepng = QString("D:/pf/shots/shot") + QString::number(m_current_file_nr) + ".png";
+#else
+	QString filenamepng = QString("D:/pf/dmd/shot") + QString::number(m_current_file_nr) + ".dmd";
+#endif
 	m_file_name_label->setText(filenamepng);
 
+#ifdef USE_PNGS
 	QImage img(filenamepng);
+#else
+	QImage img(FANTASIES_WIDTH, FANTASIES_HEIGHT, QImage::Format_RGBA8888);
+	QFile file(filenamepng);
+	if (file.open(QIODevice::ReadOnly))
+	{
+		QByteArray data = file.readAll();
+		const char* pixeldata = data.constData();
+		memcpy(rawDMD, pixeldata, sizeof(rawDMD));
+		file.close();
 
+		//for (uint32_t y = 0; y < FANTASIES_DMD_HEIGHT; ++y)
+		//{
+		//	for (uint32_t x = 0; x < FANTASIES_DMD_WIDTH; ++x)
+		//	{
+		//		uint8_t pixel = pixeldata[FANTASIES_DMD_WIDTH * y + x];
+		//		if (pixel == 255)
+		//			img.setPixel(x, y, qRgb(255, 255, 255));
+		//		else
+		//			img.setPixel(x, y, qRgb(0, 0, 0));
+		//	}
+		//}
+
+		uint32_t x = 0;
+		uint32_t y = 0;
+		for (int32_t byte = 0; byte < data.size(); ++byte)
+		{
+			uint8_t value = pixeldata[byte];
+			//for (int32_t bitindex = 7; bitindex >= 0; --bitindex)
+			for (uint32_t bitindex = 0; bitindex < 8; ++bitindex)
+			{
+				uint8_t bit = value & (1 << bitindex);
+				if (bit)
+					img.setPixel(x, y, qRgb(255, 255, 255));
+				else
+					img.setPixel(x, y, qRgb(0, 0, 0));
+				++x;
+			}
+			if (x >= 160)
+			{
+				x = 0;
+				++y;
+			}
+		}
+
+	}
+#endif
+	
 	m_image_label->setPixmap(QPixmap::fromImage(img));
+	QImage dmd = dedot_dmd(img);
+	m_dmd_label->setPixmap(QPixmap::fromImage(dmd));
+		QImage fixed = span_fix();
+	m_dmd_span_label->setPixmap(QPixmap::fromImage(fixed));
+	QVector<QImage> frames;
+	frames.push_back(fixed);
+	ImageAnimation* anim = new ImageAnimation(frames, 1);
+	m_animation_engine->show_animation(anim);
+}
 
-	int pixelnr = 0;
+QImage FantasiesWindow::span_fix()
+{
+	// Span fix
+	bool in_span = false;
+	uint32_t span_start = 0;
+	std::vector<Span> spans;
+	for (uint32_t x = 0; x < FANTASIES_DMD_WIDTH; ++x)
+	{
+		if (is_column_candidate(x))
+		{
+			if (!in_span)
+			{
+				in_span = true;
+				span_start = x;
+			}
+		}
+		else
+		{
+			if (in_span)
+			{
+				in_span = false;
+				if (x - span_start > 3)
+					spans.push_back(Span(span_start, x));
+			}
+		}
+	}
+	if (in_span)
+	{
+		in_span = false;
+		if ((FANTASIES_DMD_WIDTH - 1) - span_start > 3)
+			spans.push_back(Span(span_start, FANTASIES_DMD_WIDTH - 1));
+	}
+
+	std::set<uint32_t> remove_columns;
+
+	uint32_t num_big_spans = 0;
+
+	for (auto it = spans.begin(); it != spans.end(); ++it)
+	{
+		uint32_t spanwidth = it->width();
+		if (spanwidth >= REMOVE_COLUMN_COUNT)
+		{
+			++num_big_spans;
+		}
+	}
+
+	if (spans.size() == 1)
+	{
+		auto first = spans.begin();
+		if (first->width() == FANTASIES_DMD_WIDTH)
+		{
+			// TODO, DMD cleared, reset any animation flags
+		}
+	}
+
+	if (num_big_spans > 0)
+	{
+		if (num_big_spans == 1)
+		{
+			for (auto span = spans.begin(); span != spans.end(); ++span)
+			{
+				if (span->is_big_span())
+				{
+					if (!span->is_left_span())
+					{
+						for (uint32_t i = 0; i < REMOVE_COLUMN_COUNT; ++i)
+						{
+							remove_columns.insert(span->start_column() + i);
+						}
+					}
+					else
+					{
+						auto lspan = spans.begin();
+						auto rspan = spans.rbegin();
+						if (lspan->width() > 16 && rspan->width() > 16)
+						{
+							for (uint32_t i = 0; i < 16; ++i)
+							{
+								remove_columns.insert(lspan->start_column() + i);
+								remove_columns.insert(rspan->start_column() + i);
+							}
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			auto lspan = spans.begin();
+			auto rspan = spans.rbegin();
+			if (lspan->width() > 16 && rspan->width() > 16)
+			{
+				for (uint32_t i = 0; i < 16; ++i)
+				{
+					remove_columns.insert(lspan->start_column() + i);
+					remove_columns.insert(rspan->start_column() + i);
+				}
+			}
+		}
+	}
+	else if (spans.size() >= 2 || num_big_spans > 1) // attempt left and right removal
+	{
+		auto lspan = spans.begin();
+		auto rspan = spans.rbegin();
+
+		if (lspan->width() >= 16 && rspan->width() >= 16)
+		{
+			for (uint32_t i = 0; i < 16; ++i)
+			{
+				remove_columns.insert(lspan->start_column() + i);
+				remove_columns.insert(rspan->start_column() + i);
+			}
+		}
+		else
+		{
+			for (uint32_t i = 0; i < lspan->width(); ++i)
+			{
+				remove_columns.insert(lspan->start_column() + i);
+			}
+			for (uint32_t i = 0; i < rspan->width(); ++i)
+			{
+				remove_columns.insert(rspan->start_column() + i);
+			}
+			uint32_t remaining_columns = REMOVE_COLUMN_COUNT - lspan->width() - rspan->width();
+			if (spans.size() == 3)
+			{
+				auto& mspan = ++lspan;
+				if (mspan->width() > remaining_columns)
+				{
+					for (uint32_t i = 0; i < remaining_columns; ++i)
+					{
+						remove_columns.insert(mspan->start_column() + i);
+					}
+				}
+			}
+		}
+	}
 
 
+	// finally set span:
+	QImage spanDMD(DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT, QImage::Format_RGBA8888);
+	spanDMD.fill(Qt::black);
+	if (remove_columns.size() == 0)
+		return spanDMD;
+
+	int dest_y = 8;
+	int current_column = 0;
+	for (uint32_t x = 0; x < FANTASIES_DMD_WIDTH; ++x)
+	{
+		if (remove_columns.find(x) != remove_columns.end())
+			continue;
+
+		for (uint32_t y = 0; y < 16; ++y)
+		{
+			uint8_t val = RAWPIXEL(x, y);
+			spanDMD.setPixel(current_column, y + 8, qRgb(val, val, val));
+		}
+		++current_column;
+		if (current_column == DMDConfig::DMDWIDTH)
+			break;
+	}
+
+	return spanDMD;
+}
+
+QImage FantasiesWindow::dedot_dmd(const QImage& img)
+{
 	// de-dot DMD
 	QImage dmd(FANTASIES_DMD_WIDTH, FANTASIES_DMD_HEIGHT, QImage::Format_RGBA8888);
 	int desty = 0;
@@ -164,114 +432,8 @@ void FantasiesWindow::update_image()
 		}
 		++desty;
 	}
-	m_dmd_label->setPixmap(QPixmap::fromImage(dmd));
-	span_fix(dmd);
-}
 
-void FantasiesWindow::span_fix(const QImage& dmd)
-{
-	return;
-	// Span fix
-	bool in_span = false;
-	uint32_t span_start = 0;
-	std::set<std::pair<uint32_t, uint32_t>> spans;
-	for (uint32_t x = 0; x < FANTASIES_DMD_WIDTH; ++x)
-	{
-		if (is_column_candidate(x))
-		{
-			if (!in_span)
-			{
-				in_span = true;
-				span_start = x;
-			}
-		}
-		else
-		{
-			if (in_span)
-			{
-				in_span = false;
-				if (x - span_start > 3)
-					spans.insert(std::pair<uint32_t, uint32_t>(span_start, x));
-			}
-		}
-	}
-	if (in_span)
-	{
-		in_span = false;
-		if ((FANTASIES_DMD_WIDTH - 1) - span_start > 3)
-			spans.insert(std::pair<uint32_t, uint32_t>(span_start, FANTASIES_DMD_WIDTH - 1));
-	}
-
-	if (spans.size() > 3)
-		printf("");
-
-	std::set<uint32_t> remove_columns;
-
-	bool has_big_span = false;
-
-	for (auto it = spans.begin(); it != spans.end(); ++it)
-	{
-		uint32_t spanwidth = it->second - it->first;
-		if (spanwidth >= 32)
-		{
-			has_big_span = true;
-			for (uint32_t i = 0; i < 32; ++i)
-			{
-				remove_columns.insert(it->first + i);
-			}
-			break;
-		}
-	}
-
-	if (has_big_span)
-	{
-
-	}
-	else if (spans.size() >= 2) // attempt left and right removal
-	{
-		auto lspan = spans.begin();
-		auto rspan = spans.rbegin();
-		uint32_t lwidth = lspan->second - lspan->first;
-		uint32_t rwidth = rspan->second - rspan->first;
-
-		if (lwidth >= 16 && rwidth >= 16)
-		{
-			for (uint32_t i = 0; i < 16; ++i)
-			{
-				remove_columns.insert(lspan->first + i);
-				remove_columns.insert(rspan->first + i);
-			}
-		}
-	}
-
-	if (remove_columns.size() == 0)
-		return;
-
-	// finally set span:
-	int dest_y = 8;
-	QImage spanDMD(DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT, QImage::Format_RGBA8888);
-	spanDMD.fill(Qt::black);
-
-	int current_column = 0;
-	for (uint32_t x = 0; x < FANTASIES_DMD_WIDTH; ++x)
-	{
-		if (remove_columns.find(x) != remove_columns.end())
-			continue;
-
-		for (uint32_t y = 0; y < 16; ++y)
-		{
-			spanDMD.setPixel(current_column, y + 8, dmd.pixel(x, y));
-		}
-		++current_column;
-		if (current_column == DMDConfig::DMDWIDTH)
-			break;
-	}
-
-	m_dmd_span_label->setPixmap(QPixmap::fromImage(spanDMD));
-	QVector<QImage> frames;
-	frames.push_back(spanDMD);
-	ImageAnimation* anim = new ImageAnimation(frames, 1);
-	m_animation_engine->show_animation(anim);
+	return dmd;
 }
 
 
@@ -319,41 +481,31 @@ void FantasiesWindow::dec_img100_button_clicked()
 
 void FantasiesWindow::auto_button_clicked()
 {
-	for (uint32_t i = 0; i < 20000; ++i)
+	bool save_frames = true;
+	QVector<QImage> frames;
+	for (uint32_t i = 35; i < 15851; ++i)
+	//for (uint32_t i = 35; i < 136; ++i)
 	{
-		QString filename = QString("D:/pf/shots/shot") + QString::number(i) + ".bsr";
+		memset(rawDMD, 0, sizeof(rawDMD));
 		QString filenamepng = QString("D:/pf/shots/shot") + QString::number(i) + ".png";
+		QImage img(filenamepng);
 
-		QImage img(FANTASIES_WIDTH, FANTASIES_HEIGHT, QImage::Format_RGBA8888);
-		QFile file(filename);
-		if (file.open(QIODevice::ReadOnly))
+		QImage dmd = dedot_dmd(img);
+		QImage fixed = span_fix();
+		
+		if (save_frames)
 		{
-			QByteArray data = file.readAll();
-			const char* pixeldata = data.constData();
-			file.close();
-			int pos = 0;
-			int pixelnr = 0;
-
-			// Grab DMD
-			const int startpos = 2560;
-			uint32_t* dmddata = (uint32_t*)(pixeldata + startpos);
-
-			for (uint32_t y = 0; y < FANTASIES_HEIGHT; ++y)
-			{
-				for (uint32_t x = 0; x < FANTASIES_WIDTH; ++x)
-				{
-					int b = pixeldata[pos++];
-					int g = pixeldata[pos++];
-					int r = pixeldata[pos++];
-					int a = pixeldata[pos++];
-
-					img.setPixel(x, y, qRgba(r, g, b, a));
-				}
-			}
-			img.save(filenamepng);
+			QString savepng = QString("D:/pf/convert/cnv") + QString::number(i) + ".png";
+			QImage sub = fixed.copy(QRect(0, 8, 128, 16));
+			sub.save(savepng);
 		}
-		else break;
+		else
+		{
+			frames.push_back(fixed);
+		}
 	}
+	ImageAnimation* anim = new ImageAnimation(frames, 1);
+	m_animation_engine->show_animation(anim);
 }
 
 void FantasiesWindow::debug_button_clicked()
