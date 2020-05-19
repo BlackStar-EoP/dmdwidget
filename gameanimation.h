@@ -59,7 +59,10 @@ public:
 	void button_released(DMDKeys::Button button) override;
 
 private:
-	bool detect_collision(int32_t y) const;
+	bool detect_collision(int32_t x, int32_t y) const;
+	bool is_movement_allowed(int32_t x) const;
+	bool full_line(uint32_t line_nr) const;
+	void check_lines();
 	void store_block(uint8_t* playfield);
 	void copy_playfield();
 	void copy_block(int32_t dest_x, int32_t dest_y);
@@ -67,6 +70,6 @@ private:
 private:
 	Block* m_current_block = nullptr;
 	int32_t m_block_x = 0;
-	int32_t m_block_y = 17;
+	int32_t m_block_y = 0;
 	DMDFrame m_game_frame;
 };

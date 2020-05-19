@@ -282,10 +282,12 @@ void GameAnimation::button_pressed(DMDKeys::Button button)
 	switch (button)
 	{
 	case DMDKeys::LEFT_FLIPPER:
-		m_block_x--;
+		if (is_movement_allowed(m_block_x - 1))
+			m_block_x--;
 		break;
 	case DMDKeys::RIGHT_FLIPPER:
-		m_block_x++;
+		if (is_movement_allowed(m_block_x + 1))
+			m_block_x++;
 		break;
 	case DMDKeys::LEFT_MAGNA_SAVE:
 		m_current_block->rotate(Block::LEFT);
@@ -301,7 +303,7 @@ void GameAnimation::button_released(DMDKeys::Button button)
 	Q_UNUSED(button);
 }
 
-bool GameAnimation::detect_collision(int32_t y) const
+bool GameAnimation::detect_collision(int32_t x, int32_t y) const
 {
 	uint8_t block_size = m_current_block->block_size();
 
@@ -316,8 +318,8 @@ bool GameAnimation::detect_collision(int32_t y) const
 			if (y + block_y >= PLAYFIELD_HEIGHT)
 				return true;
 
-			int8_t dest_x = m_block_x + block_x;
-			int8_t dest_y = m_block_y + block_y;
+			int8_t dest_x = x + block_x;
+			int8_t dest_y = y + block_y;
 			assert(dest_x >= 0 && dest_x < PLAYFIELD_WIDTH);
 			assert(dest_y >= 0 && dest_y < PLAYFIELD_HEIGHT);
 			if (m_game_playfield[dest_x + (dest_y * PLAYFIELD_WIDTH)] != 0)
@@ -326,6 +328,54 @@ bool GameAnimation::detect_collision(int32_t y) const
 	}
 
 	return false;
+}
+
+bool GameAnimation::is_movement_allowed(int32_t x) const
+{
+	// check left and right bounds
+	int32_t block_size = m_current_block->block_size();
+	for (int32_t block_y = 0; block_y < block_size; ++block_y)
+	{
+		for (int32_t block_x = 0; block_x < block_size; ++block_x)
+		{
+			if (m_current_block->block_value(block_x, block_y) == 0)
+				continue;
+
+			if (x + block_x < 0 || x + block_x >= PLAYFIELD_WIDTH)
+				return false;
+		}
+	}
+
+	if (detect_collision(x, m_block_y))
+		return false;
+
+	return true;
+}
+
+bool GameAnimation::full_line(uint32_t line_nr) const
+{
+	for (uint32_t x = 0; x < PLAYFIELD_WIDTH; ++x)
+	{
+		if (m_game_playfield[line_nr * PLAYFIELD_WIDTH + x] == 0)
+			return false;
+	}
+
+	return true;
+}
+
+void GameAnimation::check_lines()
+{
+	std::vector<uint32_t> full_lines;
+	for (uint32_t line = 0; line < PLAYFIELD_HEIGHT; ++line)
+	{
+		if (full_line(line))
+			full_lines.push_back(line);
+	}
+
+	for (int32_t i = full_lines.size() - 1; i >= 0; --i)
+	{
+		memmove(m_game_playfield + PLAYFIELD_WIDTH, m_game_playfield, PLAYFIELD_WIDTH * full_lines[i]);
+	}
 }
 
 void GameAnimation::store_block(uint8_t* playfield)
@@ -357,9 +407,9 @@ void GameAnimation::copy_playfield()
 
 	framenumber++;
 
-	if (framenumber % 20 == 0)
+	if (framenumber % 10 == 0)
 	{
-		if (detect_collision(m_block_y + 1))
+		if (detect_collision(m_block_x, m_block_y + 1))
 		{
 			store_block(m_game_playfield);
 
@@ -388,6 +438,7 @@ void GameAnimation::copy_playfield()
 	memcpy(m_playfield, m_game_playfield, PLAYFIELD_WIDTH * PLAYFIELD_HEIGHT);
 
 	store_block(m_playfield);
+	check_lines();
 
 	for (uint32_t y = 0; y < PLAYFIELD_HEIGHT; ++y)
 	{
