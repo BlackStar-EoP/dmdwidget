@@ -38,6 +38,12 @@ const uint8_t GameAnimation::BLOCK[BLOCKPIXELS][BLOCKPIXELS] =
 	{ 85,  85, 85 }
 };
 
+const uint8_t GameAnimation::EMPTY[BLOCKPIXELS][BLOCKPIXELS] =
+{
+	{ 85, 85, 85 },
+	{ 85,  0, 85 },
+	{ 85, 85, 85 }
+};
 
 class Block
 {
@@ -297,10 +303,8 @@ void GameAnimation::button_released(DMDKeys::Button button)
 
 bool GameAnimation::detect_collision(int32_t y) const
 {
-	if (y == PLAYFIELD_HEIGHT)
-		return true;
-
 	uint8_t block_size = m_current_block->block_size();
+
 	for (uint8_t block_y = 0; block_y < block_size; ++block_y)
 	{
 		for (uint8_t block_x = 0; block_x < block_size; ++block_x)
@@ -309,11 +313,14 @@ bool GameAnimation::detect_collision(int32_t y) const
 			if (block_value == 0)
 				continue;
 
+			if (y + block_y >= PLAYFIELD_HEIGHT)
+				return true;
+
 			int8_t dest_x = m_block_x + block_x;
 			int8_t dest_y = m_block_y + block_y;
 			assert(dest_x >= 0 && dest_x < PLAYFIELD_WIDTH);
 			assert(dest_y >= 0 && dest_y < PLAYFIELD_HEIGHT);
-			if (m_playfield[dest_x][dest_y] != 0)
+			if (m_game_playfield[dest_x + (dest_y * PLAYFIELD_WIDTH)] != 0)
 				return true;
 		}
 	}
@@ -336,7 +343,8 @@ void GameAnimation::store_block(uint8_t* playfield)
 			int8_t dest_y = m_block_y + block_y;
 			assert(dest_x >= 0 && dest_x < PLAYFIELD_WIDTH);
 			assert(dest_y >= 0 && dest_y < PLAYFIELD_HEIGHT);
-			playfield[dest_x + (dest_y * PLAYFIELD_WIDTH)] = block_value;
+			int32_t index = dest_x + (dest_y * PLAYFIELD_WIDTH);
+			playfield[index] = block_value;
 		}
 	}
 }
@@ -349,10 +357,12 @@ void GameAnimation::copy_playfield()
 
 	framenumber++;
 
-	if (framenumber % 60 == 0)
+	if (framenumber % 20 == 0)
 	{
 		if (detect_collision(m_block_y + 1))
 		{
+			store_block(m_game_playfield);
+
 			m_block_x = 0;
 			m_block_y = 0;
 
@@ -361,12 +371,12 @@ void GameAnimation::copy_playfield()
 			switch (r)
 			{
 			case Block::I_BLOCK: m_current_block = new J_Block(); break;
-			case Block::J_BLOCK: m_current_block = new J_Block();
-			case Block::L_BLOCK: m_current_block = new L_Block();
-			case Block::O_BLOCK: m_current_block = new J_Block();
-			case Block::S_BLOCK: m_current_block = new S_Block();
-			case Block::T_BLOCK: m_current_block = new T_Block();
-			case Block::Z_BLOCK: m_current_block = new Z_Block();
+			case Block::J_BLOCK: m_current_block = new J_Block(); break;
+			case Block::L_BLOCK: m_current_block = new L_Block(); break;
+			case Block::O_BLOCK: m_current_block = new J_Block(); break;
+			case Block::S_BLOCK: m_current_block = new S_Block(); break;
+			case Block::T_BLOCK: m_current_block = new T_Block(); break;
+			case Block::Z_BLOCK: m_current_block = new Z_Block(); break;
 			}
 		}
 		else
@@ -377,26 +387,43 @@ void GameAnimation::copy_playfield()
 
 	memcpy(m_playfield, m_game_playfield, PLAYFIELD_WIDTH * PLAYFIELD_HEIGHT);
 
-	store_block(&m_playfield[0][0]);
+	store_block(m_playfield);
 
 	for (uint32_t y = 0; y < PLAYFIELD_HEIGHT; ++y)
 	{
 		for (uint32_t x = 0; x < PLAYFIELD_WIDTH; ++x)
 		{
-			if (m_playfield[x][y] != 0)
-				//copy_block(x * 3 + 68, y * 3 + 1);
-				copy_block(y * 3 + 68,  30 - (x * 3));
+			if (m_playfield[x + (y * PLAYFIELD_WIDTH)] != 0)
+				copy_block(x * 3, y * 3);
+			else
+				copy_empty(x * 3, y * 3);
 		}
 	}
 }
 
 void GameAnimation::copy_block(int32_t dest_x, int32_t dest_y)
 {
+	uint32_t start_x = 31; // for y axis
 	for (uint32_t y = 0; y < BLOCKPIXELS; ++y)
 	{
 		for (uint32_t x = 0; x < BLOCKPIXELS; ++x)
 		{
-			m_game_frame.set_pixel(dest_x + x, dest_y - y, BLOCK[x][y]);
+			uint32_t pixel_x = dest_y + y + 68;
+			uint32_t pixel_y = 31 - dest_x - x;
+			m_game_frame.set_pixel(pixel_x, pixel_y, BLOCK[x][y]);
+		}
+	}
+}
+
+void GameAnimation::copy_empty(int32_t dest_x, int32_t dest_y)
+{
+	for (uint32_t y = 0; y < BLOCKPIXELS; ++y)
+	{
+		for (uint32_t x = 0; x < BLOCKPIXELS; ++x)
+		{
+			uint32_t pixel_x = dest_y + y + 68;
+			uint32_t pixel_y = 31 - dest_x - x;
+			m_game_frame.set_pixel(pixel_x, pixel_y, EMPTY[x][y]);
 		}
 	}
 }

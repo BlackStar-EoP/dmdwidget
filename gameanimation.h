@@ -40,6 +40,7 @@ public:
 	static const uint8_t BLOCKPIXELS = 3;
 	static const uint8_t BLOCKSIZE = 3;
 	static const uint8_t BLOCK[BLOCKPIXELS][BLOCKPIXELS];
+	static const uint8_t EMPTY[BLOCKPIXELS][BLOCKPIXELS];
 
 	static const uint8_t PLAYFIELD_WIDTH = 10;
 	static const uint8_t PLAYFIELD_HEIGHT = 20;
@@ -47,10 +48,8 @@ public:
 
 	static const uint8_t EMPTY_SPACE = 0;
 	static const uint8_t FILLED_SPACE = 1;
-	uint8_t m_playfield[PLAYFIELD_WIDTH][PLAYFIELD_HEIGHT]{ 0 };
-	uint8_t m_game_playfield[PLAYFIELD_WIDTH][PLAYFIELD_HEIGHT]{ 0 };
-
-
+	uint8_t m_playfield[PLAYFIELD_WIDTH * PLAYFIELD_HEIGHT] = { 0 };
+	uint8_t m_game_playfield[PLAYFIELD_WIDTH * PLAYFIELD_HEIGHT] = { 0 };
 
 	GameAnimation();
 	~GameAnimation();
@@ -64,10 +63,10 @@ private:
 	void store_block(uint8_t* playfield);
 	void copy_playfield();
 	void copy_block(int32_t dest_x, int32_t dest_y);
-
+	void copy_empty(int32_t dest_x, int32_t dest_y);
 private:
 	Block* m_current_block = nullptr;
 	int32_t m_block_x = 0;
-	int32_t m_block_y = 0;
+	int32_t m_block_y = 17;
 	DMDFrame m_game_frame;
 };
