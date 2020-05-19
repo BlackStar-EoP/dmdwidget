@@ -37,6 +37,21 @@ class Block;
 class GameAnimation : public DMDAnimation
 {
 public:
+	static const uint8_t BLOCKPIXELS = 3;
+	static const uint8_t BLOCKSIZE = 3;
+	static const uint8_t BLOCK[BLOCKPIXELS][BLOCKPIXELS];
+
+	static const uint8_t PLAYFIELD_WIDTH = 10;
+	static const uint8_t PLAYFIELD_HEIGHT = 20;
+
+
+	static const uint8_t EMPTY_SPACE = 0;
+	static const uint8_t FILLED_SPACE = 1;
+	uint8_t m_playfield[PLAYFIELD_WIDTH][PLAYFIELD_HEIGHT]{ 0 };
+	uint8_t m_game_playfield[PLAYFIELD_WIDTH][PLAYFIELD_HEIGHT]{ 0 };
+
+
+
 	GameAnimation();
 	~GameAnimation();
 
@@ -45,6 +60,8 @@ public:
 	void button_released(DMDKeys::Button button) override;
 
 private:
+	bool detect_collision(int32_t y) const;
+	void store_block(uint8_t* playfield);
 	void copy_playfield();
 	void copy_block(int32_t dest_x, int32_t dest_y);
 

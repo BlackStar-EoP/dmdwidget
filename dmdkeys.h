@@ -59,6 +59,7 @@ namespace DMDKeys
 		START, // 1
 		BUYIN, // 2
 		EXIT, // Q
-		UNKNOWN
+		UNKNOWN,
+		NUM_BUTTONS
 	};
 }

@@ -45,4 +45,5 @@ private:
 
 private:
 	DMDAnimationEngine* m_animation_engine = nullptr;
+	bool m_button_state[DMDKeys::NUM_BUTTONS];
 };

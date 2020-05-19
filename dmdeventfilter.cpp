@@ -34,6 +34,7 @@ SOFTWARE.
 DMDEventFilter::DMDEventFilter(DMDAnimationEngine* animation_engine)
 : m_animation_engine(animation_engine)
 {
+	memset(m_button_state, false, sizeof(m_button_state));
 }
 
 bool DMDEventFilter::eventFilter(QObject* watched, QEvent* event)
@@ -41,9 +42,6 @@ bool DMDEventFilter::eventFilter(QObject* watched, QEvent* event)
 	if (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease)
 	{
 		QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
-		//quint32 native_key = keyEvent->nativeVirtualKey();
-		//uint32_t native_modifiers = keyEvent->nativeModifiers();
-		auto mods = keyEvent->modifiers();
 		uint32_t scancode = keyEvent->nativeScanCode();
 
 		DMDKeys::Button button = DMDKeys::UNKNOWN;
@@ -57,21 +55,24 @@ bool DMDEventFilter::eventFilter(QObject* watched, QEvent* event)
 		default: button = button_for_key(keyEvent->key()); break;
 		}
 
-/*		if (is_shift(native_key))
-			button = flipper(native_key, native_modifiers);
-		else if (is_ctrl(native_key))
-			button = magna_save(native_key, native_modifiers);
-		else
-			button = button_for_key(keyEvent->key());*/
-
 
 		if (event->type() == QEvent::KeyPress)
 		{
-			fire_button_pressed(button);
+			if (!m_button_state[button])
+			{
+				m_button_state[button] = true;
+				fire_button_pressed(button);
+			}
 		//	QSound::play(":/sfx/wms_save.wav");
 		}
 		else if (event->type() == QEvent::KeyRelease)
-			fire_button_released(button);
+		{
+			if (m_button_state[button])
+			{
+				m_button_state[button] = false;
+				fire_button_released(button);
+			}
+		}
 	}
 	return false;
 }
