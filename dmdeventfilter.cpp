@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 #include "dmdeventfilter.h"
+#include "dmdanimationengine.h"
 
 #include <QEvent>
 #include <QKeyEvent>
@@ -30,21 +31,39 @@ SOFTWARE.
 
 #include <assert.h>
 
+DMDEventFilter::DMDEventFilter(DMDAnimationEngine* animation_engine)
+: m_animation_engine(animation_engine)
+{
+}
+
 bool DMDEventFilter::eventFilter(QObject* watched, QEvent* event)
 {
 	if (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease)
 	{
 		QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
-		quint32 native_key = keyEvent->nativeVirtualKey();
-		uint32_t native_modifiers = keyEvent->nativeModifiers();
+		//quint32 native_key = keyEvent->nativeVirtualKey();
+		//uint32_t native_modifiers = keyEvent->nativeModifiers();
+		auto mods = keyEvent->modifiers();
+		uint32_t scancode = keyEvent->nativeScanCode();
 
 		DMDKeys::Button button = DMDKeys::UNKNOWN;
-		if (is_shift(native_key))
+
+		switch (scancode)
+		{
+		case DMDKeys::LSHIFT_SCANCODE: button = DMDKeys::LEFT_FLIPPER; break;
+		case DMDKeys::RSHIFT_SCANCODE: button = DMDKeys::RIGHT_FLIPPER; break;
+		case DMDKeys::LCTRL_SCANCODE: button = DMDKeys::LEFT_MAGNA_SAVE; break;
+		case DMDKeys::RCTRL_SCANCODE: button = DMDKeys::RIGHT_MAGNA_SAVE; break;
+		default: button = button_for_key(keyEvent->key()); break;
+		}
+
+/*		if (is_shift(native_key))
 			button = flipper(native_key, native_modifiers);
 		else if (is_ctrl(native_key))
 			button = magna_save(native_key, native_modifiers);
 		else
-			button = button_for_key(keyEvent->key());
+			button = button_for_key(keyEvent->key());*/
+
 
 		if (event->type() == QEvent::KeyPress)
 		{
@@ -113,10 +132,10 @@ DMDKeys::Button DMDEventFilter::button_for_key(int keycode) const
 
 void DMDEventFilter::fire_button_pressed(DMDKeys::Button button)
 {
-
+	m_animation_engine->button_pressed(button);
 }
 
 void DMDEventFilter::fire_button_released(DMDKeys::Button button)
 {
-
+	m_animation_engine->button_released(button);
 }

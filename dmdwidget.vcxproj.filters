@@ -137,6 +137,9 @@
     <ClCompile Include="fx3process.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="gameanimation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\src\gradient_slider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -263,6 +266,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="fx3process.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gameanimation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <CustomBuild Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\include\gradient_slider.hpp">

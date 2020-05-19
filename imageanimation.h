@@ -38,6 +38,8 @@ public:
 	~ImageAnimation();
 
 	DMDFrame* current_frame() override;
+	void button_pressed(DMDKeys::Button button) override;
+	void button_released(DMDKeys::Button button) override;
 
 	bool is_valid() const;
 

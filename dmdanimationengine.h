@@ -26,6 +26,8 @@ SOFTWARE.
 
 #include "animationthread.h"
 
+#include "dmdkeys.h"
+
 #include <QString>
 #include <QMap>
 
@@ -45,6 +47,9 @@ public:
 	void stop_recording();
 	void clear_recordings();
 	const QVector<QImage>& recordings();
+
+	void button_pressed(DMDKeys::Button button);
+	void button_released(DMDKeys::Button button);
 
 private:
 	void create_internal_animations();

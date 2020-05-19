@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include "dmdkeys.h"
+
 #include <QVector>
 
 class DMDFrame;
@@ -35,6 +37,8 @@ public:
 	virtual ~DMDAnimation() = default;
 
 	virtual DMDFrame* current_frame() = 0;
+	virtual void button_pressed(DMDKeys::Button button) = 0;
+	virtual void button_released(DMDKeys::Button button) = 0;
 
 private:
 };

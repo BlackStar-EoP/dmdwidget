@@ -26,8 +26,13 @@ SOFTWARE.
 
 #include "dmdkeys.h"
 
+class DMDAnimationEngine;
+
 class DMDEventFilter : public QObject
 {
+public:
+	DMDEventFilter(DMDAnimationEngine* animation_engine);
+
 private:
 	bool eventFilter(QObject *watched, QEvent *event) override;
 	bool is_shift(uint32_t native_key) const;
@@ -37,4 +42,7 @@ private:
 	DMDKeys::Button DMDEventFilter::button_for_key(int keycode) const;
 	void fire_button_pressed(DMDKeys::Button button);
 	void fire_button_released(DMDKeys::Button button);
+
+private:
+	DMDAnimationEngine* m_animation_engine = nullptr;
 };

@@ -35,7 +35,6 @@ DMDApplication::DMDApplication(int argc, char *argv[], FX3Process* fx3_process)
 , m_fx3_process(fx3_process)
 , m_fx3_animation(fx3_process)
 {
-	installEventFilter(new DMDEventFilter());
 	connect(&m_find_fx3_timer, SIGNAL(timeout()), this, SLOT(find_FX3_executable_timeout()));
 	connect(&m_find_DMD_timer, SIGNAL(timeout()), this, SLOT(find_DMD_timeout()));
 }
@@ -43,6 +42,7 @@ DMDApplication::DMDApplication(int argc, char *argv[], FX3Process* fx3_process)
 void DMDApplication::set_animation_engine(DMDAnimationEngine* animation_engine)
 {
 	m_animation_engine = animation_engine;
+	installEventFilter(new DMDEventFilter(m_animation_engine));
 }
 
 void DMDApplication::start_polling()

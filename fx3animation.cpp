@@ -100,6 +100,16 @@ DMDFrame* FX3Animation::current_frame()
 	return &m_DMD_frame;
 }
 
+void FX3Animation::button_pressed(DMDKeys::Button button)
+{
+	Q_UNUSED(button);
+}
+
+void FX3Animation::button_released(DMDKeys::Button button)
+{
+	Q_UNUSED(button);
+}
+
 bool FX3Animation::isGarbage(const uint8_t* rawDMD) const
 {
 	const uint32_t pixelCount = DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT;

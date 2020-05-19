@@ -103,6 +103,16 @@ const QVector<QImage>& DMDAnimationEngine::recordings()
 	return m_animation_thread.recordings();
 }
 
+void DMDAnimationEngine::button_pressed(DMDKeys::Button button)
+{
+	m_animation_thread.button_pressed(button);
+}
+
+void DMDAnimationEngine::button_released(DMDKeys::Button button)
+{
+	m_animation_thread.button_released(button);
+}
+
 void DMDAnimationEngine::create_internal_animations()
 {
 	QImage empty_image(DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT, QImage::Format_RGBA8888);

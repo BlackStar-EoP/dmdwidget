@@ -135,7 +135,7 @@ void FantasiesWindow::initUI()
 	auto_button->setGeometry(10, 180, 100, 20);
 	connect(auto_button, SIGNAL(clicked()), this, SLOT(auto_button_clicked()));
 
-	QPushButton* debug_button = new QPushButton("DEBUG", this);
+	QPushButton* debug_button = new QPushButton("TETRIS", this);
 	debug_button->setGeometry(10, 205, 100, 20);
 	connect(debug_button, SIGNAL(clicked()), this, SLOT(debug_button_clicked()));
 
@@ -508,6 +508,9 @@ void FantasiesWindow::auto_button_clicked()
 	m_animation_engine->show_animation(anim);
 }
 
+#include "gameanimation.h"
+
 void FantasiesWindow::debug_button_clicked()
 {
+	m_animation_engine->show_animation(new GameAnimation());
 }

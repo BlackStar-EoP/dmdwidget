@@ -113,3 +113,21 @@ const QVector<QImage>& AnimationThread::recordings()
 {
 	return m_recordings;
 }
+
+void AnimationThread::button_pressed(DMDKeys::Button button)
+{
+	if (m_animation)
+	{
+		QMutexLocker lock(&m_animation_mutex);
+		m_animation->button_pressed(button);
+	}
+}
+
+void AnimationThread::button_released(DMDKeys::Button button)
+{
+	if (m_animation)
+	{
+		QMutexLocker lock(&m_animation_mutex);
+		m_animation->button_released(button);
+	}
+}

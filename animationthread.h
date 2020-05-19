@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include "dmdkeys.h"
+
 #include <QThread>
 #include <QMutex>
 #include <QVector>
@@ -46,6 +48,9 @@ public:
 	void stop_recording();
 	void clear_recordings();
 	const QVector<QImage>& recordings();
+
+	void button_pressed(DMDKeys::Button button);
+	void button_released(DMDKeys::Button button);
 
 private:
 	QVector<DMDOutputDevice*> m_output_devices;

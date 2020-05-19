@@ -24,36 +24,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <QColor>
-
 #include "dmdanimation.h"
 
 #include "dmdframe.h"
 
-class FX3Process;
+class QImage;
+class DMDFrame;
+class QStringList;
 
-class FX3Animation : public DMDAnimation
+class Block;
+
+class GameAnimation : public DMDAnimation
 {
 public:
-	FX3Animation(FX3Process* fx3_process);
+	GameAnimation();
+	~GameAnimation();
+
 	DMDFrame* current_frame() override;
 	void button_pressed(DMDKeys::Button button) override;
 	void button_released(DMDKeys::Button button) override;
 
 private:
-	bool isGarbage(const uint8_t* rawDMD) const;
-	bool isWilliamsDMD(const uint8_t* rawDMD) const;
-	void normalizeZenDMD(uint8_t* rawDMD);
-	void normalizeWilliamsDMD(uint8_t* rawDMD);
-	bool isEmpty(const uint8_t* rawDMD) const;
-	bool isEqual(const uint8_t* DMD1, const uint8_t* DMD2);
+	void copy_playfield();
+	void copy_block(int32_t dest_x, int32_t dest_y);
 
 private:
-	FX3Process* m_fx3_process = nullptr;
-	DMDFrame m_DMD_frame;
-	uint8_t m_RAW_DMD[DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT];
-	uint8_t m_previous_RAW_DMD[DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT];
-	
-	bool m_DMD_color_found = false;
-	QColor m_DMD_color;
+	Block* m_current_block = nullptr;
+	int32_t m_block_x = 0;
+	int32_t m_block_y = 0;
+	DMDFrame m_game_frame;
 };

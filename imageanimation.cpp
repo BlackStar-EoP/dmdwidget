@@ -77,6 +77,16 @@ DMDFrame* ImageAnimation::current_frame()
 	return frame;
 }
 
+void ImageAnimation::button_pressed(DMDKeys::Button button)
+{
+	Q_UNUSED(button);
+}
+
+void ImageAnimation::button_released(DMDKeys::Button button)
+{
+	Q_UNUSED(button);
+}
+
 bool ImageAnimation::is_valid() const
 {
 	return m_valid;

@@ -1,3 +1,5 @@
+#pragma once
+
 /*
 MIT License
 
@@ -22,9 +24,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include <stdint.h>
+
 namespace DMDKeys
 {
 #ifdef WIN32
+	const uint32_t LSHIFT_SCANCODE = 42;
+	const uint32_t RSHIFT_SCANCODE = 54;
+	const uint32_t LCTRL_SCANCODE = 29;
+	const uint32_t RCTRL_SCANCODE = 285;
 	const uint32_t SHIFT = 16;
 	const uint32_t CTRL = 17;
 	const uint32_t LSHIFT_MODIFIER = 1;

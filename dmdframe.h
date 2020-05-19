@@ -42,21 +42,21 @@ public:
 	uint8_t* const grayscale_frame();
 	uint32_t* const color_frame();
 
-	inline void set_pixel(uint32_t x, uint32_t y, uint8_t grayscale)
+	inline void set_pixel(int32_t x, int32_t y, uint8_t grayscale)
 	{
-		assert(x < DMDConfig::DMDWIDTH);
-		assert(y < DMDConfig::DMDHEIGHT);
+		assert(x >= 0 && x < DMDConfig::DMDWIDTH);
+		assert(y >= 0 && y < DMDConfig::DMDHEIGHT);
 		m_grayscale_frame[y * DMDConfig::DMDWIDTH + x] = grayscale;
 	}
 
-	inline void set_pixel(uint32_t x, uint32_t y, uint32_t color)
+	inline void set_pixel(int32_t x, int32_t y, uint32_t color)
 	{
-		assert(x < DMDConfig::DMDWIDTH);
-		assert(y < DMDConfig::DMDHEIGHT);
+		assert(x >= 0 && x < DMDConfig::DMDWIDTH);
+		assert(y >= 0 && y < DMDConfig::DMDHEIGHT);
 		m_color_frame[y * DMDConfig::DMDWIDTH + x] = color;
 	}
 
-	inline void set_pixel(uint32_t x, uint32_t y, uint8_t grayscale, uint32_t color)
+	inline void set_pixel(int32_t x, int32_t y, uint8_t grayscale, uint32_t color)
 	{
 		set_pixel(x, y, grayscale);
 		set_pixel(x, y, color);
