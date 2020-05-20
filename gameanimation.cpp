@@ -45,47 +45,6 @@ const uint8_t GameAnimation::EMPTY[BLOCKPIXELS][BLOCKPIXELS] =
 	{ 85, 85, 85 }
 };
 
-class Block
-{
-public:
-	enum EBlockType
-	{
-		I_BLOCK,
-		J_BLOCK,
-		L_BLOCK,
-		O_BLOCK,
-		S_BLOCK,
-		T_BLOCK,
-		Z_BLOCK,
-		NUM_BLOCKS
-	};
-
-	enum ERotationDirection
-	{
-		LEFT,
-		RIGHT
-	};
-
-public:
-
-	Block(EBlockType block_type)
-	: m_block_type(block_type)
-	{
-	}
-
-	virtual void rotate(ERotationDirection direction) = 0;
-	virtual uint8_t block_size() const = 0;
-	virtual uint8_t* block_matrix() = 0;
-	virtual uint8_t block_value(int32_t x, int32_t y) const = 0;
-	EBlockType block_type() const
-	{
-		return m_block_type;
-	}
-
-protected:
-	EBlockType m_block_type = NUM_BLOCKS;
-};
-
 class Block3x3 : public Block
 {
 public:
@@ -290,10 +249,10 @@ void GameAnimation::button_pressed(DMDKeys::Button button)
 			m_block_x++;
 		break;
 	case DMDKeys::LEFT_MAGNA_SAVE:
-		m_current_block->rotate(Block::LEFT);
+		rotate_if_allowed(Block::LEFT);
 		break;
 	case DMDKeys::RIGHT_MAGNA_SAVE:
-		m_current_block->rotate(Block::RIGHT);
+		rotate_if_allowed(Block::RIGHT);
 		break;
 	}
 }
@@ -351,6 +310,52 @@ bool GameAnimation::is_movement_allowed(int32_t x) const
 
 	return true;
 }
+
+void GameAnimation::rotate_if_allowed(Block::ERotationDirection direction)
+{
+	int32_t backup_block_x = m_block_x;
+	m_current_block->rotate(direction);
+	correct_out_of_bounds();
+
+	if (detect_collision(m_block_x, m_block_y))
+	{
+		if (direction == Block::LEFT)
+			m_current_block->rotate(Block::RIGHT);
+		else if (direction == Block::RIGHT)
+			m_current_block->rotate(Block::LEFT);
+		m_block_x = backup_block_x;
+	}
+}
+
+void GameAnimation::correct_out_of_bounds()
+{
+	uint8_t block_size = m_current_block->block_size();
+	int32_t min_x = 0;
+	int32_t max_x = 0;
+	for (uint8_t block_y = 0; block_y < block_size; ++block_y)
+	{
+		for (uint8_t block_x = 0; block_x < block_size; ++block_x)
+		{
+			uint8_t block_value = m_current_block->block_value(block_x, block_y);
+			if (block_value == 0)
+				continue;
+
+			int8_t dest_x = m_block_x + block_x;
+			if (dest_x < min_x)
+				min_x = dest_x;
+
+			if (dest_x > max_x)
+				max_x = dest_x;
+		}
+	}
+
+	if (min_x < 0)
+		m_block_x -= min_x;
+
+	if (max_x >= PLAYFIELD_WIDTH)
+		m_block_x -= (max_x - PLAYFIELD_WIDTH + 1);
+}
+
 
 bool GameAnimation::full_line(uint32_t line_nr) const
 {

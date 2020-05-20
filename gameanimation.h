@@ -32,11 +32,57 @@ class QImage;
 class DMDFrame;
 class QStringList;
 
-class Block;
+class Block
+{
+public:
+	enum EBlockType
+	{
+		I_BLOCK,
+		J_BLOCK,
+		L_BLOCK,
+		O_BLOCK,
+		S_BLOCK,
+		T_BLOCK,
+		Z_BLOCK,
+		NUM_BLOCKS
+	};
+
+	enum ERotationDirection
+	{
+		LEFT,
+		RIGHT
+	};
+
+public:
+
+	Block(EBlockType block_type)
+		: m_block_type(block_type)
+	{
+	}
+
+	virtual void rotate(ERotationDirection direction) = 0;
+	virtual uint8_t block_size() const = 0;
+	virtual uint8_t* block_matrix() = 0;
+	virtual uint8_t block_value(int32_t x, int32_t y) const = 0;
+	EBlockType block_type() const
+	{
+		return m_block_type;
+	}
+
+protected:
+	EBlockType m_block_type = NUM_BLOCKS;
+};
 
 class GameAnimation : public DMDAnimation
 {
 public:
+	enum ERotationDirection
+	{
+		LEFT,
+		RIGHT
+	};
+
+
 	static const uint8_t BLOCKPIXELS = 3;
 	static const uint8_t BLOCKSIZE = 3;
 	static const uint8_t BLOCK[BLOCKPIXELS][BLOCKPIXELS];
@@ -61,6 +107,8 @@ public:
 private:
 	bool detect_collision(int32_t x, int32_t y) const;
 	bool is_movement_allowed(int32_t x) const;
+	void rotate_if_allowed(Block::ERotationDirection direction);
+	void correct_out_of_bounds();
 	bool full_line(uint32_t line_nr) const;
 	void check_lines();
 	void store_block(uint8_t* playfield);
