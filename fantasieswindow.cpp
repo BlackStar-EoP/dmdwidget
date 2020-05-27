@@ -37,10 +37,52 @@ SOFTWARE.
 #include <QDesktopWidget>
 #include <QPainter>
 #include <QSet>
+#include <QKeyEvent>
 
 #include <assert.h>
 
 #define RAWPIXEL(x,y) rawDMD[y * FANTASIES_DMD_WIDTH + x]
+
+const int DMD_SIZE = 4;
+
+class FantasiesEventFilter : public QObject
+{
+public:
+	FantasiesEventFilter(FantasiesWindow& window)
+		: m_window(window)
+	{
+
+	}
+
+	bool eventFilter(QObject* watched, QEvent* event) override
+	{
+		if (event->type() == QEvent::KeyPress)
+		{
+			QKeyEvent* key_event = (QKeyEvent*)event;
+			int key = key_event->key();
+			switch (key)
+			{
+			case Qt::Key_4:
+				m_window.key_left();
+				break;
+			case Qt::Key_6:
+				m_window.key_right();
+				break;
+			case Qt::Key_8:
+				m_window.key_up();
+				break;
+			case Qt::Key_2:
+				m_window.key_down();
+				break;
+			}
+		}
+		return false;
+	}
+
+	private:
+		FantasiesWindow& m_window;
+};
+
 
 class Span
 {
@@ -97,6 +139,7 @@ FantasiesWindow::FantasiesWindow(QWidget* parent, DMDAnimationEngine* animation_
 	QRect screenGeometry = QApplication::desktop()->screenGeometry();
 	int x = (screenGeometry.width() - width()) / 2;
 	int y = (screenGeometry.height() -height()) / 2;
+	installEventFilter(new FantasiesEventFilter(*this));
 	move(x, y);
 	show();
 }
@@ -104,6 +147,32 @@ FantasiesWindow::FantasiesWindow(QWidget* parent, DMDAnimationEngine* animation_
 FantasiesWindow::~FantasiesWindow()
 {
 }
+
+void FantasiesWindow::key_left()
+{
+	if (m_byte_index > 0)
+		m_byte_index--;
+	update_image();
+}
+void FantasiesWindow::key_right()
+{
+	if (m_byte_index < 319)
+		m_byte_index++;
+	update_image();
+}
+void FantasiesWindow::key_up()
+{
+	if (m_byte_index > 19)
+		m_byte_index -= 20;
+	update_image();
+}
+void FantasiesWindow::key_down()
+{
+	if (m_byte_index < 300)
+		m_byte_index += 20;
+	update_image();
+}
+
 
 void FantasiesWindow::initUI()
 {
@@ -131,23 +200,30 @@ void FantasiesWindow::initUI()
 	dec_img100_button->setGeometry(10, 155, 100, 20);
 	connect(dec_img100_button, SIGNAL(clicked()), this, SLOT(dec_img100_button_clicked()));
 
-	QPushButton* auto_button = new QPushButton("AUTO", this);
-	auto_button->setGeometry(10, 180, 100, 20);
-	connect(auto_button, SIGNAL(clicked()), this, SLOT(auto_button_clicked()));
+	QPushButton* inc_img1000_button = new QPushButton("INC1000", this);
+	inc_img1000_button->setGeometry(10, 180, 100, 20);
+	connect(inc_img1000_button, SIGNAL(clicked()), this, SLOT(inc_img1000_button_clicked()));
+	QPushButton* dec_img1000_button = new QPushButton("DEC1000", this);
+	dec_img1000_button->setGeometry(10, 205, 100, 20);
+	connect(dec_img1000_button, SIGNAL(clicked()), this, SLOT(dec_img1000_button_clicked()));
+
 
 	QPushButton* debug_button = new QPushButton("TETRIS", this);
-	debug_button->setGeometry(10, 205, 100, 20);
+	debug_button->setGeometry(10, 230, 100, 20);
 	connect(debug_button, SIGNAL(clicked()), this, SLOT(debug_button_clicked()));
-
-
+	
 	m_image_label = new QLabel(this);
-	m_image_label->setGeometry(100, 30, FANTASIES_WIDTH, FANTASIES_HEIGHT);
+	m_image_label->setGeometry(150, 30, FANTASIES_DMD_WIDTH * DMD_SIZE, FANTASIES_DMD_HEIGHT * DMD_SIZE);
 
 	m_dmd_label = new QLabel(this);
 	m_dmd_label->setGeometry(440, 30, FANTASIES_DMD_WIDTH, FANTASIES_DMD_HEIGHT);
 
 	m_dmd_span_label = new QLabel(this);
 	m_dmd_span_label->setGeometry(440, 50, DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT);
+
+	m_byte_label = new QLabel("byte label", this);
+	m_byte_label->setGeometry(150, 100, 200, 20);
+
 }
 
 bool FantasiesWindow::is_column_candidate(uint32_t column)
@@ -178,8 +254,10 @@ void FantasiesWindow::update_image()
 
 #ifdef USE_PNGS
 	QImage img(filenamepng);
+	QImage dmd = dedot_dmd(img);
+	m_dmd_label->setPixmap(QPixmap::fromImage(dmd));
 #else
-	QImage img(FANTASIES_WIDTH, FANTASIES_HEIGHT, QImage::Format_RGBA8888);
+	QImage img(FANTASIES_DMD_WIDTH, FANTASIES_DMD_HEIGHT, QImage::Format_RGBA8888);
 	QFile file(filenamepng);
 	if (file.open(QIODevice::ReadOnly))
 	{
@@ -187,6 +265,8 @@ void FantasiesWindow::update_image()
 		const char* pixeldata = data.constData();
 		memcpy(rawDMD, pixeldata, sizeof(rawDMD));
 		file.close();
+		QString byteval = QString(" Value = 0x") + QString::number(pixeldata[m_byte_index], 16).right(2).toUpper();
+		m_byte_label->setText(QString("Byte index = ") + QString::number(m_byte_index) + byteval);
 
 		//for (uint32_t y = 0; y < FANTASIES_DMD_HEIGHT; ++y)
 		//{
@@ -210,9 +290,20 @@ void FantasiesWindow::update_image()
 			{
 				uint8_t bit = value & (1 << bitindex);
 				if (bit)
-					img.setPixel(x, y, qRgb(255, 255, 255));
+				{
+					if (byte == m_byte_index)
+						img.setPixel(x, y, qRgb(0, 255, 0));
+					else
+						img.setPixel(x, y, qRgb(255, 255, 255));
+					
+				}
 				else
-					img.setPixel(x, y, qRgb(0, 0, 0));
+				{
+					if (byte == m_byte_index)
+						img.setPixel(x, y, qRgb(255, 0, 0));
+					else
+						img.setPixel(x, y, qRgb(0, 0, 0));
+				}
 				++x;
 			}
 			if (x >= 160)
@@ -224,16 +315,16 @@ void FantasiesWindow::update_image()
 
 	}
 #endif
-	
-	m_image_label->setPixmap(QPixmap::fromImage(img));
-	QImage dmd = dedot_dmd(img);
-	m_dmd_label->setPixmap(QPixmap::fromImage(dmd));
-		QImage fixed = span_fix();
-	m_dmd_span_label->setPixmap(QPixmap::fromImage(fixed));
-	QVector<QImage> frames;
-	frames.push_back(fixed);
-	ImageAnimation* anim = new ImageAnimation(frames, 1);
-	m_animation_engine->show_animation(anim);
+
+	QImage scaledImage = img.scaled(FANTASIES_DMD_WIDTH * DMD_SIZE, FANTASIES_DMD_HEIGHT * DMD_SIZE, Qt::KeepAspectRatio, Qt::FastTransformation);
+
+	m_image_label->setPixmap(QPixmap::fromImage(scaledImage));
+	//QImage fixed = span_fix();
+	//m_dmd_span_label->setPixmap(QPixmap::fromImage(fixed));
+	//QVector<QImage> frames;
+	//frames.push_back(fixed);
+	//ImageAnimation* anim = new ImageAnimation(frames, 1);
+	//m_animation_engine->show_animation(anim);
 }
 
 QImage FantasiesWindow::span_fix()
@@ -479,34 +570,24 @@ void FantasiesWindow::dec_img100_button_clicked()
 	update_image();
 }
 
-void FantasiesWindow::auto_button_clicked()
+void FantasiesWindow::inc_img1000_button_clicked()
 {
-	bool save_frames = true;
-	QVector<QImage> frames;
-	for (uint32_t i = 35; i < 15851; ++i)
-	//for (uint32_t i = 35; i < 136; ++i)
-	{
-		memset(rawDMD, 0, sizeof(rawDMD));
-		QString filenamepng = QString("D:/pf/shots/shot") + QString::number(i) + ".png";
-		QImage img(filenamepng);
-
-		QImage dmd = dedot_dmd(img);
-		QImage fixed = span_fix();
-		
-		if (save_frames)
-		{
-			QString savepng = QString("D:/pf/convert/cnv") + QString::number(i) + ".png";
-			QImage sub = fixed.copy(QRect(0, 8, 128, 16));
-			sub.save(savepng);
-		}
-		else
-		{
-			frames.push_back(fixed);
-		}
-	}
-	ImageAnimation* anim = new ImageAnimation(frames, 1);
-	m_animation_engine->show_animation(anim);
+	m_current_file_nr += 1000;
+	update_image();
 }
+
+void FantasiesWindow::dec_img1000_button_clicked()
+{
+	if (m_current_file_nr > 1000)
+		m_current_file_nr -= 1000;
+	update_image();
+}
+
+void FantasiesWindow::split_range_button_clicked()
+{
+
+}
+
 
 #include "gameanimation.h"
 

@@ -48,6 +48,12 @@ public:
 public:
 	FantasiesWindow(QWidget* parent, DMDAnimationEngine* animation_engine);
 	~FantasiesWindow();
+
+	void key_left();
+	void key_right();
+	void key_up();
+	void key_down();
+
 private:
 	void initUI();
 	bool is_column_candidate(uint32_t column);
@@ -66,7 +72,12 @@ private slots:
 
 	void inc_img100_button_clicked();
 	void dec_img100_button_clicked();
-	void auto_button_clicked();
+
+	void inc_img1000_button_clicked();
+	void dec_img1000_button_clicked();
+
+	void split_range_button_clicked();
+	
 	void debug_button_clicked();
 
 private:
@@ -74,8 +85,12 @@ private:
 	QLabel* m_image_label = nullptr;
 	QLabel* m_dmd_label = nullptr;
 	QLabel* m_dmd_span_label = nullptr;
+	QLabel* m_byte_label = nullptr;
 	uint32_t m_current_file_nr = 0;
 
-	uint8_t rawDMD[FANTASIES_DMD_WIDTH * FANTASIES_DMD_HEIGHT];
+	uint8_t rawDMD[FANTASIES_DMD_WIDTH * FANTASIES_DMD_HEIGHT / 8];
 	DMDAnimationEngine* m_animation_engine = nullptr;
+
+	int32_t m_byte_index = 0;
+
 };
