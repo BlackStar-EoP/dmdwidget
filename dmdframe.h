@@ -62,6 +62,20 @@ public:
 		set_pixel(x, y, color);
 	}
 
+	inline uint8_t grayscale_pixel(int32_t x, int32_t y) const
+	{
+		assert(x >= 0 && x < DMDConfig::DMDWIDTH);
+		assert(y >= 0 && y < DMDConfig::DMDHEIGHT);
+		return m_grayscale_frame[y * DMDConfig::DMDWIDTH + x];
+	}
+
+	inline uint32_t color_pixel(int32_t x, int32_t y) const
+	{
+		assert(x >= 0 && x < DMDConfig::DMDWIDTH);
+		assert(y >= 0 && y < DMDConfig::DMDHEIGHT);
+		return m_color_frame[y * DMDConfig::DMDWIDTH + x];
+	}
+
 	inline void clear()
 	{
 		memset(m_grayscale_frame, 0, sizeof(m_grayscale_frame));
