@@ -29,6 +29,7 @@ SOFTWARE.
 #include <QMap>
 #include <QVector>
 #include <set>
+#include <assert.h>
 
 class DMDAnimationEngine;
 class QLabel;
@@ -112,6 +113,7 @@ private:
 	void paint_spans(const QImage& img);
 	void determine_spans();
 	bool is_scrolling_rtl() const;
+	bool is_current_frame_empty() const;
 	inline uint8_t RAWPIXEL(int32_t x, int32_t y)
 	{
 		if (y >= FantasiesWindow::FANTASIES_DMD_WIDTH)
@@ -120,6 +122,7 @@ private:
 		//#define RAWPIXEL(x,y) rawDMD[y * FANTASIES_DMD_WIDTH + x]
 		uint32_t pixel_number = y * FantasiesWindow::FANTASIES_DMD_WIDTH + x;
 		uint32_t bytenumber = pixel_number / 8;
+		assert(bytenumber < 320);
 		uint32_t bitnumber = pixel_number % 8;
 
 		uint8_t pixel = rawDMD[bytenumber];

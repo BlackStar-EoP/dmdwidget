@@ -63,15 +63,19 @@ public:
 			switch (key)
 			{
 			case Qt::Key_4:
+			case Qt::Key_A:
 				m_window.key_left();
 				break;
 			case Qt::Key_6:
+			case Qt::Key_D:
 				m_window.key_right();
 				break;
 			case Qt::Key_8:
+			case Qt::Key_W:
 				m_window.key_up();
 				break;
 			case Qt::Key_2:
+			case Qt::Key_S:
 				m_window.key_down();
 				break;
 			}
@@ -97,6 +101,8 @@ FantasiesWindow::FantasiesWindow(QWidget* parent, DMDAnimationEngine* animation_
 	installEventFilter(new FantasiesEventFilter(*this));
 	move(x, y);
 	show();
+
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 }
 
 FantasiesWindow::~FantasiesWindow()
@@ -205,8 +211,14 @@ bool FantasiesWindow::is_column_candidate(uint32_t column)
 	return true;
 }
 
+#include <Windows.h>
+
 void FantasiesWindow::update_image()
 {
+	if (_CrtCheckMemory() == FALSE)
+	{
+		printf("");
+	}
 	memset(rawDMD, 0, sizeof(rawDMD));
 	QString filenamepng = QString("./dmd/shot") + QString::number(m_current_file_nr) + ".dmd";
 	m_file_name_label->setText(filenamepng);
@@ -283,7 +295,7 @@ void FantasiesWindow::paint_spans(const QImage& img)
 	QPainter p(&span_img);
 	const uint32_t NUM_COLORS = 8;
 	QColor colors[NUM_COLORS] = { QColor(255,0,0),
-						QColor(0,255,0),
+						QColor(0,255,0),                                         
 						QColor(0,0,255),
 						QColor(255,255,0),
 						QColor(255,0,255),
@@ -347,9 +359,17 @@ bool FantasiesWindow::is_scrolling_rtl() const
 		const Span& current_span = m_spans[0];
 		if (current_span.start_column() == 0 &&
 			current_span.end_column() == 158)
-		{
-			printf("TODO SCROLLMODE");
-		}
+			return true;
+	}
+
+	return false;
+}
+
+bool FantasiesWindow::is_current_frame_empty() const
+{
+	if (m_spans.size() == 1)
+	{
+		return m_spans[0].is_clear_screen();
 	}
 
 	return false;
@@ -492,30 +512,41 @@ QImage FantasiesWindow::span_fix()
 QImage FantasiesWindow::parsed_fix()
 {
 	DMDFrame frame;
-
-	// Fantasies logo
-	char cmpbufferp[]{ 0xF0, 0xF3, 0xF7, 0xF3 };
-	if (memcmp(rawDMD + 21, cmpbufferp, 4) == 0)
+	if (is_current_frame_empty())
 	{
-		/// 12 - 67 = PINBALL
-		copyblock(12, 0, 66, 15, 27, 0, frame);
-		copyblock(76, 0, 146, 15, 35, 16, frame);
-		printf("");
+		m_current_animation = NONE;
 	}
-	// Score
-	char scorebuffer[]{ 0x3F, 0x07, 0x3E, 0x77 };
+	else if (is_scrolling_rtl())
 	{
-		if (memcmp(rawDMD + 21, scorebuffer, 4) == 0)
+		m_current_animation = SCROLLING_RTL;
+	}
+
+	if (m_current_animation == NONE)
+	{
+		// Fantasies logo
+		char cmpbufferp[]{ 0xF0, 0xF3, 0xF7, 0xF3 };
+		if (memcmp(rawDMD + 21, cmpbufferp, 4) == 0)
 		{
-			copyblock(8, 0, 76, 15, 8, 0, frame);
-			copyblock(77, 0, 159, 15, 45, 16, frame);
+			/// 12 - 67 = PINBALL
+			copyblock(12, 0, 66, 15, 27, 0, frame);
+			copyblock(76, 0, 146, 15, 35, 16, frame);
+			printf("");
+		}
+		// Score
+		char scorebuffer[]{ 0x3F, 0x07, 0x3E, 0x77 };
+		{
+			if (memcmp(rawDMD + 21, scorebuffer, 4) == 0)
+			{
+				copyblock(8, 0, 76, 15, 8, 0, frame);
+				copyblock(77, 0, 159, 15, 45, 16, frame);
+			}
 		}
 	}
-
-	if (is_scrolling_rtl())
+	else if (m_current_animation == SCROLLING_RTL)
 	{
-		printf("");
+		copyblock(32, 0, 159, 15, 0, 8, frame);
 	}
+
 		//21 0xF0
 		//0xF3
 		//0xF7
