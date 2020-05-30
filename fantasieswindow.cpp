@@ -335,6 +335,25 @@ void FantasiesWindow::determine_spans()
 	}
 }
 
+bool FantasiesWindow::is_scrolling_rtl() const
+{
+	if (m_prev_frame_spans.size() != 1 ||
+		m_spans.size() != 1)
+		return false;
+
+	if (m_prev_frame_spans[0].is_clear_screen())
+	{
+		const Span& current_span = m_spans[0];
+		if (current_span.start_column() == 0 &&
+			current_span.end_column() == 158)
+		{
+			printf("TODO SCROLLMODE");
+		}
+	}
+
+	return false;
+}
+
 QImage FantasiesWindow::span_fix()
 {
 	std::set<uint32_t> remove_columns;
@@ -492,11 +511,15 @@ QImage FantasiesWindow::parsed_fix()
 		}
 	}
 
+	if (is_scrolling_rtl())
+	{
+		printf("");
+	}
 		//21 0xF0
 		//0xF3
 		//0xF7
 		//0xF3
-
+	m_prev_frame_spans = m_spans;
 	return image_from_DMD_frame(frame);
 }
 

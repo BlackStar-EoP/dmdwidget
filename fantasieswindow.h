@@ -38,6 +38,8 @@ class Span
 {
 public:
 	static const uint32_t REMOVE_COLUMN_COUNT = 32;
+	static const uint32_t FANTASIES_DMD_WIDTH = 160;
+	static const uint32_t FANTASIES_DMD_HEIGHT = 16;
 
 	Span(uint32_t start_column, uint32_t end_column)
 	{
@@ -53,6 +55,11 @@ public:
 	bool is_big_span() const
 	{
 		return width() >= REMOVE_COLUMN_COUNT;
+	}
+
+	bool is_clear_screen() const
+	{
+		return width() == FANTASIES_DMD_WIDTH;
 	}
 
 	uint32_t start_column() const
@@ -104,6 +111,7 @@ private:
 	void update_image();
 	void paint_spans(const QImage& img);
 	void determine_spans();
+	bool is_scrolling_rtl() const;
 	inline uint8_t RAWPIXEL(int32_t x, int32_t y)
 	{
 		if (y >= FantasiesWindow::FANTASIES_DMD_WIDTH)
@@ -140,6 +148,15 @@ private slots:
 	void debug_button_clicked();
 
 private:
+	enum EAnimation
+	{
+		CLEAR_SCREEN,
+		SCROLLING_RTL,
+		LOOP,
+		NONE
+	};
+
+
 	QLabel* m_file_name_label = nullptr;
 	QLabel* m_image_label = nullptr;
 	QLabel* m_dmd_span_label = nullptr;
@@ -156,4 +173,6 @@ private:
 
 	int32_t m_byte_index = 0;
 	std::vector<Span> m_spans;
+	std::vector<Span> m_prev_frame_spans;
+	EAnimation m_current_animation = NONE;
 };
