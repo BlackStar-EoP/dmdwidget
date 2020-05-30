@@ -5,3 +5,4 @@ recordings/
 *.rom
 *.png
 *.jpg
+dmd/

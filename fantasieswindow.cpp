@@ -208,13 +208,14 @@ bool FantasiesWindow::is_column_candidate(uint32_t column)
 void FantasiesWindow::update_image()
 {
 	memset(rawDMD, 0, sizeof(rawDMD));
-	QString filenamepng = QString("D:/pf/dmd/shot") + QString::number(m_current_file_nr) + ".dmd";
+	QString filenamepng = QString("./dmd/shot") + QString::number(m_current_file_nr) + ".dmd";
 	m_file_name_label->setText(filenamepng);
 
 	QImage img(FANTASIES_DMD_WIDTH, FANTASIES_DMD_HEIGHT, QImage::Format_RGBA8888);
 	QFile file(filenamepng);
 	if (file.open(QIODevice::ReadOnly))
 	{
+
 		QByteArray data = file.readAll();
 		const char* pixeldata = data.constData();
 		memcpy(rawDMD, pixeldata, sizeof(rawDMD));

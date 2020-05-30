@@ -47,7 +47,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\src\abstract_widget_list.cpp">
+    <ClCompile Include="vendor\Qt-Color-Widgets\src\abstract_widget_list.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="animationthread.cpp">
@@ -56,46 +56,46 @@
     <ClCompile Include="animationwindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\src\bound_color_selector.cpp">
+    <ClCompile Include="vendor\Qt-Color-Widgets\src\bound_color_selector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\src\color_2d_slider.cpp">
+    <ClCompile Include="vendor\Qt-Color-Widgets\src\color_2d_slider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\src\color_delegate.cpp">
+    <ClCompile Include="vendor\Qt-Color-Widgets\src\color_delegate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\src\color_dialog.cpp">
+    <ClCompile Include="vendor\Qt-Color-Widgets\src\color_dialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\src\color_line_edit.cpp">
+    <ClCompile Include="vendor\Qt-Color-Widgets\src\color_line_edit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\src\color_list_widget.cpp">
+    <ClCompile Include="vendor\Qt-Color-Widgets\src\color_list_widget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\src\color_names.cpp">
+    <ClCompile Include="vendor\Qt-Color-Widgets\src\color_names.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\src\color_palette.cpp">
+    <ClCompile Include="vendor\Qt-Color-Widgets\src\color_palette.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\src\color_palette_model.cpp">
+    <ClCompile Include="vendor\Qt-Color-Widgets\src\color_palette_model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\src\color_palette_widget.cpp">
+    <ClCompile Include="vendor\Qt-Color-Widgets\src\color_palette_widget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\src\color_preview.cpp">
+    <ClCompile Include="vendor\Qt-Color-Widgets\src\color_preview.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\src\color_selector.cpp">
+    <ClCompile Include="vendor\Qt-Color-Widgets\src\color_selector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\src\color_utils.cpp">
+    <ClCompile Include="vendor\Qt-Color-Widgets\src\color_utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\src\color_wheel.cpp">
+    <ClCompile Include="vendor\Qt-Color-Widgets\src\color_wheel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="deviceconfigwindow.cpp">
@@ -140,10 +140,10 @@
     <ClCompile Include="gameanimation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\src\gradient_slider.cpp">
+    <ClCompile Include="vendor\Qt-Color-Widgets\src\gradient_slider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\src\hue_slider.cpp">
+    <ClCompile Include="vendor\Qt-Color-Widgets\src\hue_slider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="imageanimation.cpp">
@@ -164,7 +164,7 @@
     <ClCompile Include="rominspectwindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\src\swatch.cpp">
+    <ClCompile Include="vendor\Qt-Color-Widgets\src\swatch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="widgetoutputdevice.cpp">
@@ -175,7 +175,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\include\abstract_widget_list.hpp">
+    <CustomBuild Include="vendor\Qt-Color-Widgets\include\abstract_widget_list.hpp">
       <Filter>Header Files</Filter>
     </CustomBuild>
     <ClInclude Include="animationthread.h">
@@ -184,49 +184,49 @@
     <CustomBuild Include="animationwindow.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\include\bound_color_selector.hpp">
+    <CustomBuild Include="vendor\Qt-Color-Widgets\include\bound_color_selector.hpp">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\include\color_2d_slider.hpp">
+    <CustomBuild Include="vendor\Qt-Color-Widgets\include\color_2d_slider.hpp">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\include\color_delegate.hpp">
+    <CustomBuild Include="vendor\Qt-Color-Widgets\include\color_delegate.hpp">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\include\color_dialog.hpp">
+    <CustomBuild Include="vendor\Qt-Color-Widgets\include\color_dialog.hpp">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\include\color_line_edit.hpp">
+    <CustomBuild Include="vendor\Qt-Color-Widgets\include\color_line_edit.hpp">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\include\color_list_widget.hpp">
+    <CustomBuild Include="vendor\Qt-Color-Widgets\include\color_list_widget.hpp">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <ClInclude Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\include\color_names.hpp">
+    <ClInclude Include="vendor\Qt-Color-Widgets\include\color_names.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <CustomBuild Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\include\color_palette.hpp">
+    <CustomBuild Include="vendor\Qt-Color-Widgets\include\color_palette.hpp">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\include\color_palette_model.hpp">
+    <CustomBuild Include="vendor\Qt-Color-Widgets\include\color_palette_model.hpp">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\include\color_palette_widget.hpp">
+    <CustomBuild Include="vendor\Qt-Color-Widgets\include\color_palette_widget.hpp">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\include\color_preview.hpp">
+    <CustomBuild Include="vendor\Qt-Color-Widgets\include\color_preview.hpp">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\include\color_selector.hpp">
+    <CustomBuild Include="vendor\Qt-Color-Widgets\include\color_selector.hpp">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <ClInclude Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\src\color_utils.hpp">
+    <ClInclude Include="vendor\Qt-Color-Widgets\src\color_utils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <CustomBuild Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\include\color_wheel.hpp">
+    <CustomBuild Include="vendor\Qt-Color-Widgets\include\color_wheel.hpp">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <ClInclude Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\include\colorwidgets_global.hpp">
+    <ClInclude Include="vendor\Qt-Color-Widgets\include\colorwidgets_global.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <CustomBuild Include="deviceconfigwindow.h">
@@ -271,10 +271,10 @@
     <ClInclude Include="gameanimation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <CustomBuild Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\include\gradient_slider.hpp">
+    <CustomBuild Include="vendor\Qt-Color-Widgets\include\gradient_slider.hpp">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\include\hue_slider.hpp">
+    <CustomBuild Include="vendor\Qt-Color-Widgets\include\hue_slider.hpp">
       <Filter>Header Files</Filter>
     </CustomBuild>
     <ClInclude Include="imageanimation.h">
@@ -292,7 +292,7 @@
     <CustomBuild Include="rominspectwindow.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\include\swatch.hpp">
+    <CustomBuild Include="vendor\Qt-Color-Widgets\include\swatch.hpp">
       <Filter>Header Files</Filter>
     </CustomBuild>
     <ClInclude Include="widgetoutputdevice.h">
@@ -461,29 +461,23 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\src\color_dialog.ui">
+    <CustomBuild Include="vendor\Qt-Color-Widgets\src\color_dialog.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\src\color_palette_widget.ui">
+    <CustomBuild Include="vendor\Qt-Color-Widgets\src\color_palette_widget.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <None Include="D:\users\BlackStar\Desktop\Edge">
+    <None Include="vendor\Qt-Color-Widgets\src\alphaback.png">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="Panic\dmdwidget\vendor\Qt-Color-Widgets\src\alphaback.png">
-      <Filter>Resource Files</Filter>
-    </None>
-    <CustomBuild Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\src\color_widgets.qrc">
+    <CustomBuild Include="vendor\Qt-Color-Widgets\src\color_widgets.qrc">
       <Filter>Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="dmdwidget.qrc">
       <Filter>Resource Files</Filter>
     </CustomBuild>
-    <None Include="of">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="sfx\wms_cancel.wav">
       <Filter>Resource Files</Filter>
     </None>
