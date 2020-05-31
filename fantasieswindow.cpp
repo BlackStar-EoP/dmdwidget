@@ -174,9 +174,6 @@ void FantasiesWindow::initUI()
 	m_image_label = new QLabel(this);
 	m_image_label->setGeometry(150, 30, FantasiesDMD::FANTASIES_DMD_WIDTH * DMD_SIZE, FantasiesDMD::FANTASIES_DMD_HEIGHT * DMD_SIZE);
 
-	m_dmd_span_label = new QLabel(this);
-	m_dmd_span_label->setGeometry(150, 300, DMDConfig::DMDWIDTH * DMD_SIZE, DMDConfig::DMDHEIGHT * DMD_SIZE);
-
 	m_byte_label = new QLabel("byte label", this);
 	m_byte_label->setGeometry(150, 100, 600, 20);
 
@@ -216,10 +213,7 @@ void FantasiesWindow::update_image()
 
 	QImage scaled = img.scaled(FantasiesDMD::FANTASIES_DMD_WIDTH * DMD_SIZE, FantasiesDMD::FANTASIES_DMD_HEIGHT * DMD_SIZE, Qt::KeepAspectRatio, Qt::FastTransformation);
 	m_image_label->setPixmap(QPixmap::fromImage(scaled));
-	const DMDFrame& spanned = m_fantasies_DMD.span_fix();
-	QImage fixed = m_fantasies_DMD.image().scaled(DMDConfig::DMDWIDTH * DMD_SIZE, DMDConfig::DMDHEIGHT * DMD_SIZE, Qt::KeepAspectRatio, Qt::FastTransformation);
-	m_dmd_span_label->setPixmap(QPixmap::fromImage(fixed));
-
+	
 	const DMDFrame& parsed_dmd = m_fantasies_DMD.parsed_fix();
 	
 	QImage parsed = m_fantasies_DMD.image().scaled(DMDConfig::DMDWIDTH * DMD_SIZE, DMDConfig::DMDHEIGHT * DMD_SIZE, Qt::KeepAspectRatio, Qt::FastTransformation);

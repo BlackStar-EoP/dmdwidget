@@ -532,8 +532,8 @@ public:
 			if (is_fantasies_logo())
 			{
 				/// 12 - 67 = PINBALL
-				copyblock(12, 0, 66, 15, 27, 0);
-				copyblock(76, 0, 146, 15, 35, 16);
+				copyblock_centered(12, 0, 66, 15, 0);
+				copyblock_centered(76, 0, 146, 15, 16);
 			}
 			else if (is_score())
 			{
@@ -565,7 +565,8 @@ public:
 		int32_t height = y2 - y1 + 1;
 		assert(width <= FantasiesDMD::FANTASIES_DMD_WIDTH);
 		assert(height <= FantasiesDMD::FANTASIES_DMD_HEIGHT);
-
+		assert(dest_x + width <= DMDConfig::DMDWIDTH);
+		assert(dest_y + height <= DMDConfig::DMDHEIGHT);
 		for (int32_t y = 0; y < height; ++y)
 		{
 			for (int32_t x = 0; x < width; ++x)
@@ -574,6 +575,13 @@ public:
 				m_dmd_frame.set_pixel(dest_x + x, dest_y + y, val);
 			}
 		}
+	}
+
+	void copyblock_centered(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t dest_y)
+	{
+		int32_t width = x2 - x1 + 1;
+		int32_t dest_x = (DMDConfig::DMDWIDTH - width) / 2;
+		copyblock(x1, y1, x2, y2, dest_x, dest_y);
 	}
 
 private:
@@ -627,7 +635,6 @@ private:
 
 	QLabel* m_file_name_label = nullptr;
 	QLabel* m_image_label = nullptr;
-	QLabel* m_dmd_span_label = nullptr;
 	QLabel* m_byte_label = nullptr;
 	QLabel* m_spans_image_label = nullptr;
 	QLabel* m_spans_text_label = nullptr;
