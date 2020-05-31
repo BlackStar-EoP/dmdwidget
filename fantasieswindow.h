@@ -32,27 +32,133 @@ SOFTWARE.
 #include <assert.h>
 #include <QFile>
 
+#include "dmdframe.h"
+
 class DMDAnimationEngine;
 class QLabel;
-class DMDFrame;
 
+class Span
+{
+public:
+	static const uint32_t REMOVE_COLUMN_COUNT = 32;
+	static const uint32_t FANTASIES_DMD_WIDTH = 160;
+
+	Span(uint32_t start_column, uint32_t end_column)
+	{
+		m_start_column = start_column;
+		m_end_column = end_column;
+	}
+
+	uint32_t width() const
+	{
+		return m_end_column - m_start_column + 1;
+	}
+
+	bool is_big_span() const
+	{
+		return width() >= REMOVE_COLUMN_COUNT;
+	}
+
+	bool is_clear_screen() const
+	{
+		return width() == FANTASIES_DMD_WIDTH;
+	}
+
+	uint32_t start_column() const
+	{
+		return m_start_column;
+	}
+
+	uint32_t end_column() const
+	{
+		return m_end_column;
+	}
+
+	bool is_left_span() const
+	{
+		return m_start_column == 0;
+	}
+
+	bool is_right_span() const
+	{
+		return m_end_column == 159;
+	}
+
+	uint32_t m_start_column = 0;
+	uint32_t m_end_column = 0;
+};
 
 class FantasiesDMD
 {
 public:
+	enum EAnimation
+	{
+		CLEAR_SCREEN,
+		SCROLLING_RTL,
+		LOOP,
+		NONE
+	};
+
+
 	static const uint32_t FANTASIES_DMD_WIDTH = 160;
 	static const uint32_t FANTASIES_DMD_HEIGHT = 16;
 	static const uint32_t DMD_SIZE = FANTASIES_DMD_WIDTH * FANTASIES_DMD_HEIGHT;
 	static const uint32_t BIT_DMD_SIZE = DMD_SIZE / 8;
+
+	FantasiesDMD()
+	{
+		clear();
+	}
+
+	FantasiesDMD(uint32_t* dmddata)
+	{
+		int desty = 0;
+		for (uint32_t y = 0; y < FANTASIES_DMD_HEIGHT + 0; ++y)
+		{
+			for (uint32_t x = 0; x < FANTASIES_DMD_WIDTH; ++x)
+			{
+				uint32_t pixel = dmddata[(y * 320 * 2) + (x * 2)];
+				switch (pixel)
+				{
+				case 0xff000000:
+				case 0xff515151:
+				case 0xff555555:
+				default:
+					m_decodedDMD[desty * FANTASIES_DMD_WIDTH + x] = 0;
+					break;
+				case 0xfff3b245:
+					m_decodedDMD[desty * FANTASIES_DMD_WIDTH + x] = 255;
+					break;
+				}
+			}
+			++desty;
+		}
+
+		uint32_t blockindex = 0;
+		for (uint32_t block = 0; block < DMD_SIZE; block += 8)
+		{
+			uint8_t bitblock = 0;
+			for (uint32_t pixel = 0; pixel < 8; ++pixel)
+			{
+				if (m_decodedDMD[block + pixel] == 255)
+				{
+					uint8_t bit = 1;
+					bit <<= pixel;
+					bitblock |= bit;
+				}
+			}
+			m_bitDMD[blockindex++] = bitblock;
+		}
+	}
 
 	inline void clear()
 	{
 		memset(m_bitDMD, 0, sizeof(m_bitDMD));
 	}
 
+#ifdef QT_VERSION
 	inline bool read_file(const QString& filename)
 	{
-#ifdef QT_VERSION
 		QFile file(filename);
 		if (file.open(QIODevice::ReadOnly))
 		{
@@ -86,11 +192,9 @@ public:
 			}
 			return true;
 		}
-#endif
 		return false;
 	}
 
-#ifdef QT_VERSION
 	QImage image(uint32_t marked_byte_index) const
 	{
 		QImage img(FANTASIES_DMD_WIDTH, FANTASIES_DMD_HEIGHT, QImage::Format_RGBA8888);
@@ -124,6 +228,22 @@ public:
 		return img;
 	}
 
+	QImage image()
+	{
+		QImage dmd(DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT, QImage::Format_RGBA8888);
+		dmd.fill(Qt::black);
+
+		for (int32_t y = 0; y < DMDConfig::DMDHEIGHT; ++y)
+		{
+			for (int32_t x = 0; x < DMDConfig::DMDWIDTH; ++x)
+			{
+				uint8_t pixel = m_dmd_frame.grayscale_pixel(x, y);
+				dmd.setPixel(x, y, qRgb(pixel, pixel, pixel));
+			}
+		}
+
+		return dmd;
+	}
 #endif
 	inline uint8_t pixel(uint32_t pixel_number) const
 	{
@@ -194,61 +314,277 @@ public:
 		return (memcmp(m_bitDMD + 20, buffer, 4) == 0);
 	}
 
+	void determine_spans()
+	{
+		m_spans.clear();
+
+		bool in_span = false;
+		uint32_t span_start = 0;
+
+		for (uint32_t x = 0; x < FantasiesDMD::FANTASIES_DMD_WIDTH + 1; ++x)
+		{
+			if (is_column_candidate(x))
+			{
+				if (!in_span)
+				{
+					in_span = true;
+					span_start = x;
+				}
+			}
+			else
+			{
+				if (in_span)
+				{
+					in_span = false;
+					if (x - span_start > 3)
+						m_spans.push_back(Span(span_start, x - 1));
+				}
+			}
+		}
+	}
+
+	size_t num_spans() const
+	{
+		return m_spans.size();
+	}
+
+	const Span& span(size_t index) const
+	{
+		assert(index < m_spans.size());
+		return m_spans[index];
+	}
+
+	const Span& first_span() const
+	{
+		assert(m_spans.size() != 0);
+		return m_spans.front();
+	}
+
+	const Span& last_span() const
+	{
+		assert(m_spans.size() != 0);
+		return m_spans.back();
+	}
+
+
+	bool is_scrolling_rtl() const
+	{
+		if (m_prev_frame_spans.size() != 1 || m_spans.size() != 1)
+			return false;
+
+		if (m_prev_frame_spans[0].is_clear_screen())
+		{
+			const Span& current_span = m_spans[0];
+			if (current_span.start_column() == 0 &&
+				current_span.end_column() == 158)
+				return true;
+		}
+
+		return false;
+	}
+
+	bool is_current_frame_empty() const
+	{
+		if (m_spans.size() == 1)
+			return m_spans[0].is_clear_screen();
+
+		return false;
+	}
+
+	const DMDFrame& span_fix()
+	{
+		std::set<uint32_t> remove_columns;
+
+		uint32_t num_big_spans = 0;
+		for (size_t i = 0; i < num_spans(); ++i)
+		{
+			uint32_t spanwidth = span(i).width();
+			if (spanwidth >= Span::REMOVE_COLUMN_COUNT)
+			{
+				++num_big_spans;
+			}
+		}
+
+		if (num_big_spans > 0)
+		{
+			if (num_big_spans == 1)
+			{
+				for (size_t i = 0; i < num_spans(); ++i)
+				{
+					const Span& sp = span(i);
+					if (sp.is_big_span())
+					{
+						if (!sp.is_left_span())
+						{
+							for (uint32_t i = 0; i < Span::REMOVE_COLUMN_COUNT; ++i)
+							{
+								remove_columns.insert(sp.start_column() + i);
+							}
+						}
+						else
+						{
+							const Span& lspan = first_span();
+							const Span& rspan = last_span();
+							if (lspan.width() > 16 && rspan.width() > 16)
+							{
+								for (uint32_t i = 0; i < 16; ++i)
+								{
+									remove_columns.insert(lspan.start_column() + i);
+									remove_columns.insert(rspan.start_column() + i);
+								}
+							}
+						}
+					}
+				}
+			}
+			else
+			{
+				const Span& lspan = first_span();
+				const Span& rspan = last_span();
+				if (lspan.width() > 16 && rspan.width() > 16)
+				{
+					for (uint32_t i = 0; i < 16; ++i)
+					{
+						remove_columns.insert(lspan.start_column() + i);
+						remove_columns.insert(rspan.start_column() + i);
+					}
+				}
+			}
+		}
+		else if (num_spans() >= 2 || num_big_spans > 1) // attempt left and right removal
+		{
+			const Span& lspan = first_span();
+			const Span& rspan = last_span();
+
+			if (lspan.width() >= 16 && rspan.width() >= 16)
+			{
+				for (uint32_t i = 0; i < 16; ++i)
+				{
+					remove_columns.insert(lspan.start_column() + i);
+					remove_columns.insert(rspan.start_column() + i);
+				}
+			}
+			else
+			{
+				for (uint32_t i = 0; i < lspan.width(); ++i)
+				{
+					remove_columns.insert(lspan.start_column() + i);
+				}
+				for (uint32_t i = 0; i < rspan.width(); ++i)
+				{
+					remove_columns.insert(rspan.start_column() + i);
+				}
+				uint32_t remaining_columns = Span::REMOVE_COLUMN_COUNT - lspan.width() - rspan.width();
+				if (num_spans() == 3)
+				{
+					const Span& mspan = span(1);
+					if (mspan.width() > remaining_columns)
+					{
+						for (uint32_t i = 0; i < remaining_columns; ++i)
+						{
+							remove_columns.insert(mspan.start_column() + i);
+						}
+					}
+				}
+			}
+		}
+
+
+		if (remove_columns.size() == 0)
+		{
+			m_dmd_frame.clear();
+			return m_dmd_frame;
+		}
+
+		int current_column = 0;
+		for (uint32_t x = 0; x < FantasiesDMD::FANTASIES_DMD_WIDTH; ++x)
+		{
+			if (remove_columns.find(x) != remove_columns.end())
+				continue;
+
+			for (uint32_t y = 0; y < 16; ++y)
+			{
+				uint8_t val = pixel(x, y);
+				m_dmd_frame.set_pixel(current_column, y + 8, qRgb(val, val, val));
+			}
+			++current_column;
+			if (current_column == DMDConfig::DMDWIDTH)
+				break;
+		}
+
+		return m_dmd_frame;
+	}
+
+	const DMDFrame& parsed_fix()
+	{
+		if (is_current_frame_empty())
+		{
+			m_current_animation = NONE;
+		}
+		else if (is_scrolling_rtl())
+		{
+			m_current_animation = SCROLLING_RTL;
+		}
+
+		if (m_current_animation == NONE)
+		{
+			// Fantasies logo
+			if (is_fantasies_logo())
+			{
+				/// 12 - 67 = PINBALL
+				copyblock(12, 0, 66, 15, 27, 0);
+				copyblock(76, 0, 146, 15, 35, 16);
+			}
+			else if (is_score())
+			{
+				copyblock(8, 0, 76, 15, 8, 0);
+				copyblock(77, 0, 159, 15, 45, 16);
+			}
+			else if (is_hiscore_label())
+			{
+				//4 - 66 -> 33
+				//76 - 154 -> 25
+				copyblock(4, 0, 66, 15, 33, 0);
+				copyblock(76, 0, 154, 15, 25, 16);
+			}
+		}
+		else if (m_current_animation == SCROLLING_RTL)
+		{
+			copyblock(32, 0, 159, 15, 0, 8);
+		}
+
+		m_prev_frame_spans = m_spans;
+		return m_dmd_frame;
+	}
+
+	void copyblock(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t dest_x, int32_t dest_y)
+	{
+		assert(x1 <= x2);
+		assert(y1 <= y2);
+		int32_t width = x2 - x1 + 1;
+		int32_t height = y2 - y1 + 1;
+		assert(width <= FantasiesDMD::FANTASIES_DMD_WIDTH);
+		assert(height <= FantasiesDMD::FANTASIES_DMD_HEIGHT);
+
+		for (int32_t y = 0; y < height; ++y)
+		{
+			for (int32_t x = 0; x < width; ++x)
+			{
+				uint8_t val = pixel(x + x1, y + y1);
+				m_dmd_frame.set_pixel(dest_x + x, dest_y + y, val);
+			}
+		}
+	}
+
 private:
 	uint8_t m_bitDMD[BIT_DMD_SIZE];
 	uint8_t m_decodedDMD[FANTASIES_DMD_WIDTH * FANTASIES_DMD_HEIGHT];
-};
+	DMDFrame m_dmd_frame;
 
-class Span
-{
-public:
-	static const uint32_t REMOVE_COLUMN_COUNT = 32;
-	static const uint32_t FANTASIES_DMD_WIDTH = 160;
-	static const uint32_t FANTASIES_DMD_HEIGHT = 16;
+	std::vector<Span> m_spans;
+	std::vector<Span> m_prev_frame_spans;
 
-	Span(uint32_t start_column, uint32_t end_column)
-	{
-		m_start_column = start_column;
-		m_end_column = end_column;
-	}
-
-	uint32_t width() const
-	{
-		return m_end_column - m_start_column + 1;
-	}
-
-	bool is_big_span() const
-	{
-		return width() >= REMOVE_COLUMN_COUNT;
-	}
-
-	bool is_clear_screen() const
-	{
-		return width() == FANTASIES_DMD_WIDTH;
-	}
-
-	uint32_t start_column() const
-	{
-		return m_start_column;
-	}
-
-	uint32_t end_column() const
-	{
-		return m_end_column;
-	}
-
-	bool is_left_span() const
-	{
-		return m_start_column == 0;
-	}
-
-	bool is_right_span() const
-	{
-		return m_end_column == 159;
-	}
-
-	uint32_t m_start_column = 0;
-	uint32_t m_end_column = 0;
+	EAnimation m_current_animation = NONE;
 };
 
 class FantasiesWindow : public QWidget
@@ -267,13 +603,6 @@ private:
 	void initUI();
 	void update_image();
 	void paint_spans(const QImage& img);
-	void determine_spans();
-	bool is_scrolling_rtl() const;
-	bool is_current_frame_empty() const;
-	QImage span_fix();
-	QImage parsed_fix();
-	void copyblock(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t dest_x, int32_t dest_y, DMDFrame& outputDMD);
-	QImage image_from_DMD_frame(const DMDFrame& frame);
 
 private slots:
 	void inc_img_button_clicked();
@@ -293,13 +622,7 @@ private slots:
 	void debug_button_clicked();
 
 private:
-	enum EAnimation
-	{
-		CLEAR_SCREEN,
-		SCROLLING_RTL,
-		LOOP,
-		NONE
-	};
+
 
 
 	QLabel* m_file_name_label = nullptr;
@@ -315,7 +638,4 @@ private:
 	DMDAnimationEngine* m_animation_engine = nullptr;
 	FantasiesDMD m_fantasies_DMD;
 	int32_t m_byte_index = 0;
-	std::vector<Span> m_spans;
-	std::vector<Span> m_prev_frame_spans;
-	EAnimation m_current_animation = NONE;
 };
