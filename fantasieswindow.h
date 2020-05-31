@@ -30,10 +30,174 @@ SOFTWARE.
 #include <QVector>
 #include <set>
 #include <assert.h>
+#include <QFile>
 
 class DMDAnimationEngine;
 class QLabel;
 class DMDFrame;
+
+
+class FantasiesDMD
+{
+public:
+	static const uint32_t FANTASIES_DMD_WIDTH = 160;
+	static const uint32_t FANTASIES_DMD_HEIGHT = 16;
+	static const uint32_t DMD_SIZE = FANTASIES_DMD_WIDTH * FANTASIES_DMD_HEIGHT;
+	static const uint32_t BIT_DMD_SIZE = DMD_SIZE / 8;
+
+	inline void clear()
+	{
+		memset(m_bitDMD, 0, sizeof(m_bitDMD));
+	}
+
+	inline bool read_file(const QString& filename)
+	{
+#ifdef QT_VERSION
+		QFile file(filename);
+		if (file.open(QIODevice::ReadOnly))
+		{
+
+			QByteArray data = file.readAll();
+			const char* pixeldata = data.constData();
+			assert(data.size() == BIT_DMD_SIZE);
+			memcpy(m_bitDMD, pixeldata, sizeof(m_bitDMD));
+			file.close();
+
+			uint32_t x = 0;
+			uint32_t y = 0;
+			for (int32_t byte = 0; byte < data.size(); ++byte)
+			{
+				uint8_t value = pixeldata[byte];
+				for (uint32_t bitindex = 0; bitindex < 8; ++bitindex)
+				{
+					uint8_t bit = value & (1 << bitindex);
+					if (bit)
+						m_decodedDMD[FANTASIES_DMD_WIDTH * y + x] = 255;
+					else
+						m_decodedDMD[FANTASIES_DMD_WIDTH * y + x] = 0;
+
+					++x;
+				}
+				if (x >= 160)
+				{
+					x = 0;
+					++y;
+				}
+			}
+			return true;
+		}
+#endif
+		return false;
+	}
+
+#ifdef QT_VERSION
+	QImage image(uint32_t marked_byte_index) const
+	{
+		QImage img(FANTASIES_DMD_WIDTH, FANTASIES_DMD_HEIGHT, QImage::Format_RGBA8888);
+
+		uint32_t x = 0;
+		uint32_t y = 0;
+		for (int32_t byte = 0; byte < DMD_SIZE; ++byte)
+		{
+			uint8_t value = m_decodedDMD[byte];
+			if (value)
+			{
+				if (byte / 8 == marked_byte_index)
+					img.setPixel(x, y, qRgb(255, 0, 0));
+				else
+					img.setPixel(x, y, qRgb(value, value, value));
+			}
+			else
+			{
+				if (byte / 8 == marked_byte_index)
+					img.setPixel(x, y, qRgb(0, 255, 0));
+				else
+					img.setPixel(x, y, qRgb(0, 0, 0));
+			}
+			if (++x >= FANTASIES_DMD_WIDTH)
+			{
+				x = 0;
+				++y;
+			}
+		}
+
+		return img;
+	}
+
+#endif
+	inline uint8_t pixel(uint32_t pixel_number) const
+	{
+		assert(pixel_number < DMD_SIZE);
+		return m_decodedDMD[pixel_number];
+	}
+
+	inline uint8_t pixel(int32_t x, int32_t y) const
+	{
+		assert(x >= 0 && x < FANTASIES_DMD_WIDTH);
+		assert(y >= 0 && y < FANTASIES_DMD_HEIGHT);
+		uint32_t pixel_number = y * FANTASIES_DMD_WIDTH + x;
+		assert(pixel_number < DMD_SIZE);
+		return m_decodedDMD[pixel_number];
+	}
+
+	inline uint8_t bytevalue(uint32_t bytenumber) const
+	{
+		assert(bytenumber < BIT_DMD_SIZE);
+		return m_bitDMD[bytenumber];
+	}
+
+	inline uint8_t bitpixel(int32_t x, int32_t y) const
+	{
+		assert(x >= 0 && x < FANTASIES_DMD_WIDTH);
+		assert(y >= 0 && y < FANTASIES_DMD_HEIGHT);
+		uint32_t pixel_number = y * FANTASIES_DMD_WIDTH + x;
+		uint32_t bytenumber = pixel_number / 8;
+		assert(bytenumber < BIT_DMD_SIZE);
+		uint32_t bitnumber = pixel_number % 8;
+
+		uint8_t pixel = m_bitDMD[bytenumber];
+		return (pixel & (1 << bitnumber)) > 0 ? 255 : 0;
+	}
+
+
+	bool is_column_candidate(uint32_t column) const
+	{
+		if (column >= FantasiesDMD::FANTASIES_DMD_WIDTH)
+			return false;
+
+		for (uint32_t y = 0; y < FantasiesDMD::FANTASIES_DMD_HEIGHT; ++y)
+		{
+			if (bitpixel(column, y) != 0)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	bool is_fantasies_logo() const
+	{
+		char cmpbufferp[]{ 0xF0, 0xF3, 0xF7, 0xF3 };
+		return  (memcmp(m_bitDMD + 21, cmpbufferp, 4) == 0);
+	}
+
+	bool is_score() const
+	{
+		// Score
+		char scorebuffer[]{ 0x3F, 0x07, 0x3E, 0x77 };
+		return (memcmp(m_bitDMD + 21, scorebuffer, 4) == 0);
+	}
+
+	bool is_hiscore_label() const
+	{
+		char buffer[]{ 0xE0, 0x73, 0x70, 0x00 };
+		return (memcmp(m_bitDMD + 20, buffer, 4) == 0);
+	}
+
+private:
+	uint8_t m_bitDMD[BIT_DMD_SIZE];
+	uint8_t m_decodedDMD[FANTASIES_DMD_WIDTH * FANTASIES_DMD_HEIGHT];
+};
 
 class Span
 {
@@ -91,13 +255,6 @@ class FantasiesWindow : public QWidget
 {
 	Q_OBJECT
 public:
-	static const uint32_t FANTASIES_WIDTH = 320;
-	static const uint32_t FANTASIES_HEIGHT = 34;
-
-	static const uint32_t FANTASIES_DMD_WIDTH = 160;
-	static const uint32_t FANTASIES_DMD_HEIGHT = 16;
-
-public:
 	FantasiesWindow(QWidget* parent, DMDAnimationEngine* animation_engine);
 	~FantasiesWindow();
 
@@ -108,26 +265,11 @@ public:
 
 private:
 	void initUI();
-	bool is_column_candidate(uint32_t column);
 	void update_image();
 	void paint_spans(const QImage& img);
 	void determine_spans();
 	bool is_scrolling_rtl() const;
 	bool is_current_frame_empty() const;
-	inline uint8_t RAWPIXEL(int32_t x, int32_t y)
-	{
-		if (y >= FantasiesWindow::FANTASIES_DMD_WIDTH)
-			return 0;
-
-		//#define RAWPIXEL(x,y) rawDMD[y * FANTASIES_DMD_WIDTH + x]
-		uint32_t pixel_number = y * FantasiesWindow::FANTASIES_DMD_WIDTH + x;
-		uint32_t bytenumber = pixel_number / 8;
-		assert(bytenumber < 320);
-		uint32_t bitnumber = pixel_number % 8;
-
-		uint8_t pixel = rawDMD[bytenumber];
-		return (pixel & (1 << bitnumber)) > 0 ? 255 : 0;
-	}
 	QImage span_fix();
 	QImage parsed_fix();
 	void copyblock(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t dest_x, int32_t dest_y, DMDFrame& outputDMD);
@@ -170,10 +312,8 @@ private:
 	QLabel* m_parsed_text_label = nullptr;
 	uint32_t m_current_file_nr = 0;
 
-	uint8_t rawDMD[FANTASIES_DMD_WIDTH * FANTASIES_DMD_HEIGHT / 8];
-	uint8_t decodedDMD[FANTASIES_DMD_WIDTH * FANTASIES_DMD_HEIGHT];
 	DMDAnimationEngine* m_animation_engine = nullptr;
-
+	FantasiesDMD m_fantasies_DMD;
 	int32_t m_byte_index = 0;
 	std::vector<Span> m_spans;
 	std::vector<Span> m_prev_frame_spans;

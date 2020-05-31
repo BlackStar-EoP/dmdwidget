@@ -174,19 +174,19 @@ void FantasiesWindow::initUI()
 	connect(debug_button, SIGNAL(clicked()), this, SLOT(debug_button_clicked()));
 	
 	m_image_label = new QLabel(this);
-	m_image_label->setGeometry(150, 30, FANTASIES_DMD_WIDTH * DMD_SIZE, FANTASIES_DMD_HEIGHT * DMD_SIZE);
+	m_image_label->setGeometry(150, 30, FantasiesDMD::FANTASIES_DMD_WIDTH * DMD_SIZE, FantasiesDMD::FANTASIES_DMD_HEIGHT * DMD_SIZE);
 
 	m_dmd_span_label = new QLabel(this);
 	m_dmd_span_label->setGeometry(150, 300, DMDConfig::DMDWIDTH * DMD_SIZE, DMDConfig::DMDHEIGHT * DMD_SIZE);
 
 	m_byte_label = new QLabel("byte label", this);
-	m_byte_label->setGeometry(150, 100, 200, 20);
+	m_byte_label->setGeometry(150, 100, 600, 20);
 
 	m_spans_image_label = new QLabel(this);
-	m_spans_image_label->setGeometry(150, 130, FANTASIES_DMD_WIDTH * DMD_SIZE, FANTASIES_DMD_HEIGHT * DMD_SIZE);
+	m_spans_image_label->setGeometry(150, 130, FantasiesDMD::FANTASIES_DMD_WIDTH * DMD_SIZE, FantasiesDMD::FANTASIES_DMD_HEIGHT * DMD_SIZE);
 
 	m_spans_text_label = new QLabel("spans label", this);
-	m_spans_text_label->setGeometry(150, 200, 400, 20);
+	m_spans_text_label->setGeometry(150, 200, 600, 20);
 
 
 	m_parsed_image_label = new QLabel(this);
@@ -196,87 +196,27 @@ void FantasiesWindow::initUI()
 	m_parsed_text_label->setGeometry(150, 590, 400, 20);
 }
 
-bool FantasiesWindow::is_column_candidate(uint32_t column)
-{
-	if (column >= FANTASIES_DMD_WIDTH)
-		return false;
 
-	for (uint32_t y = 0; y < FANTASIES_DMD_HEIGHT; ++y)
-	{
-		if (RAWPIXEL(column, y) != 0)
-		{
-			return false;
-		}
-	}
-	return true;
-}
 
 #include <Windows.h>
 
 void FantasiesWindow::update_image()
 {
-	if (_CrtCheckMemory() == FALSE)
-	{
-		printf("");
-	}
-	memset(rawDMD, 0, sizeof(rawDMD));
+	m_fantasies_DMD.clear();
 	QString filenamepng = QString("./dmd/shot") + QString::number(m_current_file_nr) + ".dmd";
 	m_file_name_label->setText(filenamepng);
 
-	QImage img(FANTASIES_DMD_WIDTH, FANTASIES_DMD_HEIGHT, QImage::Format_RGBA8888);
-	QFile file(filenamepng);
-	if (file.open(QIODevice::ReadOnly))
+	if (m_fantasies_DMD.read_file(filenamepng))
 	{
-
-		QByteArray data = file.readAll();
-		const char* pixeldata = data.constData();
-		memcpy(rawDMD, pixeldata, sizeof(rawDMD));
-		file.close();
-		QString byteval = QString(" Value = 0x") + QString::number(pixeldata[m_byte_index], 16).right(2).toUpper();
+		QString byteval = QString(" Value = 0x") + QString::number(m_fantasies_DMD.bytevalue(m_byte_index), 16).right(2).toUpper();
 		m_byte_label->setText(QString("Byte index = ") + QString::number(m_byte_index) + byteval);
-
-		uint32_t x = 0;
-		uint32_t y = 0;
-		for (int32_t byte = 0; byte < data.size(); ++byte)
-		{
-			uint8_t value = pixeldata[byte];
-			for (uint32_t bitindex = 0; bitindex < 8; ++bitindex)
-			{
-				uint8_t bit = value & (1 << bitindex);
-				if (bit)
-				{
-					if (byte == m_byte_index)
-						img.setPixel(x, y, qRgb(255, 0, 0));
-					else
-						img.setPixel(x, y, qRgb(255, 255, 255));
-					
-					decodedDMD[FANTASIES_DMD_WIDTH * y + x] = 255;
-				}
-				else
-				{
-					if (byte == m_byte_index)
-						img.setPixel(x, y, qRgb(0, 255, 0));
-					else
-						img.setPixel(x, y, qRgb(0, 0, 0));
-					
-					decodedDMD[FANTASIES_DMD_WIDTH * y + x] = 0;
-				}
-				
-				++x;
-			}
-			if (x >= 160)
-			{
-				x = 0;
-				++y;
-			}
-		}
-
 	}
 
 	determine_spans();
+	QImage img = m_fantasies_DMD.image(m_byte_index);
 	paint_spans(img);
 
-	QImage scaled = img.scaled(FANTASIES_DMD_WIDTH * DMD_SIZE, FANTASIES_DMD_HEIGHT * DMD_SIZE, Qt::KeepAspectRatio, Qt::FastTransformation);
+	QImage scaled = img.scaled(FantasiesDMD::FANTASIES_DMD_WIDTH * DMD_SIZE, FantasiesDMD::FANTASIES_DMD_HEIGHT * DMD_SIZE, Qt::KeepAspectRatio, Qt::FastTransformation);
 	m_image_label->setPixmap(QPixmap::fromImage(scaled));
 	QImage fixed = span_fix().scaled(DMDConfig::DMDWIDTH * DMD_SIZE, DMDConfig::DMDHEIGHT * DMD_SIZE, Qt::KeepAspectRatio, Qt::FastTransformation);
 	m_dmd_span_label->setPixmap(QPixmap::fromImage(fixed));
@@ -314,7 +254,7 @@ void FantasiesWindow::paint_spans(const QImage& img)
 		p.fillRect(span.start_column(), 0, span.width(), 16, colors[i % NUM_COLORS]);
 	}
 	spans_text += QString(" Total width=") + QString::number(spans_total_width);
-	QImage scaled = span_img.scaled(FANTASIES_DMD_WIDTH * DMD_SIZE, FANTASIES_DMD_HEIGHT * DMD_SIZE, Qt::KeepAspectRatio, Qt::FastTransformation);
+	QImage scaled = span_img.scaled(FantasiesDMD::FANTASIES_DMD_WIDTH * DMD_SIZE, FantasiesDMD::FANTASIES_DMD_HEIGHT * DMD_SIZE, Qt::KeepAspectRatio, Qt::FastTransformation);
 	m_spans_image_label->setPixmap(QPixmap::fromImage(scaled));
 	m_spans_text_label->setText(spans_text);
 }
@@ -326,9 +266,9 @@ void FantasiesWindow::determine_spans()
 	bool in_span = false;
 	uint32_t span_start = 0;
 
-	for (uint32_t x = 0; x < FANTASIES_DMD_WIDTH + 1; ++x)
+	for (uint32_t x = 0; x < FantasiesDMD::FANTASIES_DMD_WIDTH + 1; ++x)
 	{
-		if (is_column_candidate(x))
+		if (m_fantasies_DMD.is_column_candidate(x))
 		{
 			if (!in_span)
 			{
@@ -387,15 +327,6 @@ QImage FantasiesWindow::span_fix()
 		if (spanwidth >= Span::REMOVE_COLUMN_COUNT)
 		{
 			++num_big_spans;
-		}
-	}
-
-	if (m_spans.size() == 1)
-	{
-		auto first = m_spans.begin();
-		if (first->width() == FANTASIES_DMD_WIDTH)
-		{
-			// TODO, DMD cleared, reset any animation flags
 		}
 	}
 
@@ -490,14 +421,14 @@ QImage FantasiesWindow::span_fix()
 		return spanDMD;
 
 	int current_column = 0;
-	for (uint32_t x = 0; x < FANTASIES_DMD_WIDTH; ++x)
+	for (uint32_t x = 0; x < FantasiesDMD::FANTASIES_DMD_WIDTH; ++x)
 	{
 		if (remove_columns.find(x) != remove_columns.end())
 			continue;
 
 		for (uint32_t y = 0; y < 16; ++y)
 		{
-			uint8_t val = RAWPIXEL(x, y);
+			uint8_t val = m_fantasies_DMD.pixel(x, y);
 			spanDMD.setPixel(current_column, y + 8, qRgb(val, val, val));
 		}
 		++current_column;
@@ -524,22 +455,24 @@ QImage FantasiesWindow::parsed_fix()
 	if (m_current_animation == NONE)
 	{
 		// Fantasies logo
-		char cmpbufferp[]{ 0xF0, 0xF3, 0xF7, 0xF3 };
-		if (memcmp(rawDMD + 21, cmpbufferp, 4) == 0)
+		if (m_fantasies_DMD.is_fantasies_logo())
 		{
 			/// 12 - 67 = PINBALL
 			copyblock(12, 0, 66, 15, 27, 0, frame);
 			copyblock(76, 0, 146, 15, 35, 16, frame);
 			printf("");
 		}
-		// Score
-		char scorebuffer[]{ 0x3F, 0x07, 0x3E, 0x77 };
+		else if (m_fantasies_DMD.is_score())
 		{
-			if (memcmp(rawDMD + 21, scorebuffer, 4) == 0)
-			{
-				copyblock(8, 0, 76, 15, 8, 0, frame);
-				copyblock(77, 0, 159, 15, 45, 16, frame);
-			}
+			copyblock(8, 0, 76, 15, 8, 0, frame);
+			copyblock(77, 0, 159, 15, 45, 16, frame);
+		}
+		else if (m_fantasies_DMD.is_hiscore_label())
+		{
+			//4 - 66 -> 33
+			//76 - 154 -> 25
+			copyblock(4, 0, 66, 15, 33, 0, frame);
+			copyblock(76, 0, 154, 15, 25, 16, frame);
 		}
 	}
 	else if (m_current_animation == SCROLLING_RTL)
@@ -561,14 +494,14 @@ void FantasiesWindow::copyblock(int32_t x1, int32_t y1, int32_t x2, int32_t y2, 
 	assert(y1 <= y2);
 	int32_t width = x2 - x1 + 1;
 	int32_t height = y2 - y1 + 1;
-	assert(width <= FANTASIES_DMD_WIDTH);
-	assert(height <= FANTASIES_DMD_HEIGHT);
+	assert(width <= FantasiesDMD::FANTASIES_DMD_WIDTH);
+	assert(height <= FantasiesDMD::FANTASIES_DMD_HEIGHT);
 
 	for (int32_t y = 0; y < height; ++y)
 	{
 		for (int32_t x = 0; x < width; ++x)
 		{
-			uint8_t pixel = decodedDMD[(FANTASIES_DMD_WIDTH * (y1 + y)) + (x + x1)];
+			uint8_t pixel = m_fantasies_DMD.pixel(x + x1, y + y1);
 			outputDMD.set_pixel(dest_x + x, dest_y + y, pixel);
 		}
 	}
