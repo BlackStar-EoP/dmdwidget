@@ -313,4 +313,15 @@ void FantasiesWindow::split_range_button_clicked()
 void FantasiesWindow::debug_button_clicked()
 {
 	m_animation_engine->show_animation(new GameAnimation());
+
+	// // Rename stuff
+	//int32_t out_nr = 42000;
+	//for (int32_t i = 0; i < 27000; ++i)
+	//{
+	//	QString filenamepng = QString("d:/pf/dmd/shot") + QString::number(i) + ".dmd";
+	//	QString newname = QString("d:/pf/dmd/shot") + QString::number(out_nr) + ".dmd";
+	//	QFile file(filenamepng);
+	//	file.rename(newname);
+	//	out_nr++;
+	//}
 }

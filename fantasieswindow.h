@@ -326,34 +326,42 @@ public:
 		return false;
 	}
 
+	bool is_crazy_letter_spotted() const
+	{
+		return false;
+	}
+
 	bool is_eob_bonus() const
 	{
-
+		return false;
 	}
 
 	bool is_eob_counting() const
 	{
-
+		return false;
 	}
 
 	bool is_cyclone() const
 	{
-
+		// 20787
+		char buffer[]{ 0x00, 0x7F, 0xCB, 0xE5 };
+		return (memcmp(m_bitDMD + 207, buffer, 4) == 0);
 	}
 
 	bool is_million() const
 	{
-
+		return false;
 	}
 
 	bool is_mega_laugh() const
 	{
-
+		// 17537
+		return false;
 	}
 
 	bool is_shoot_again() const
 	{
-
+		return false;
 	}
 
 	void determine_spans()
@@ -590,6 +598,10 @@ public:
 		{
 			m_current_animation = LOOP;
 		}
+		else if (is_cyclone())
+		{
+			m_current_animation = CYCLONE;
+		}
 		else if (m_current_animation == NONE)
 		{
 			// Fantasies logo
@@ -630,8 +642,24 @@ public:
 		{
 			copyblock_centered(19, 0, 132, 15, 8);
 		}
+		else if (m_current_animation == CYCLONE)
+		{
+			copyblock_centered(21, 0, 131, 15, 8);
+		}
 
-
+		// 22087 EAT SOME POPCORNS  not working
+		// 24012 SCORE disappearing not working
+		// 24697 4X bonus not working
+		// 25660 EXTRA BALL
+		// 27740 BONUS
+		// 27989 BONUS COUNT
+		// 28107 SHOOT AGAIN
+		// 31748 TUNNEL SKILL SHOT
+		// 35645 HIT SOME DUCKS FIRST
+		// 37371 TILT TILT TILT
+		// 37755 CYCLONE SKILL SHOT
+		// 68158 MATCH
+		// 68261 HISCORE
 		m_prev_frame_spans = m_spans;
 		return m_dmd_frame;
 	}
