@@ -191,10 +191,6 @@ void FantasiesWindow::initUI()
 	m_parsed_text_label->setGeometry(150, 590, 400, 20);
 }
 
-
-
-#include <Windows.h>
-
 void FantasiesWindow::update_image()
 {
 	m_fantasies_DMD.clear();
@@ -214,7 +210,7 @@ void FantasiesWindow::update_image()
 	QImage scaled = img.scaled(FantasiesDMD::FANTASIES_DMD_WIDTH * DMD_SIZE, FantasiesDMD::FANTASIES_DMD_HEIGHT * DMD_SIZE, Qt::KeepAspectRatio, Qt::FastTransformation);
 	m_image_label->setPixmap(QPixmap::fromImage(scaled));
 	
-	const DMDFrame& parsed_dmd = m_fantasies_DMD.parsed_fix();
+	const DMDFrame& parsed_dmd = m_fantasies_DMD.parse_DMD();
 	
 	QImage parsed = m_fantasies_DMD.image().scaled(DMDConfig::DMDWIDTH * DMD_SIZE, DMDConfig::DMDHEIGHT * DMD_SIZE, Qt::KeepAspectRatio, Qt::FastTransformation);
 	m_parsed_image_label->setPixmap(QPixmap::fromImage(parsed));

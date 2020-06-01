@@ -96,6 +96,9 @@ public:
 		CLEAR_SCREEN,
 		SCROLLING_RTL,
 		LOOP,
+		CYCLONE,
+		MILLION,
+		BONUS, // 27994
 		NONE
 	};
 
@@ -297,8 +300,12 @@ public:
 
 	bool is_fantasies_logo() const
 	{
-		char cmpbufferp[]{ 0xF0, 0xF3, 0xF7, 0xF3 };
-		return  (memcmp(m_bitDMD + 21, cmpbufferp, 4) == 0);
+		//char cmpbufferp[]{ 0xF0, 0xF3, 0xF7, 0xF3 };
+		//return  (memcmp(m_bitDMD + 21, cmpbufferp, 4) == 0);
+
+
+		char cmpbufferp[]{ 0x70, 0xF0, 0x77, 0xF7 };
+		return  (memcmp(m_bitDMD + 261, cmpbufferp, 4) == 0);
 	}
 
 	bool is_score() const
@@ -312,6 +319,41 @@ public:
 	{
 		char buffer[]{ 0xE0, 0x73, 0x70, 0x00 };
 		return (memcmp(m_bitDMD + 20, buffer, 4) == 0);
+	}
+
+	bool is_hiscore_scores() const
+	{
+		return false;
+	}
+
+	bool is_eob_bonus() const
+	{
+
+	}
+
+	bool is_eob_counting() const
+	{
+
+	}
+
+	bool is_cyclone() const
+	{
+
+	}
+
+	bool is_million() const
+	{
+
+	}
+
+	bool is_mega_laugh() const
+	{
+
+	}
+
+	bool is_shoot_again() const
+	{
+
 	}
 
 	void determine_spans()
@@ -383,6 +425,14 @@ public:
 		return false;
 	}
 
+	bool is_loop() const
+	{
+		// 15586
+		return m_bitDMD[262] == 0xE0 &&
+			m_bitDMD[282] == 0xF8 &&
+			m_bitDMD[302] == 0x1C;
+	}
+
 	bool is_current_frame_empty() const
 	{
 		if (m_spans.size() == 1)
@@ -391,19 +441,26 @@ public:
 		return false;
 	}
 
-	const DMDFrame& span_fix()
+	bool apply_span_fix()
 	{
 		std::set<uint32_t> remove_columns;
 
 		uint32_t num_big_spans = 0;
+		uint32_t total_span_width = 0;
 		for (size_t i = 0; i < num_spans(); ++i)
 		{
 			uint32_t spanwidth = span(i).width();
+			total_span_width += spanwidth;
+
 			if (spanwidth >= Span::REMOVE_COLUMN_COUNT)
 			{
 				++num_big_spans;
 			}
 		}
+
+		// Can't fix this by removing columns
+		if (total_span_width < Span::REMOVE_COLUMN_COUNT)
+			return false;
 
 		if (num_big_spans > 0)
 		{
@@ -489,12 +546,9 @@ public:
 			}
 		}
 
-
-		if (remove_columns.size() == 0)
-		{
-			m_dmd_frame.clear();
-			return m_dmd_frame;
-		}
+		// Not enough columns to remove for proper image
+		if (remove_columns.size() < Span::REMOVE_COLUMN_COUNT)
+			return false;
 
 		int current_column = 0;
 		for (uint32_t x = 0; x < FantasiesDMD::FANTASIES_DMD_WIDTH; ++x)
@@ -505,18 +559,25 @@ public:
 			for (uint32_t y = 0; y < 16; ++y)
 			{
 				uint8_t val = pixel(x, y);
-				m_dmd_frame.set_pixel(current_column, y + 8, qRgb(val, val, val));
+				m_dmd_frame.set_pixel(current_column, y + 8, val);
 			}
 			++current_column;
 			if (current_column == DMDConfig::DMDWIDTH)
 				break;
 		}
 
-		return m_dmd_frame;
+		return true;
 	}
 
-	const DMDFrame& parsed_fix()
+	void apply_crop_fix()
 	{
+		copyblock(16, 0, 143, 15, 0, 8);
+	}
+
+	const DMDFrame& parse_DMD()
+	{
+		m_dmd_frame.clear();
+
 		if (is_current_frame_empty())
 		{
 			m_current_animation = NONE;
@@ -525,8 +586,11 @@ public:
 		{
 			m_current_animation = SCROLLING_RTL;
 		}
-
-		if (m_current_animation == NONE)
+		else if (is_loop())
+		{
+			m_current_animation = LOOP;
+		}
+		else if (m_current_animation == NONE)
 		{
 			// Fantasies logo
 			if (is_fantasies_logo())
@@ -547,11 +611,26 @@ public:
 				copyblock(4, 0, 66, 15, 33, 0);
 				copyblock(76, 0, 154, 15, 25, 16);
 			}
+			else if (is_crazy_letter_spotted())
+			{
+
+			}
+			else
+			{
+				if (!apply_span_fix())
+					apply_crop_fix();
+			}
 		}
-		else if (m_current_animation == SCROLLING_RTL)
+		
+		if (m_current_animation == SCROLLING_RTL)
 		{
 			copyblock(32, 0, 159, 15, 0, 8);
 		}
+		else if (m_current_animation == LOOP)
+		{
+			copyblock_centered(19, 0, 132, 15, 8);
+		}
+
 
 		m_prev_frame_spans = m_spans;
 		return m_dmd_frame;
