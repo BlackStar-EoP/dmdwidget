@@ -577,6 +577,110 @@ public:
 		return true;
 	}
 
+	bool apply_span_fix2()
+	{
+		std::set<uint32_t> remove_columns;
+
+		uint32_t total_span_width = 0;
+		for (size_t i = 0; i < num_spans(); ++i)
+		{
+			total_span_width += span(i).width();
+		}
+
+		// Can't fix this by removing columns
+		if (total_span_width < Span::REMOVE_COLUMN_COUNT)
+			return false;
+
+		if (num_spans() >= 2) // attempt left and right removal
+		{
+			const Span& lspan = first_span();
+			const Span& rspan = last_span();
+
+			if (lspan.width() >= 16 && rspan.width() >= 16)
+			{
+				for (uint32_t i = 0; i < 16; ++i)
+				{
+					remove_columns.insert(lspan.start_column() + i);
+					remove_columns.insert(rspan.start_column() + i);
+				}
+			}
+			else
+			{
+				for (uint32_t i = 0; i < lspan.width(); ++i)
+				{
+					remove_columns.insert(lspan.start_column() + i);
+				}
+				for (uint32_t i = 0; i < rspan.width(); ++i)
+				{
+					remove_columns.insert(rspan.start_column() + i);
+				}
+				uint32_t remaining_columns = Span::REMOVE_COLUMN_COUNT - lspan.width() - rspan.width();
+				if (num_spans() == 3)
+				{
+					const Span& mspan = span(1);
+					if (mspan.width() > remaining_columns)
+					{
+						for (uint32_t i = 0; i < remaining_columns; ++i)
+						{
+							remove_columns.insert(mspan.start_column() + i);
+						}
+					}
+				}
+				else // More than 3
+				{
+					uint32_t remaining_span_width = 0;
+					for (size_t i = 1; i < num_spans() - 1; ++i)
+					{
+						const Span& sp = span(i);
+						remaining_span_width += sp.width();
+					}
+
+					if (remaining_span_width > remaining_columns)
+					{
+						uint32_t iteration = 1;
+						while (remaining_columns > 0)
+						{
+							for (size_t i = 1; i < num_spans() - 1; ++i)
+							{
+								const Span& sp = span(i);
+								if (sp.width() > iteration)
+								{
+									remove_columns.insert(sp.start_column() + iteration);
+									remaining_columns--;
+									if (remaining_columns == 0)
+										break;
+								}
+							}
+							++iteration;
+						}
+					}
+				}
+			}
+		}
+
+		// Not enough columns to remove for proper image
+		if (remove_columns.size() < Span::REMOVE_COLUMN_COUNT)
+			return false;
+
+		int current_column = 0;
+		for (uint32_t x = 0; x < FANTASIES_DMD_WIDTH; ++x)
+		{
+			if (remove_columns.find(x) != remove_columns.end())
+				continue;
+
+			for (uint32_t y = 0; y < FANTASIES_DMD_HEIGHT; ++y)
+			{
+				uint8_t val = pixel(x, y);
+				m_dmd_frame.set_pixel(current_column, y + (FANTASIES_DMD_HEIGHT / 2), val);
+			}
+			++current_column;
+			if (current_column == DMDConfig::DMDWIDTH)
+				break;
+		}
+
+		return true;
+	}
+
 	void apply_crop_fix()
 	{
 		copyblock(16, 0, 143, 15, 0, 8);
@@ -629,7 +733,7 @@ public:
 			}
 			else
 			{
-				if (!apply_span_fix())
+				if (!apply_span_fix2())
 					apply_crop_fix();
 			}
 		}
