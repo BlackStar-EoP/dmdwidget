@@ -104,6 +104,7 @@ public:
 		BONUS, // 27994
 		SCORE,
 		MEGALAUGH,
+		REALSIMULATOR,
 		NONE
 	};
 
@@ -312,7 +313,7 @@ public:
 	bool is_the_real_simulator() const
 	{
 		char cmpbufferp[]{ 0x3F, 0x7F, 0x3E, 0x07 };
-		return  (memcmp(m_bitDMD + 25, cmpbufferp, 4) == 0);
+		return  (memcmp(m_bitDMD + 305, cmpbufferp, 4) == 0);
 	}
 
 	bool is_score() const
@@ -358,9 +359,11 @@ public:
 		return (memcmp(m_bitDMD + 20, buffer, 4) == 0);
 	}
 
-	bool is_eob_bonus() const
+	bool is_eob_cyclone() const
 	{
-		return false;
+		//27841
+		char buffer[]{ 0x3E, 0x77, 0x3E, 0x07 };
+		return (memcmp(m_bitDMD + 3, buffer, 4) == 0);
 	}
 
 	bool is_eob_counting() const
@@ -753,12 +756,25 @@ public:
 			}
 			else if (is_the_real_simulator())
 			{
-				copyblock_centered(8, 0, 70, 15, 0);
-				copyblock_centered(80, 0, 150, 15, 16);
+				m_current_animation = REALSIMULATOR;
 			}
 			else if (is_score())
 			{
 				m_current_animation = SCORE;
+			}
+			else if (is_eob_cyclone())
+			{
+				copyblock_centered(0, 0, 87, 5, 0);
+				copyblock_centered(96, 0, 159, 5, 7);
+				copyblock(16, 6, 143, 15, 0, 17);
+				uint8_t correction = 255;
+				uint8_t correction2 = 0;
+				m_dmd_frame.set_pixel(70, 13, correction);
+				m_dmd_frame.set_pixel(71, 13, correction);
+
+				m_dmd_frame.set_pixel(119, 17, correction2);
+				m_dmd_frame.set_pixel(118, 17, correction2);
+
 			}
 			else if (is_eob_counting())
 			{
@@ -825,6 +841,11 @@ public:
 			copyblock(0, 0, 30, 15, 0, 0);
 			copyblock(129, 0, 159, 15, 97, 0);
 			copyblock_centered(31, 0, 129, 15, 15);
+		}
+		else if (m_current_animation == REALSIMULATOR)
+		{
+			copyblock_centered(8, 0, 70, 15, 0);
+			copyblock_centered(80, 0, 150, 15, 16);
 		}
 		// 17537 MEGALAUGH
 		// 22087 EAT SOME POPCORNS  not working
