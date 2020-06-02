@@ -352,6 +352,12 @@ public:
 		return (memcmp(m_bitDMD + 41, buffer, 4) == 0);
 	}
 
+	bool is_shoot_again() const
+	{
+		char buffer[]{ 0x7E, 0x77, 0x3E, 0x3E };
+		return (memcmp(m_bitDMD + 20, buffer, 4) == 0);
+	}
+
 	bool is_eob_bonus() const
 	{
 		return false;
@@ -359,7 +365,16 @@ public:
 
 	bool is_eob_counting() const
 	{
-		return false;
+		// 27991 & 68089
+		return m_bitDMD[127] == 0x3E &&
+			m_bitDMD[147] == 0x7F &&
+			m_bitDMD[167] == 0x73 &&
+			m_bitDMD[187] == 0x7B &&
+
+			m_bitDMD[39] == 0x3E &&
+			m_bitDMD[59] == 0x7F &&
+			m_bitDMD[79] == 0x7F &&
+			m_bitDMD[99] == 0x77;
 	}
 
 	bool is_cyclone() const
@@ -378,11 +393,6 @@ public:
 	{
 		char buffer[]{ 0x90, 0xE8, 0x4D, 0x1A };
 		return (memcmp(m_bitDMD + 20, buffer, 4) == 0);
-	}
-
-	bool is_shoot_again() const
-	{
-		return false;
 	}
 
 	void determine_spans()
@@ -750,6 +760,11 @@ public:
 			{
 				m_current_animation = SCORE;
 			}
+			else if (is_eob_counting())
+			{
+				copyblock_centered(0, 0, 62, 15, 0);
+				copyblock_centered(96, 0, 159, 15, 16);
+			}
 			else if (is_hiscore_label())
 			{
 				copyblock(4, 0, 66, 15, 33, 0);
@@ -775,6 +790,11 @@ public:
 			{
 				copyblock_centered(8, 0, 62, 15, 0);
 				copyblock_centered(72, 0, 150, 15, 16);
+			}
+			else if (is_shoot_again())
+			{
+				copyblock_centered(0, 0, 86, 15, 0);
+				copyblock_centered(96, 0, 159, 15, 16);
 			}
 			else
 			{
