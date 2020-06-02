@@ -305,12 +305,14 @@ public:
 
 	bool is_fantasies_logo() const
 	{
-		//char cmpbufferp[]{ 0xF0, 0xF3, 0xF7, 0xF3 };
-		//return  (memcmp(m_bitDMD + 21, cmpbufferp, 4) == 0);
-
-
 		char cmpbufferp[]{ 0x70, 0xF0, 0x77, 0xF7 };
 		return  (memcmp(m_bitDMD + 261, cmpbufferp, 4) == 0);
+	}
+
+	bool is_the_real_simulator() const
+	{
+		char cmpbufferp[]{ 0x3F, 0x7F, 0x3E, 0x07 };
+		return  (memcmp(m_bitDMD + 25, cmpbufferp, 4) == 0);
 	}
 
 	bool is_score() const
@@ -328,7 +330,8 @@ public:
 
 	bool is_hiscore_scores() const
 	{
-		return false;
+		return m_bitDMD[6] == 0 && m_bitDMD[26] == 0 && m_bitDMD[46] == 0 &&
+			m_bitDMD[146] == 0x7F && m_bitDMD[313] == 0xC0 && m_bitDMD[316] == 0xC0;
 	}
 
 	bool is_crazy_letter_spotted() const
@@ -738,6 +741,11 @@ public:
 				copyblock_centered(12, 0, 66, 15, 0);
 				copyblock_centered(76, 0, 146, 15, 16);
 			}
+			else if (is_the_real_simulator())
+			{
+				copyblock_centered(8, 0, 70, 15, 0);
+				copyblock_centered(80, 0, 150, 15, 16);
+			}
 			else if (is_score())
 			{
 				m_current_animation = SCORE;
@@ -746,6 +754,12 @@ public:
 			{
 				copyblock(4, 0, 66, 15, 33, 0);
 				copyblock(76, 0, 154, 15, 25, 16);
+			}
+			else if (is_hiscore_scores())
+			{
+				copyblock_centered(0, 0, 38, 15, 0);
+				uint32_t score_start = m_spans.back().end_column() + 1;
+				copyblock_centered(score_start, 0, 159, 15, 15);
 			}
 			else if (is_crazy_letter_spotted())
 			{
