@@ -788,9 +788,12 @@ public:
 			}
 			else if (is_hiscore_scores())
 			{
-				copyblock_centered(0, 0, 38, 15, 0);
-				uint32_t score_start = m_spans.back().end_column() + 1;
-				copyblock_centered(score_start, 0, 159, 15, 15);
+				if (m_spans.size() > 0)
+				{
+					copyblock_centered(0, 0, 38, 15, 0);
+					uint32_t score_start = m_spans.back().end_column() + 1;
+					copyblock_centered(score_start, 0, 159, 15, 15);
+				}
 			}
 			else if (is_crazy_letter_spotted())
 			{
