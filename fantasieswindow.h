@@ -32,6 +32,8 @@ SOFTWARE.
 #include <assert.h>
 #include <QFile>
 #include <QTimer>
+#include <QTextEdit>
+#include <QLineEdit>
 
 #include "dmdframe.h"
 
@@ -100,6 +102,8 @@ public:
 		CYCLONE,
 		MILLION,
 		BONUS, // 27994
+		SCORE,
+		MEGALAUGH,
 		NONE
 	};
 
@@ -329,7 +333,20 @@ public:
 
 	bool is_crazy_letter_spotted() const
 	{
-		return false;
+		char buffer[]{ 0x7F, 0x7F, 0x7F, 0x7F };
+		return (memcmp(m_bitDMD + 60, buffer, 4) == 0);
+	}
+
+	bool is_tunnel_skill_shot() const
+	{
+		char buffer[]{ 0x7F, 0x77, 0x7F, 0x7F };
+		return (memcmp(m_bitDMD + 41, buffer, 4) == 0);
+	}
+
+	bool is_cyclone_skill_shot() const
+	{
+		char buffer[]{ 0x7F, 0x77, 0x7F, 0x07 };
+		return (memcmp(m_bitDMD + 41, buffer, 4) == 0);
 	}
 
 	bool is_eob_bonus() const
@@ -356,8 +373,8 @@ public:
 
 	bool is_mega_laugh() const
 	{
-		// 17537
-		return false;
+		char buffer[]{ 0x90, 0xE8, 0x4D, 0x1A };
+		return (memcmp(m_bitDMD + 20, buffer, 4) == 0);
 	}
 
 	bool is_shoot_again() const
@@ -708,6 +725,10 @@ public:
 		{
 			m_current_animation = CYCLONE;
 		}
+		else if (is_mega_laugh())
+		{
+			m_current_animation = MEGALAUGH;
+		}
 		else if (m_current_animation == NONE)
 		{
 			// Fantasies logo
@@ -719,19 +740,27 @@ public:
 			}
 			else if (is_score())
 			{
-				copyblock(8, 0, 76, 15, 8, 0);
-				copyblock(77, 0, 159, 15, 45, 16);
+				m_current_animation = SCORE;
 			}
 			else if (is_hiscore_label())
 			{
-				//4 - 66 -> 33
-				//76 - 154 -> 25
 				copyblock(4, 0, 66, 15, 33, 0);
 				copyblock(76, 0, 154, 15, 25, 16);
 			}
 			else if (is_crazy_letter_spotted())
 			{
-
+				copyblock_centered(0, 0, 94, 15, 0);
+				copyblock_centered(104, 0, 159, 15, 16);
+			}
+			else if (is_tunnel_skill_shot())
+			{
+				copyblock_centered(8, 0, 54, 15, 0);
+				copyblock_centered(64, 0, 142, 15, 16);
+			}
+			else if (is_cyclone_skill_shot())
+			{
+				copyblock_centered(8, 0, 62, 15, 0);
+				copyblock_centered(72, 0, 150, 15, 16);
 			}
 			else
 			{
@@ -752,7 +781,18 @@ public:
 		{
 			copyblock_centered(21, 0, 131, 15, 8);
 		}
-
+		else if (m_current_animation == SCORE)
+		{
+			copyblock(8, 0, 76, 15, 8, 0);
+			copyblock(77, 0, 159, 15, 45, 16);
+		}
+		else if (m_current_animation == MEGALAUGH)
+		{
+			copyblock(0, 0, 30, 15, 0, 0);
+			copyblock(129, 0, 159, 15, 97, 0);
+			copyblock_centered(31, 0, 129, 15, 15);
+		}
+		// 17537 MEGALAUGH
 		// 22087 EAT SOME POPCORNS  not working
 		// 24012 SCORE disappearing not working
 		// 24697 4X bonus not working
@@ -844,6 +884,10 @@ private slots:
 
 	void auto_button_clicked();
 
+	void addtext_button_clicked();
+
+	void index_button_clicked();
+
 private:
 
 
@@ -855,6 +899,10 @@ private:
 	QLabel* m_spans_text_label = nullptr;
 	QLabel* m_parsed_image_label = nullptr;
 	QLabel* m_parsed_text_label = nullptr;
+	QTextEdit* m_text_edit = nullptr;
+	QLineEdit* m_index_edit = nullptr;
+	QString m_text_string;
+
 	uint32_t m_current_file_nr = 0;
 
 	DMDAnimationEngine* m_animation_engine = nullptr;

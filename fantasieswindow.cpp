@@ -194,6 +194,21 @@ void FantasiesWindow::initUI()
 
 	m_parsed_text_label = new QLabel("parsed label", this);
 	m_parsed_text_label->setGeometry(150, 590, 400, 20);
+
+	m_text_edit = new QTextEdit(this);
+	m_text_edit->setGeometry(680, 250, 200, 400);
+
+	m_index_edit = new QLineEdit(this);
+	m_index_edit->setGeometry(150, 620, 100, 20);
+
+	QPushButton* addtext_button = new QPushButton("Add current index", this);
+	addtext_button->setGeometry(680, 660, 200, 30);
+	connect(addtext_button, SIGNAL(clicked()), this, SLOT(addtext_button_clicked()));
+
+	QPushButton* index_button = new QPushButton("Set index", this);
+	index_button->setGeometry(150, 645, 100, 30);
+	connect(index_button, SIGNAL(clicked()), this, SLOT(index_button_clicked()));
+
 }
 
 void FantasiesWindow::update_image()
@@ -335,4 +350,16 @@ void FantasiesWindow::auto_button_clicked()
 {
 	connect(&m_timer, SIGNAL(timeout()), this, SLOT(inc_img_button_clicked()));
 	m_timer.start(16);
+}
+
+void FantasiesWindow::addtext_button_clicked()
+{
+	m_text_string += QString::number(m_current_file_nr) + "\n";
+	m_text_edit->setText(m_text_string);
+}
+
+void FantasiesWindow::index_button_clicked()
+{
+	m_current_file_nr = m_index_edit->text().toInt();
+	update_image();
 }
