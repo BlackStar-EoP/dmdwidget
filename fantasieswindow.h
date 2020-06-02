@@ -31,6 +31,7 @@ SOFTWARE.
 #include <set>
 #include <assert.h>
 #include <QFile>
+#include <QTimer>
 
 #include "dmdframe.h"
 
@@ -637,13 +638,14 @@ public:
 
 					if (remaining_span_width > remaining_columns)
 					{
-						uint32_t iteration = 1;
+						uint32_t iteration = 0;
+						// TODO prevent infinite loop here
 						while (remaining_columns > 0)
 						{
 							for (size_t i = 1; i < num_spans() - 1; ++i)
 							{
 								const Span& sp = span(i);
-								if (sp.width() > iteration)
+								if (sp.width() >= (iteration + 1))
 								{
 									remove_columns.insert(sp.start_column() + iteration);
 									remaining_columns--;
@@ -840,6 +842,8 @@ private slots:
 	
 	void debug_button_clicked();
 
+	void auto_button_clicked();
+
 private:
 
 
@@ -856,4 +860,6 @@ private:
 	DMDAnimationEngine* m_animation_engine = nullptr;
 	FantasiesDMD m_fantasies_DMD;
 	int32_t m_byte_index = 0;
+
+	QTimer m_timer;
 };

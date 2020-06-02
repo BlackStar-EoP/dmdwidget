@@ -170,7 +170,12 @@ void FantasiesWindow::initUI()
 	QPushButton* debug_button = new QPushButton("TETRIS", this);
 	debug_button->setGeometry(10, 230, 100, 20);
 	connect(debug_button, SIGNAL(clicked()), this, SLOT(debug_button_clicked()));
-	
+
+	QPushButton* auto_button = new QPushButton("AUTO", this);
+	auto_button->setGeometry(10, 255, 100, 20);
+	connect(auto_button, SIGNAL(clicked()), this, SLOT(auto_button_clicked()));
+
+
 	m_image_label = new QLabel(this);
 	m_image_label->setGeometry(150, 30, FantasiesDMD::FANTASIES_DMD_WIDTH * DMD_SIZE, FantasiesDMD::FANTASIES_DMD_HEIGHT * DMD_SIZE);
 
@@ -324,4 +329,10 @@ void FantasiesWindow::debug_button_clicked()
 	//	file.rename(newname);
 	//	out_nr++;
 	//}
+}
+
+void FantasiesWindow::auto_button_clicked()
+{
+	connect(&m_timer, SIGNAL(timeout()), this, SLOT(inc_img_button_clicked()));
+	m_timer.start(16);
 }
