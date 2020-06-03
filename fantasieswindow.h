@@ -359,6 +359,12 @@ public:
 		return (memcmp(m_bitDMD + 20, buffer, 4) == 0);
 	}
 
+	bool is_hit_some_ducks_first() const
+	{
+		char buffer[]{ 0x77, 0x7F, 0x7F, 0x00 };
+		return (memcmp(m_bitDMD + 20, buffer, 4) == 0);
+	}
+
 	bool is_eob_cyclone() const
 	{
 		//27841
@@ -385,11 +391,6 @@ public:
 		// 20787
 		char buffer[]{ 0x00, 0x7F, 0xCB, 0xE5 };
 		return (memcmp(m_bitDMD + 207, buffer, 4) == 0);
-	}
-
-	bool is_million() const
-	{
-		return false;
 	}
 
 	bool is_mega_laugh() const
@@ -815,6 +816,11 @@ public:
 				copyblock_centered(0, 0, 86, 15, 0);
 				copyblock_centered(96, 0, 159, 15, 16);
 			}
+			else if (is_hit_some_ducks_first())
+			{
+				copyblock_centered(0, 0, 62, 15, 0);
+				copyblock_centered(72, 0, 159, 15, 16);
+			}
 			else
 			{
 				if (!apply_span_fix2())
@@ -851,9 +857,12 @@ public:
 			copyblock_centered(80, 0, 150, 15, 16);
 		}
 		// 17537 MEGALAUGH
+		// 19678 MEGALAUGH TOTAL SCROLL
+
 		// 22087 EAT SOME POPCORNS  not working
 		// 24012 SCORE disappearing not working
 		// 24697 4X bonus not working
+
 		// 25660 EXTRA BALL
 		// 27740 BONUS
 		// 27989 BONUS COUNT
@@ -941,6 +950,9 @@ private slots:
 	void debug_button_clicked();
 
 	void auto_button_clicked();
+	void stop_auto_button_clicked();
+	void save_png_button_clicked();
+	void create_animation_button_clicked();
 
 	void addtext_button_clicked();
 

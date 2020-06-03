@@ -48,6 +48,13 @@ ImageAnimation::ImageAnimation(const QVector<QImage>& images, uint8_t animation_
 	m_valid = true;
 }
 
+ImageAnimation::ImageAnimation(const QVector<DMDFrame*>& frames, uint8_t animation_speed)
+: m_animation_speed(animation_speed)
+, m_frames(frames)
+{
+	m_valid = true;
+}
+
 ImageAnimation::~ImageAnimation()
 {
 	qDeleteAll(m_frames);

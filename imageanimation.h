@@ -35,6 +35,7 @@ class ImageAnimation : public DMDAnimation
 public:
 	ImageAnimation(const QString& path, const QString& directory, uint8_t animation_speed);
 	ImageAnimation(const QVector<QImage>& images, uint8_t animation_speed);
+	ImageAnimation(const QVector<DMDFrame*>& frames, uint8_t animation_speed);
 	~ImageAnimation();
 
 	DMDFrame* current_frame() override;

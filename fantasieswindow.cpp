@@ -175,7 +175,18 @@ void FantasiesWindow::initUI()
 	auto_button->setGeometry(10, 255, 100, 20);
 	connect(auto_button, SIGNAL(clicked()), this, SLOT(auto_button_clicked()));
 
+	QPushButton* stop_auto_button = new QPushButton("STOP", this);
+	stop_auto_button->setGeometry(10, 280, 100, 20);
+	connect(stop_auto_button, SIGNAL(clicked()), this, SLOT(stop_auto_button_clicked()));
 
+	QPushButton* save_png_button = new QPushButton("SAVEPNG", this);
+	save_png_button->setGeometry(10, 305, 100, 20);
+	connect(save_png_button, SIGNAL(clicked()), this, SLOT(save_png_button_clicked()));
+
+	QPushButton* anim_button = new QPushButton("ANIM", this);
+	anim_button->setGeometry(10, 330, 100, 20);
+	connect(anim_button, SIGNAL(clicked()), this, SLOT(create_animation_button_clicked()));
+	
 	m_image_label = new QLabel(this);
 	m_image_label->setGeometry(150, 30, FantasiesDMD::FANTASIES_DMD_WIDTH * DMD_SIZE, FantasiesDMD::FANTASIES_DMD_HEIGHT * DMD_SIZE);
 
@@ -234,10 +245,6 @@ void FantasiesWindow::update_image()
 	
 	QImage parsed = m_fantasies_DMD.image().scaled(DMDConfig::DMDWIDTH * DMD_SIZE, DMDConfig::DMDHEIGHT * DMD_SIZE, Qt::KeepAspectRatio, Qt::FastTransformation);
 	m_parsed_image_label->setPixmap(QPixmap::fromImage(parsed));
-	//QVector<QImage> frames;
-	//frames.push_back(fixed);
-	//ImageAnimation* anim = new ImageAnimation(frames, 1);
-	//m_animation_engine->show_animation(anim);
 }
 
 void FantasiesWindow::paint_spans(const QImage& img)
@@ -362,4 +369,45 @@ void FantasiesWindow::index_button_clicked()
 {
 	m_current_file_nr = m_index_edit->text().toInt();
 	update_image();
+}
+
+void FantasiesWindow::stop_auto_button_clicked()
+{
+	m_timer.stop();
+}
+
+void FantasiesWindow::save_png_button_clicked()
+{
+	for (uint32_t i = 0; i < 68999; ++i)
+	{
+		QString filename = QString("./dmd/shot") + QString::number(i) + ".dmd";
+		QString savename = QString("./dmd/png/shot") + QString::number(i) + ".png";
+
+		if (m_fantasies_DMD.read_file(filename))
+		{
+			m_fantasies_DMD.determine_spans();
+			QImage img = m_fantasies_DMD.image();
+			img.save(savename);
+		}
+	}
+}
+
+void FantasiesWindow::create_animation_button_clicked()
+{
+	QVector<DMDFrame*> frames;
+
+	for (uint32_t i = 0; i < 68999; ++i)
+	{
+		QString filename = QString("./dmd/shot") + QString::number(i) + ".dmd";
+
+		if (m_fantasies_DMD.read_file(filename))
+		{
+			m_fantasies_DMD.determine_spans();
+			const DMDFrame& parsed_dmd = m_fantasies_DMD.parse_DMD();
+			frames.push_back(new DMDFrame(parsed_dmd));
+		}
+	}
+
+	ImageAnimation* anim = new ImageAnimation(frames, 0);
+	m_animation_engine->show_animation(anim);
 }
