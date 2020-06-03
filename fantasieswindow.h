@@ -158,6 +158,8 @@ public:
 			}
 			m_bitDMD[blockindex++] = bitblock;
 		}
+
+		determine_spans();
 	}
 
 	inline void clear()
@@ -199,6 +201,8 @@ public:
 					++y;
 				}
 			}
+
+			determine_spans();
 			return true;
 		}
 		return false;
@@ -397,35 +401,6 @@ public:
 	{
 		char buffer[]{ 0x90, 0xE8, 0x4D, 0x1A };
 		return (memcmp(m_bitDMD + 20, buffer, 4) == 0);
-	}
-
-	void determine_spans()
-	{
-		m_spans.clear();
-
-		bool in_span = false;
-		uint32_t span_start = 0;
-
-		for (uint32_t x = 0; x < FantasiesDMD::FANTASIES_DMD_WIDTH + 1; ++x)
-		{
-			if (is_column_candidate(x))
-			{
-				if (!in_span)
-				{
-					in_span = true;
-					span_start = x;
-				}
-			}
-			else
-			{
-				if (in_span)
-				{
-					in_span = false;
-					if (x - span_start > 3)
-						m_spans.push_back(Span(span_start, x - 1));
-				}
-			}
-		}
 	}
 
 	size_t num_spans() const
@@ -902,6 +877,35 @@ public:
 		int32_t width = x2 - x1 + 1;
 		int32_t dest_x = (DMDConfig::DMDWIDTH - width) / 2;
 		copyblock(x1, y1, x2, y2, dest_x, dest_y);
+	}
+private:
+	void determine_spans()
+	{
+		m_spans.clear();
+
+		bool in_span = false;
+		uint32_t span_start = 0;
+
+		for (uint32_t x = 0; x < FantasiesDMD::FANTASIES_DMD_WIDTH + 1; ++x)
+		{
+			if (is_column_candidate(x))
+			{
+				if (!in_span)
+				{
+					in_span = true;
+					span_start = x;
+				}
+			}
+			else
+			{
+				if (in_span)
+				{
+					in_span = false;
+					if (x - span_start > 3)
+						m_spans.push_back(Span(span_start, x - 1));
+				}
+			}
+		}
 	}
 
 private:

@@ -234,7 +234,6 @@ void FantasiesWindow::update_image()
 		m_byte_label->setText(QString("Byte index = ") + QString::number(m_byte_index) + byteval);
 	}
 
-	m_fantasies_DMD.determine_spans();
 	QImage img = m_fantasies_DMD.image(m_byte_index);
 	paint_spans(img);
 
@@ -385,7 +384,6 @@ void FantasiesWindow::save_png_button_clicked()
 
 		if (m_fantasies_DMD.read_file(filename))
 		{
-			m_fantasies_DMD.determine_spans();
 			QImage img = m_fantasies_DMD.image();
 			img.save(savename);
 		}
@@ -402,7 +400,6 @@ void FantasiesWindow::create_animation_button_clicked()
 
 		if (m_fantasies_DMD.read_file(filename))
 		{
-			m_fantasies_DMD.determine_spans();
 			const DMDFrame& parsed_dmd = m_fantasies_DMD.parse_DMD();
 			frames.push_back(new DMDFrame(parsed_dmd));
 		}
