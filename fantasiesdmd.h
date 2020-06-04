@@ -164,7 +164,7 @@ public:
 		return false;
 	}
 
-	QImage image(uint32_t marked_byte_index) const
+	QImage image(uint32_t marked_byte_index, bool color_marked_byte = true) const
 	{
 		QImage img(FANTASIES_DMD_WIDTH, FANTASIES_DMD_HEIGHT, QImage::Format_RGBA8888);
 
@@ -175,14 +175,14 @@ public:
 			uint8_t value = m_decodedDMD[byte];
 			if (value)
 			{
-				if (byte / 8 == marked_byte_index)
+				if (color_marked_byte && (byte / 8 == marked_byte_index))
 					img.setPixel(x, y, qRgb(255, 0, 0));
 				else
 					img.setPixel(x, y, qRgb(value, value, value));
 			}
 			else
 			{
-				if (byte / 8 == marked_byte_index)
+				if (color_marked_byte && (byte / 8 == marked_byte_index))
 					img.setPixel(x, y, qRgb(0, 255, 0));
 				else
 					img.setPixel(x, y, qRgb(0, 0, 0));
@@ -198,6 +198,11 @@ public:
 	}
 
 	QImage image()
+	{
+		return image(0, false);
+	}
+
+	QImage dmd_image()
 	{
 		QImage dmd(DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT, QImage::Format_RGBA8888);
 		dmd.fill(Qt::black);

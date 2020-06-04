@@ -241,7 +241,7 @@ void FantasiesWindow::update_image()
 	
 	const DMDFrame& parsed_dmd = m_fantasies_DMD.parse_DMD();
 	
-	QImage parsed = m_fantasies_DMD.image().scaled(DMDConfig::DMDWIDTH * DMD_SIZE, DMDConfig::DMDHEIGHT * DMD_SIZE, Qt::KeepAspectRatio, Qt::FastTransformation);
+	QImage parsed = m_fantasies_DMD.dmd_image().scaled(DMDConfig::DMDWIDTH * DMD_SIZE, DMDConfig::DMDHEIGHT * DMD_SIZE, Qt::KeepAspectRatio, Qt::FastTransformation);
 	m_parsed_image_label->setPixmap(QPixmap::fromImage(parsed));
 }
 
