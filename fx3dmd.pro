@@ -55,6 +55,8 @@ HEADERS += $$PWD/mainwindow.h \
            $$PWD/fantasieswindow.h \
            $$PWD/dmdeventfilter.h \
            $$PWD/dmdkeys.h \
+           $$PWD/span.h \
+           $$PWD/fantasiesdmd.h \
            $$PWD/dmdconfig.h
 
 RESOURCES += \

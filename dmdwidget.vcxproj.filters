@@ -259,6 +259,9 @@
     <CustomBuild Include="dmdwidget.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <ClInclude Include="fantasiesdmd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <CustomBuild Include="fantasieswindow.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
@@ -292,6 +295,9 @@
     <CustomBuild Include="rominspectwindow.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <ClInclude Include="span.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <CustomBuild Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\include\swatch.hpp">
       <Filter>Header Files</Filter>
     </CustomBuild>

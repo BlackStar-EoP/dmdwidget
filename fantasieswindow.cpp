@@ -41,7 +41,6 @@ SOFTWARE.
 
 #include <assert.h>
 
-
 const int DMD_SIZE = 4;
 
 class FantasiesEventFilter : public QObject
