@@ -59,6 +59,7 @@ public:
 		MILLION,
 		BONUS, // 27994
 		SCORE,
+		SCORE2,
 		MEGALAUGH,
 		REALSIMULATOR,
 		NONE
@@ -237,7 +238,7 @@ public:
 	inline uint8_t bytevalue(uint32_t bytenumber) const
 	{
 		assert(bytenumber < BIT_DMD_SIZE);
-		return m_bitDMD[bytenumber];
+return m_bitDMD[bytenumber];
 	}
 
 	inline uint8_t bitpixel(int32_t x, int32_t y) const
@@ -288,6 +289,13 @@ public:
 		return (memcmp(m_bitDMD + 21, scorebuffer, 4) == 0);
 	}
 
+	bool is_score2() const
+	{
+		// Score
+		char scorebuffer[]{ 0x3F, 0x07, 0x3E, 0x77 };
+		return (memcmp(m_bitDMD + 20, scorebuffer, 4) == 0);
+	}
+
 	bool is_hiscore_label() const
 	{
 		char buffer[]{ 0xE0, 0x73, 0x70, 0x00 };
@@ -328,6 +336,25 @@ public:
 	{
 		char buffer[]{ 0x77, 0x7F, 0x7F, 0x00 };
 		return (memcmp(m_bitDMD + 20, buffer, 4) == 0);
+	}
+
+	bool is_match() const
+	{
+		if (m_bitDMD[0] != 0 &&
+			m_bitDMD[20] != 0 &&
+			m_bitDMD[40] != 0 &&
+			m_bitDMD[60] != 0 &&
+			m_bitDMD[80] != 0)
+		{
+			char buffer[]{ 0x00, 0x00, 0x00, 0x00 };
+			return (memcmp(m_bitDMD + 1, buffer, 4) == 0) &&
+				(memcmp(m_bitDMD + 21, buffer, 4) == 0) &&
+				(memcmp(m_bitDMD + 41, buffer, 4) == 0) &&
+				(memcmp(m_bitDMD + 61, buffer, 4) == 0) &&
+				(memcmp(m_bitDMD + 81, buffer, 4) == 0);
+		}
+		
+		return false;
 	}
 
 	bool is_eob_cyclone() const
@@ -530,12 +557,12 @@ public:
 			return false;
 
 		int current_column = 0;
-		for (uint32_t x = 0; x < FantasiesDMD::FANTASIES_DMD_WIDTH; ++x)
+		for (uint32_t x = 0; x < FANTASIES_DMD_WIDTH; ++x)
 		{
 			if (remove_columns.find(x) != remove_columns.end())
 				continue;
 
-			for (uint32_t y = 0; y < 16; ++y)
+			for (uint32_t y = 0; y < FANTASIES_DMD_HEIGHT; ++y)
 			{
 				uint8_t val = pixel(x, y);
 				m_dmd_frame.set_pixel(current_column, y + 8, val);
@@ -634,6 +661,13 @@ public:
 		if (remove_columns.size() < Span::REMOVE_COLUMN_COUNT)
 			return false;
 
+		apply_removed_columns(remove_columns);
+
+		return true;
+	}
+
+	void apply_removed_columns(const std::set<uint32_t> remove_columns)
+	{
 		int current_column = 0;
 		for (uint32_t x = 0; x < FANTASIES_DMD_WIDTH; ++x)
 		{
@@ -649,10 +683,7 @@ public:
 			if (current_column == DMDConfig::DMDWIDTH)
 				break;
 		}
-
-		return true;
 	}
-
 	void apply_crop_fix()
 	{
 		copyblock(16, 0, 143, 15, 0, 8);
@@ -698,6 +729,10 @@ public:
 			else if (is_score())
 			{
 				m_current_animation = SCORE;
+			}
+			else if (is_score2())
+			{
+				m_current_animation = SCORE2;
 			}
 			else if (is_eob_cyclone())
 			{
@@ -757,6 +792,54 @@ public:
 				copyblock_centered(0, 0, 62, 15, 0);
 				copyblock_centered(72, 0, 159, 15, 16);
 			}
+			else if (is_match())
+			{
+				//0 =            0 -   6
+				//1 = 7,16      17 -  20
+				//2 = 7,31      32 -  38
+				//3 = 7,47      48 -  54
+				//4 = 7,63      64 -  70
+				//5 = 7,79      80 -  86
+				//6 = 7,95      96 - 102
+				//7 = 7,111    112 - 118
+				//8 = 7,127    128 - 134
+				//9 = 7,143    144 - 150
+				std::set<uint32_t> remove_columns;
+				for (uint32_t i = 151; i < 156; ++i)
+				{
+					remove_columns.insert(i);
+				}
+				remove_columns.insert(7);
+				remove_columns.insert(31);
+				remove_columns.insert(39);
+				remove_columns.insert(55);
+				remove_columns.insert(71);
+				remove_columns.insert(87);
+				remove_columns.insert(103);
+				remove_columns.insert(119);
+				remove_columns.insert(135);
+
+				remove_columns.insert(8);
+				remove_columns.insert(32);
+				remove_columns.insert(40);
+				remove_columns.insert(56);
+				remove_columns.insert(72);
+				remove_columns.insert(88);
+				remove_columns.insert(104);
+				remove_columns.insert(120);
+				remove_columns.insert(136);
+
+				remove_columns.insert(9);
+				remove_columns.insert(33);
+				remove_columns.insert(41);
+				remove_columns.insert(57);
+				remove_columns.insert(73);
+				remove_columns.insert(89);
+				remove_columns.insert(105);
+				remove_columns.insert(121);
+				remove_columns.insert(137);
+				apply_removed_columns(remove_columns);
+			}
 			else
 			{
 				if (!apply_span_fix2())
@@ -779,6 +862,11 @@ public:
 		else if (m_current_animation == SCORE)
 		{
 			copyblock(8, 0, 76, 15, 8, 0);
+			copyblock(77, 0, 159, 15, 45, 16);
+		}
+		else if (m_current_animation == SCORE2)
+		{
+			copyblock(0, 0, 76, 15, 0, 0);
 			copyblock(77, 0, 159, 15, 45, 16);
 		}
 		else if (m_current_animation == MEGALAUGH)
