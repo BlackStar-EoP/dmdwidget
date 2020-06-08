@@ -255,7 +255,7 @@ return m_bitDMD[bytenumber];
 	}
 
 
-	bool is_column_candidate(uint32_t column) const
+	inline bool is_column_candidate(uint32_t column) const
 	{
 		if (column >= FantasiesDMD::FANTASIES_DMD_WIDTH)
 			return false;
@@ -270,75 +270,81 @@ return m_bitDMD[bytenumber];
 		return true;
 	}
 
-	bool is_fantasies_logo() const
+	inline bool is_fantasies_logo() const
 	{
 		char cmpbufferp[]{ 0x70, 0xF0, 0x77, 0xF7 };
 		return  (memcmp(m_bitDMD + 261, cmpbufferp, 4) == 0);
 	}
 
-	bool is_the_real_simulator() const
+	inline bool is_the_real_simulator() const
 	{
 		char cmpbufferp[]{ 0x3F, 0x7F, 0x3E, 0x07 };
 		return  (memcmp(m_bitDMD + 305, cmpbufferp, 4) == 0);
 	}
 
-	bool is_score() const
+	inline bool is_score() const
 	{
 		// Score
 		char scorebuffer[]{ 0x3F, 0x07, 0x3E, 0x77 };
 		return (memcmp(m_bitDMD + 21, scorebuffer, 4) == 0);
 	}
 
-	bool is_score2() const
+	inline bool is_score2() const
 	{
 		// Score
 		char scorebuffer[]{ 0x3F, 0x07, 0x3E, 0x77 };
 		return (memcmp(m_bitDMD + 20, scorebuffer, 4) == 0);
 	}
 
-	bool is_hiscore_label() const
+	inline bool is_hiscore_label() const
 	{
 		char buffer[]{ 0xE0, 0x73, 0x70, 0x00 };
 		return (memcmp(m_bitDMD + 20, buffer, 4) == 0);
 	}
 
-	bool is_hiscore_scores() const
+	inline bool is_hiscore_scores() const
 	{
 		return m_bitDMD[6] == 0 && m_bitDMD[26] == 0 && m_bitDMD[46] == 0 &&
 			m_bitDMD[146] == 0x7F && m_bitDMD[313] == 0xC0 && m_bitDMD[316] == 0xC0;
 	}
 
-	bool is_crazy_letter_spotted() const
+	inline bool is_crazy_letter_spotted() const
 	{
 		char buffer[]{ 0x7F, 0x7F, 0x7F, 0x7F };
 		return (memcmp(m_bitDMD + 60, buffer, 4) == 0);
 	}
 
-	bool is_tunnel_skill_shot() const
+	inline bool is_tunnel_skill_shot() const
 	{
 		char buffer[]{ 0x7F, 0x77, 0x7F, 0x7F };
 		return (memcmp(m_bitDMD + 41, buffer, 4) == 0);
 	}
 
-	bool is_cyclone_skill_shot() const
+	inline bool is_cyclone_skill_shot() const
 	{
 		char buffer[]{ 0x7F, 0x77, 0x7F, 0x07 };
 		return (memcmp(m_bitDMD + 41, buffer, 4) == 0);
 	}
 
-	bool is_shoot_again() const
+	inline bool is_shoot_again() const
 	{
 		char buffer[]{ 0x7E, 0x77, 0x3E, 0x3E };
 		return (memcmp(m_bitDMD + 20, buffer, 4) == 0);
 	}
 
-	bool is_hit_some_ducks_first() const
+	inline bool is_hit_some_ducks_first() const
 	{
 		char buffer[]{ 0x77, 0x7F, 0x7F, 0x00 };
 		return (memcmp(m_bitDMD + 20, buffer, 4) == 0);
 	}
 
-	bool is_match() const
+	inline bool is_party_on() const
+	{
+		char buffer[]{ 0x3F, 0x3E, 0x3F, 0x7F };
+		return (memcmp(m_bitDMD + 21, buffer, 4) == 0);
+	}
+
+	inline bool is_match() const
 	{
 		if (m_bitDMD[0] != 0 &&
 			m_bitDMD[20] != 0 &&
@@ -357,14 +363,14 @@ return m_bitDMD[bytenumber];
 		return false;
 	}
 
-	bool is_eob_cyclone() const
+	inline bool is_eob_cyclone() const
 	{
 		//27841
 		char buffer[]{ 0x3E, 0x77, 0x3E, 0x07 };
 		return (memcmp(m_bitDMD + 3, buffer, 4) == 0);
 	}
 
-	bool is_eob_counting() const
+	inline bool is_eob_counting() const
 	{
 		// 27991 & 68089
 		return m_bitDMD[127] == 0x3E &&
@@ -378,44 +384,43 @@ return m_bitDMD[bytenumber];
 			m_bitDMD[99] == 0x77;
 	}
 
-	bool is_cyclone() const
+	inline bool is_cyclone() const
 	{
 		// 20787
 		char buffer[]{ 0x00, 0x7F, 0xCB, 0xE5 };
 		return (memcmp(m_bitDMD + 207, buffer, 4) == 0);
 	}
 
-	bool is_mega_laugh() const
+	inline bool is_mega_laugh() const
 	{
 		char buffer[]{ 0x90, 0xE8, 0x4D, 0x1A };
 		return (memcmp(m_bitDMD + 20, buffer, 4) == 0);
 	}
 
-	size_t num_spans() const
+	inline size_t num_spans() const
 	{
 		return m_spans.size();
 	}
 
-	const Span& span(size_t index) const
+	inline const Span& span(size_t index) const
 	{
 		assert(index < m_spans.size());
 		return m_spans[index];
 	}
 
-	const Span& first_span() const
+	inline const Span& first_span() const
 	{
 		assert(m_spans.size() != 0);
 		return m_spans.front();
 	}
 
-	const Span& last_span() const
+	inline const Span& last_span() const
 	{
 		assert(m_spans.size() != 0);
 		return m_spans.back();
 	}
 
-
-	bool is_scrolling_rtl() const
+	inline bool is_scrolling_rtl() const
 	{
 		if (m_prev_frame_spans.size() != 1 || m_spans.size() != 1)
 			return false;
@@ -431,7 +436,7 @@ return m_bitDMD[bytenumber];
 		return false;
 	}
 
-	bool is_loop() const
+	inline bool is_loop() const
 	{
 		// 15586
 		return m_bitDMD[262] == 0xE0 &&
@@ -439,7 +444,7 @@ return m_bitDMD[bytenumber];
 			m_bitDMD[302] == 0x1C;
 	}
 
-	bool is_current_frame_empty() const
+	inline bool is_current_frame_empty() const
 	{
 		if (m_spans.size() == 1)
 			return m_spans[0].is_clear_screen();
@@ -447,7 +452,7 @@ return m_bitDMD[bytenumber];
 		return false;
 	}
 
-	bool apply_span_fix()
+	inline bool apply_span_fix()
 	{
 		std::set<uint32_t> remove_columns;
 
@@ -575,7 +580,7 @@ return m_bitDMD[bytenumber];
 		return true;
 	}
 
-	bool apply_span_fix2()
+	inline bool apply_span_fix2()
 	{
 		std::set<uint32_t> remove_columns;
 
@@ -666,7 +671,7 @@ return m_bitDMD[bytenumber];
 		return true;
 	}
 
-	void apply_removed_columns(const std::set<uint32_t> remove_columns)
+	inline void apply_removed_columns(const std::set<uint32_t> remove_columns)
 	{
 		int current_column = 0;
 		for (uint32_t x = 0; x < FANTASIES_DMD_WIDTH; ++x)
@@ -684,12 +689,12 @@ return m_bitDMD[bytenumber];
 				break;
 		}
 	}
-	void apply_crop_fix()
+	inline void apply_crop_fix()
 	{
 		copyblock(16, 0, 143, 15, 0, 8);
 	}
 
-	const DMDFrame& parse_DMD()
+	inline const DMDFrame& parse_DMD()
 	{
 		m_dmd_frame.clear();
 
@@ -791,6 +796,11 @@ return m_bitDMD[bytenumber];
 			{
 				copyblock_centered(0, 0, 62, 15, 0);
 				copyblock_centered(72, 0, 159, 15, 16);
+			}
+			else if (is_party_on())
+			{
+				copyblock_centered(8, 0, 70, 15, 0);
+				copyblock_centered(88, 0, 150, 15, 16);
 			}
 			else if (is_match())
 			{
@@ -901,7 +911,7 @@ return m_bitDMD[bytenumber];
 		return m_dmd_frame;
 	}
 
-	void copyblock(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t dest_x, int32_t dest_y)
+	inline void copyblock(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t dest_x, int32_t dest_y)
 	{
 		assert(x1 <= x2);
 		assert(y1 <= y2);
@@ -921,14 +931,14 @@ return m_bitDMD[bytenumber];
 		}
 	}
 
-	void copyblock_centered(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t dest_y)
+	inline void copyblock_centered(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t dest_y)
 	{
 		int32_t width = x2 - x1 + 1;
 		int32_t dest_x = (DMDConfig::DMDWIDTH - width) / 2;
 		copyblock(x1, y1, x2, y2, dest_x, dest_y);
 	}
 private:
-	void determine_spans()
+	inline void determine_spans()
 	{
 		m_spans.clear();
 
