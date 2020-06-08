@@ -641,9 +641,10 @@ return m_bitDMD[bytenumber];
 					if (remaining_span_width > remaining_columns)
 					{
 						uint32_t iteration = 0;
-						// TODO prevent infinite loop here
+						
 						while (remaining_columns > 0)
 						{
+							uint32_t prev_remaining_columns = remaining_columns;
 							for (size_t i = 1; i < num_spans() - 1; ++i)
 							{
 								const Span& sp = span(i);
@@ -656,6 +657,10 @@ return m_bitDMD[bytenumber];
 								}
 							}
 							++iteration;
+
+							// if no columns were removed, we're stuck in an infinite loop
+							if (prev_remaining_columns == remaining_columns)
+								return false;
 						}
 					}
 				}
