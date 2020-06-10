@@ -86,12 +86,10 @@ public:
 				uint32_t pixel = dmddata[(y * 320 * 2) + (x * 2)];
 				switch (pixel)
 				{
-				case 0xff000000:
-				case 0xff515151:
-				case 0xff555555:
 				default:
 					m_decodedDMD[desty * FANTASIES_DMD_WIDTH + x] = 0;
 					break;
+				case 0xfff3d330:
 				case 0xfff3b245:
 					m_decodedDMD[desty * FANTASIES_DMD_WIDTH + x] = 255;
 					break;
