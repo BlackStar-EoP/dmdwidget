@@ -224,7 +224,10 @@ void FantasiesWindow::initUI()
 void FantasiesWindow::update_image()
 {
 	m_fantasies_DMD.clear();
-	QString filenamepng = QString("./dmd/shot") + QString::number(m_current_file_nr) + ".dmd";
+
+	QString filenamepng = QString("d:/pf/dmd/shot") + QString::number(m_current_file_nr) + ".dmd";
+
+	//QString filenamepng = QString("./dmd/shot") + QString::number(m_current_file_nr) + ".dmd";
 	m_file_name_label->setText(filenamepng);
 
 	if (m_fantasies_DMD.read_file(filenamepng))
