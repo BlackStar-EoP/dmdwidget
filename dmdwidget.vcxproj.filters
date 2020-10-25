@@ -475,10 +475,7 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <None Include="D:\users\BlackStar\Desktop\Edge">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Panic\dmdwidget\vendor\Qt-Color-Widgets\src\alphaback.png">
+    <None Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\src\alphaback.png">
       <Filter>Resource Files</Filter>
     </None>
     <CustomBuild Include="D:\users\BlackStar\Desktop\Edge of Panic\dmdwidget\vendor\Qt-Color-Widgets\src\color_widgets.qrc">
@@ -487,28 +484,25 @@
     <CustomBuild Include="dmdwidget.qrc">
       <Filter>Resource Files</Filter>
     </CustomBuild>
-    <None Include="of">
+    <None Include="C:\Users\BlackStar\Desktop\Edge of Panic\dmdwidget\sfx\wms_cancel.wav">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="sfx\wms_cancel.wav">
+    <None Include="C:\Users\BlackStar\Desktop\Edge of Panic\dmdwidget\sfx\wms_down.wav">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="sfx\wms_down.wav">
+    <None Include="C:\Users\BlackStar\Desktop\Edge of Panic\dmdwidget\sfx\wms_menu_enter.wav">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="sfx\wms_menu_enter.wav">
+    <None Include="C:\Users\BlackStar\Desktop\Edge of Panic\dmdwidget\sfx\wms_post.wav">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="sfx\wms_post.wav">
+    <None Include="C:\Users\BlackStar\Desktop\Edge of Panic\dmdwidget\sfx\wms_save.wav">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="sfx\wms_save.wav">
+    <None Include="C:\Users\BlackStar\Desktop\Edge of Panic\dmdwidget\sfx\wms_save_done.wav">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="sfx\wms_save_done.wav">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="sfx\wms_up.wav">
+    <None Include="C:\Users\BlackStar\Desktop\Edge of Panic\dmdwidget\sfx\wms_up.wav">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

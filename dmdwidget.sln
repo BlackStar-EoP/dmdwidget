@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2006
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30225.117
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dmdwidget", "dmdwidget.vcxproj", "{963596BC-676E-3DDB-AE97-4E9D9C9A3898}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dmdwidget", "dmdwidget.vcxproj", "{FA92B3F2-C26F-37EB-9B57-5ABEBF3B03AD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{963596BC-676E-3DDB-AE97-4E9D9C9A3898}.Debug|x64.ActiveCfg = Debug|x64
-		{963596BC-676E-3DDB-AE97-4E9D9C9A3898}.Debug|x64.Build.0 = Debug|x64
-		{963596BC-676E-3DDB-AE97-4E9D9C9A3898}.Release|x64.ActiveCfg = Release|x64
-		{963596BC-676E-3DDB-AE97-4E9D9C9A3898}.Release|x64.Build.0 = Release|x64
+		{FA92B3F2-C26F-37EB-9B57-5ABEBF3B03AD}.Debug|x64.ActiveCfg = Debug|x64
+		{FA92B3F2-C26F-37EB-9B57-5ABEBF3B03AD}.Debug|x64.Build.0 = Debug|x64
+		{FA92B3F2-C26F-37EB-9B57-5ABEBF3B03AD}.Release|x64.ActiveCfg = Release|x64
+		{FA92B3F2-C26F-37EB-9B57-5ABEBF3B03AD}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {6BF94344-8403-499C-8E9B-3D545495C867}
+		SolutionGuid = {8FBD69CC-4EA2-4140-8B19-550E9B41A5EA}
 	EndGlobalSection
 EndGlobal

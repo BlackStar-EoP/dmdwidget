@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'color_palette_widget.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.3
+** Created by: Qt User Interface Compiler version 5.15.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,12 +10,10 @@
 #define UI_COLOR_PALETTE_WIDGET_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
+#include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QVBoxLayout>
@@ -48,15 +46,15 @@ public:
     void setupUi(QWidget *color_widgets__ColorPaletteWidget)
     {
         if (color_widgets__ColorPaletteWidget->objectName().isEmpty())
-            color_widgets__ColorPaletteWidget->setObjectName(QStringLiteral("color_widgets__ColorPaletteWidget"));
+            color_widgets__ColorPaletteWidget->setObjectName(QString::fromUtf8("color_widgets__ColorPaletteWidget"));
         color_widgets__ColorPaletteWidget->resize(227, 186);
         verticalLayout = new QVBoxLayout(color_widgets__ColorPaletteWidget);
-        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         verticalLayout->setContentsMargins(0, 0, 0, 0);
         horizontalLayout_3 = new QHBoxLayout();
-        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
+        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
         palette_list = new QComboBox(color_widgets__ColorPaletteWidget);
-        palette_list->setObjectName(QStringLiteral("palette_list"));
+        palette_list->setObjectName(QString::fromUtf8("palette_list"));
         QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -66,45 +64,45 @@ public:
         horizontalLayout_3->addWidget(palette_list);
 
         group_edit_list = new QWidget(color_widgets__ColorPaletteWidget);
-        group_edit_list->setObjectName(QStringLiteral("group_edit_list"));
+        group_edit_list->setObjectName(QString::fromUtf8("group_edit_list"));
         horizontalLayout_2 = new QHBoxLayout(group_edit_list);
         horizontalLayout_2->setSpacing(0);
-        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
         horizontalLayout_2->setContentsMargins(0, 0, 0, 0);
         button_palette_open = new QToolButton(group_edit_list);
-        button_palette_open->setObjectName(QStringLiteral("button_palette_open"));
+        button_palette_open->setObjectName(QString::fromUtf8("button_palette_open"));
         QIcon icon;
-        QString iconThemeName = QStringLiteral("document-open");
+        QString iconThemeName = QString::fromUtf8("document-open");
         if (QIcon::hasThemeIcon(iconThemeName)) {
             icon = QIcon::fromTheme(iconThemeName);
         } else {
-            icon.addFile(QStringLiteral(""), QSize(), QIcon::Normal, QIcon::Off);
+            icon.addFile(QString::fromUtf8(""), QSize(), QIcon::Normal, QIcon::Off);
         }
         button_palette_open->setIcon(icon);
 
         horizontalLayout_2->addWidget(button_palette_open);
 
         button_palette_new = new QToolButton(group_edit_list);
-        button_palette_new->setObjectName(QStringLiteral("button_palette_new"));
+        button_palette_new->setObjectName(QString::fromUtf8("button_palette_new"));
         QIcon icon1;
-        iconThemeName = QStringLiteral("document-new");
+        iconThemeName = QString::fromUtf8("document-new");
         if (QIcon::hasThemeIcon(iconThemeName)) {
             icon1 = QIcon::fromTheme(iconThemeName);
         } else {
-            icon1.addFile(QStringLiteral(""), QSize(), QIcon::Normal, QIcon::Off);
+            icon1.addFile(QString::fromUtf8(""), QSize(), QIcon::Normal, QIcon::Off);
         }
         button_palette_new->setIcon(icon1);
 
         horizontalLayout_2->addWidget(button_palette_new);
 
         button_palette_duplicate = new QToolButton(group_edit_list);
-        button_palette_duplicate->setObjectName(QStringLiteral("button_palette_duplicate"));
+        button_palette_duplicate->setObjectName(QString::fromUtf8("button_palette_duplicate"));
         QIcon icon2;
-        iconThemeName = QStringLiteral("edit-copy");
+        iconThemeName = QString::fromUtf8("edit-copy");
         if (QIcon::hasThemeIcon(iconThemeName)) {
             icon2 = QIcon::fromTheme(iconThemeName);
         } else {
-            icon2.addFile(QStringLiteral(""), QSize(), QIcon::Normal, QIcon::Off);
+            icon2.addFile(QString::fromUtf8(""), QSize(), QIcon::Normal, QIcon::Off);
         }
         button_palette_duplicate->setIcon(icon2);
 
@@ -117,50 +115,50 @@ public:
         verticalLayout->addLayout(horizontalLayout_3);
 
         swatch = new color_widgets::Swatch(color_widgets__ColorPaletteWidget);
-        swatch->setObjectName(QStringLiteral("swatch"));
+        swatch->setObjectName(QString::fromUtf8("swatch"));
 
         verticalLayout->addWidget(swatch);
 
         group_edit_palette = new QWidget(color_widgets__ColorPaletteWidget);
-        group_edit_palette->setObjectName(QStringLiteral("group_edit_palette"));
+        group_edit_palette->setObjectName(QString::fromUtf8("group_edit_palette"));
         horizontalLayout = new QHBoxLayout(group_edit_palette);
         horizontalLayout->setSpacing(0);
-        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
         button_palette_delete = new QToolButton(group_edit_palette);
-        button_palette_delete->setObjectName(QStringLiteral("button_palette_delete"));
+        button_palette_delete->setObjectName(QString::fromUtf8("button_palette_delete"));
         QIcon icon3;
-        iconThemeName = QStringLiteral("document-close");
+        iconThemeName = QString::fromUtf8("document-close");
         if (QIcon::hasThemeIcon(iconThemeName)) {
             icon3 = QIcon::fromTheme(iconThemeName);
         } else {
-            icon3.addFile(QStringLiteral(""), QSize(), QIcon::Normal, QIcon::Off);
+            icon3.addFile(QString::fromUtf8(""), QSize(), QIcon::Normal, QIcon::Off);
         }
         button_palette_delete->setIcon(icon3);
 
         horizontalLayout->addWidget(button_palette_delete);
 
         button_palette_revert = new QToolButton(group_edit_palette);
-        button_palette_revert->setObjectName(QStringLiteral("button_palette_revert"));
+        button_palette_revert->setObjectName(QString::fromUtf8("button_palette_revert"));
         QIcon icon4;
-        iconThemeName = QStringLiteral("document-revert");
+        iconThemeName = QString::fromUtf8("document-revert");
         if (QIcon::hasThemeIcon(iconThemeName)) {
             icon4 = QIcon::fromTheme(iconThemeName);
         } else {
-            icon4.addFile(QStringLiteral(""), QSize(), QIcon::Normal, QIcon::Off);
+            icon4.addFile(QString::fromUtf8(""), QSize(), QIcon::Normal, QIcon::Off);
         }
         button_palette_revert->setIcon(icon4);
 
         horizontalLayout->addWidget(button_palette_revert);
 
         button_palette_save = new QToolButton(group_edit_palette);
-        button_palette_save->setObjectName(QStringLiteral("button_palette_save"));
+        button_palette_save->setObjectName(QString::fromUtf8("button_palette_save"));
         QIcon icon5;
-        iconThemeName = QStringLiteral("document-save");
+        iconThemeName = QString::fromUtf8("document-save");
         if (QIcon::hasThemeIcon(iconThemeName)) {
             icon5 = QIcon::fromTheme(iconThemeName);
         } else {
-            icon5.addFile(QStringLiteral(""), QSize(), QIcon::Normal, QIcon::Off);
+            icon5.addFile(QString::fromUtf8(""), QSize(), QIcon::Normal, QIcon::Off);
         }
         button_palette_save->setIcon(icon5);
 
@@ -171,26 +169,26 @@ public:
         horizontalLayout->addItem(horizontalSpacer);
 
         button_color_add = new QToolButton(group_edit_palette);
-        button_color_add->setObjectName(QStringLiteral("button_color_add"));
+        button_color_add->setObjectName(QString::fromUtf8("button_color_add"));
         QIcon icon6;
-        iconThemeName = QStringLiteral("list-add");
+        iconThemeName = QString::fromUtf8("list-add");
         if (QIcon::hasThemeIcon(iconThemeName)) {
             icon6 = QIcon::fromTheme(iconThemeName);
         } else {
-            icon6.addFile(QStringLiteral(""), QSize(), QIcon::Normal, QIcon::Off);
+            icon6.addFile(QString::fromUtf8(""), QSize(), QIcon::Normal, QIcon::Off);
         }
         button_color_add->setIcon(icon6);
 
         horizontalLayout->addWidget(button_color_add);
 
         button_color_remove = new QToolButton(group_edit_palette);
-        button_color_remove->setObjectName(QStringLiteral("button_color_remove"));
+        button_color_remove->setObjectName(QString::fromUtf8("button_color_remove"));
         QIcon icon7;
-        iconThemeName = QStringLiteral("list-remove");
+        iconThemeName = QString::fromUtf8("list-remove");
         if (QIcon::hasThemeIcon(iconThemeName)) {
             icon7 = QIcon::fromTheme(iconThemeName);
         } else {
-            icon7.addFile(QStringLiteral(""), QSize(), QIcon::Normal, QIcon::Off);
+            icon7.addFile(QString::fromUtf8(""), QSize(), QIcon::Normal, QIcon::Off);
         }
         button_color_remove->setIcon(icon7);
 
@@ -207,31 +205,31 @@ public:
 
     void retranslateUi(QWidget *color_widgets__ColorPaletteWidget)
     {
-#ifndef QT_NO_TOOLTIP
-        button_palette_open->setToolTip(QApplication::translate("color_widgets::ColorPaletteWidget", "Open a new palette from file", Q_NULLPTR));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        button_palette_new->setToolTip(QApplication::translate("color_widgets::ColorPaletteWidget", "Create a new palette", Q_NULLPTR));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        button_palette_duplicate->setToolTip(QApplication::translate("color_widgets::ColorPaletteWidget", "Duplicate the current palette", Q_NULLPTR));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        button_palette_delete->setToolTip(QApplication::translate("color_widgets::ColorPaletteWidget", "Delete the current palette", Q_NULLPTR));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        button_palette_revert->setToolTip(QApplication::translate("color_widgets::ColorPaletteWidget", "Revert changes to the current palette", Q_NULLPTR));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        button_palette_save->setToolTip(QApplication::translate("color_widgets::ColorPaletteWidget", "Save changes to the current palette", Q_NULLPTR));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        button_color_add->setToolTip(QApplication::translate("color_widgets::ColorPaletteWidget", "Add a color to the palette", Q_NULLPTR));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        button_color_remove->setToolTip(QApplication::translate("color_widgets::ColorPaletteWidget", "Remove the selected color from the palette", Q_NULLPTR));
-#endif // QT_NO_TOOLTIP
-        Q_UNUSED(color_widgets__ColorPaletteWidget);
+#if QT_CONFIG(tooltip)
+        button_palette_open->setToolTip(QCoreApplication::translate("color_widgets::ColorPaletteWidget", "Open a new palette from file", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        button_palette_new->setToolTip(QCoreApplication::translate("color_widgets::ColorPaletteWidget", "Create a new palette", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        button_palette_duplicate->setToolTip(QCoreApplication::translate("color_widgets::ColorPaletteWidget", "Duplicate the current palette", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        button_palette_delete->setToolTip(QCoreApplication::translate("color_widgets::ColorPaletteWidget", "Delete the current palette", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        button_palette_revert->setToolTip(QCoreApplication::translate("color_widgets::ColorPaletteWidget", "Revert changes to the current palette", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        button_palette_save->setToolTip(QCoreApplication::translate("color_widgets::ColorPaletteWidget", "Save changes to the current palette", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        button_color_add->setToolTip(QCoreApplication::translate("color_widgets::ColorPaletteWidget", "Add a color to the palette", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        button_color_remove->setToolTip(QCoreApplication::translate("color_widgets::ColorPaletteWidget", "Remove the selected color from the palette", nullptr));
+#endif // QT_CONFIG(tooltip)
+        (void)color_widgets__ColorPaletteWidget;
     } // retranslateUi
 
 };
