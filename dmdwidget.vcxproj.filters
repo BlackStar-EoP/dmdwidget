@@ -164,6 +164,9 @@
     <ClCompile Include="rominspectwindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="rominspectwindow2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="vendor\Qt-Color-Widgets\src\swatch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -293,6 +296,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <CustomBuild Include="rominspectwindow.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="rominspectwindow2.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
     <ClInclude Include="span.h">
@@ -439,6 +445,12 @@
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="release\moc_rominspectwindow.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="debug\moc_rominspectwindow2.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="release\moc_rominspectwindow2.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="debug\moc_swatch.cpp">

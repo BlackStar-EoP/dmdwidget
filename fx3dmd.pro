@@ -28,6 +28,7 @@ SOURCES += $$PWD/main.cpp \
            $$PWD/deviceconfigwindow.cpp \
            $$PWD/widgetoutputdeviceconfigtab.cpp \
            $$PWD/rominspectwindow.cpp \
+           $$PWD/rominspectwindow2.cpp \
            $$PWD/fantasieswindow.cpp \
            $$PWD/dmdeventfilter.cpp \
            $$PWD/dmdkeys.cpp \
@@ -52,6 +53,7 @@ HEADERS += $$PWD/mainwindow.h \
            $$PWD/deviceconfigwindow.h \
            $$PWD/widgetoutputdeviceconfigtab.h \
            $$PWD/rominspectwindow.h \
+           $$PWD/rominspectwindow2.h \
            $$PWD/fantasieswindow.h \
            $$PWD/dmdeventfilter.h \
            $$PWD/dmdkeys.h \
