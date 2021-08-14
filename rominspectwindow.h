@@ -32,42 +32,42 @@ class QLabel;
 class ROMInspectWindow : public QWidget
 {
 	Q_OBJECT
-public:
-	ROMInspectWindow(QWidget* parent, DMDAnimationEngine* animation_engine);
-	~ROMInspectWindow();
-private:
-	void initUI();
-	void parse_image();
-	void update_index();
-	void inc_rom_index(uint32_t amount);
-	void dec_rom_index(uint32_t amount);
-
-private slots:
-	void file_open_button_clicked();
-
-	void reset_rom_index_button_clicked();
-	void dec_rom_index_button_clicked();
-	void dec_line_rom_index_button_clicked();
-	void pgdn_rom_index_button_clicked();
-	void pgup_rom_index_button_clicked();
-	void inc_rom_index_button_clicked();
-	void inc_line_rom_index_button_clicked();
-	void inc_bank_rom_index_button_clicked();
-	void dec_bank_rom_index_button_clicked();
-	void scan_rle_index_button_clicked();
-	void scan_sparse_index_button_clicked();
-	void scan_normal_index_button_clicked();
-	void bruteforce_table_button_clicked();
-
-private:
-	DMDAnimationEngine* m_animation_engine = nullptr;
-	uint32_t m_rom_index = 0;
-
-	static const uint32_t FRAME_IMAGE_HEIGHT = 128;
-	static const uint32_t FRAME_SIZE = 128 * FRAME_IMAGE_HEIGHT / 8;
-	QLabel* m_rom_index_label = nullptr;
-	QLabel* m_file_name_label = nullptr;
-	QLabel* m_image_label = nullptr;
-	uint8_t* m_rom_content = nullptr;
-	uint32_t m_rom_size = 0;
+//public:
+//	ROMInspectWindow(QWidget* parent, DMDAnimationEngine* animation_engine);
+//	~ROMInspectWindow();
+//private:
+//	void initUI();
+//	void parse_image();
+//	void update_index();
+//	void inc_rom_index(uint32_t amount);
+//	void dec_rom_index(uint32_t amount);
+//
+//private slots:
+//	void file_open_button_clicked();
+//
+//	void reset_rom_index_button_clicked();
+//	void dec_rom_index_button_clicked();
+//	void dec_line_rom_index_button_clicked();
+//	void pgdn_rom_index_button_clicked();
+//	void pgup_rom_index_button_clicked();
+//	void inc_rom_index_button_clicked();
+//	void inc_line_rom_index_button_clicked();
+//	void inc_bank_rom_index_button_clicked();
+//	void dec_bank_rom_index_button_clicked();
+//	void scan_rle_index_button_clicked();
+//	void scan_sparse_index_button_clicked();
+//	void scan_normal_index_button_clicked();
+//	void bruteforce_table_button_clicked();
+//
+//private:
+//	DMDAnimationEngine* m_animation_engine = nullptr;
+//	uint32_t m_rom_index = 0;
+//
+//	static const uint32_t FRAME_IMAGE_HEIGHT = 128;
+//	static const uint32_t FRAME_SIZE = 128 * FRAME_IMAGE_HEIGHT / 8;
+//	QLabel* m_rom_index_label = nullptr;
+//	QLabel* m_file_name_label = nullptr;
+//	QLabel* m_image_label = nullptr;
+//	uint8_t* m_rom_content = nullptr;
+//	uint32_t m_rom_size = 0;
 };

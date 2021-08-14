@@ -604,16 +604,6 @@ void ROMInspectWindow2::bruteforce_table_button_clicked()
 // DMD.cpp : implementation file
 //
 
-#include "stdafx.h"
-#include "defines.h"
-#include "HexEditor.h"
-#include "DMD.h"
-#include "hexeditordoc.h"
-#include "hexeditorview.h"
-#include "mybutton.h"
-#include "nagdlg.h"
-#include "version.h"
-
 time_t actTime;
 
 #ifdef _DEBUG
@@ -692,224 +682,38 @@ static char THIS_FILE[] = __FILE__;
 // DMD dialog
 
 
-DMD::DMD(CWnd* pParent /*=NULL*/,RegistrySettings *mainptr, int DialogType)
-	: CDialog(DMD::IDD, pParent)
+
+void DMD::DebugKeyMsgStrPrint(const QString& str, int KeyMask)
 {
-	PassedInPointer = mainptr;
-	NaggedOnce = 0;
-	dialogType = DialogType;
-	//{{AFX_DATA_INIT(DMD)
-	//}}AFX_DATA_INIT
+	//if (debugKeyBitmask & KeyMask)
+	//{
+	//	if (AfxMessageBox(str,(MB_OKCANCEL | MB_ICONQUESTION)) == IDCANCEL)
+	//	{
+	//		// 'Cancel' stops further debug messages
+	//		debugKeyBitmask &= ~KeyMask;
+	//	}
+	//}
 }
 
-DMD::~DMD()
-{
-}
-void DMD::DoDataExchange(CDataExchange* pDX)
-{
-	CDialog::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(DMD)
-	DDX_Control(pDX, IDC_BUTTON_WIPE, m_Wipe);
-	DDX_Control(pDX, IDC_BUTTON_PREVIOUS_GRAPHICX2, m_PreviousGraphicX2);
-	DDX_Control(pDX, IDC_BUTTON_NEXT_GRAPHICX2, m_NextGraphicX2);
-	DDX_Control(pDX, IDC_CHECK_EXPORT, m_Export);
-	DDX_Control(pDX, IDC_STATIC_DMD3_HEADER, m_Dmd3Title);
-	DDX_Control(pDX, IDC_STATIC_DMD2_HEADER, m_Dmd2Title);
-	DDX_Control(pDX, IDC_STATIC_DMD1_HEADER, m_Dmd1Title);
-	DDX_Control(pDX, IDC_SPIN1, m_Spin);
-	DDX_Control(pDX, IDC_LIST1, m_PixelColor);
-	DDX_Control(pDX, IDC_CHECK_XORED, m_Xored);
-	DDX_Control(pDX, IDC_CHECK_SKIPPED, m_Skipped);
-	DDX_Control(pDX, IDC_STATIC_DMD1_TEXTBOX, m_Dmd1);
-	DDX_Control(pDX, IDC_STATIC_DMD2_TEXTBOX, m_Dmd2);
-	DDX_Control(pDX, IDC_STATIC_DMD3_TEXTBOX, m_Dmd3);
-	DDX_Control(pDX, IDC_BUTTON_NEXT_GRAPHIC, m_NextGraphic);
-	DDX_Control(pDX, IDC_BUTTON_PREVIOUS_GRAPHIC, m_PreviousGraphic);
-	DDX_Control(pDX, IDC_STATIC_USERREG, m_UserReg);
-	//}}AFX_DATA_MAP
-}
-
-
-BEGIN_MESSAGE_MAP(DMD, CDialog)
-	//{{AFX_MSG_MAP(DMD)
-	ON_WM_CREATE()
-	ON_WM_DESTROY()
-	ON_WM_PAINT()
-	ON_BN_CLICKED(IDC_BUTTON_NEXT_GRAPHIC, OnButtonNextGraphic)
-	ON_BN_CLICKED(IDC_BUTTON_PREVIOUS_GRAPHIC, OnButtonPreviousGraphic)
-	ON_BN_CLICKED(IDC_CHECK_SKIPPED, OnCheckSkipped)
-	ON_BN_CLICKED(IDC_CHECK_XORED, OnCheckXored)
-	ON_BN_CLICKED(IDC_CHECK_EXPORT, OnCheckExport)
-	ON_LBN_SELCHANGE(IDC_LIST1, OnSelchangeList1)
-	ON_WM_CLOSE()
-	ON_WM_CTLCOLOR()
-	ON_WM_SHOWWINDOW()
-	ON_WM_TIMER()
-	ON_WM_LBUTTONDOWN()
-	ON_WM_LBUTTONUP()
-	ON_BN_CLICKED(IDC_BUTTON_NEXT_GRAPHICX2, OnButtonNextGraphicx2)
-	ON_BN_CLICKED(IDC_BUTTON_PREVIOUS_GRAPHICX2, OnButtonPreviousGraphicx2)
-	ON_BN_CLICKED(IDC_BUTTON_WIPE, OnButtonWipe)
-	//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
-
-/////////////////////////////////////////////////////////////////////////////
-// DMD message handlers
-
-BOOL DMD::Create() 
-{
-	return CDialog::Create(DMD::IDD);
-}
-
-BOOL DMD::Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID, CCreateContext* pContext) 
-{
-	return CDialog::Create(IDD, pParentWnd);
-}
-
-int DMD::OnCreate(LPCREATESTRUCT lpCreateStruct) 
-{
-	if (CDialog::OnCreate(lpCreateStruct) == -1)
-	{
-		return -1;
-	}
-	return 0;
-}
-
-void DMD::OnDestroy() 
-{
-	CDialog::OnDestroy();
-}
-
-void DMD::DebugKeyMsgStrPrint(CString str, int KeyMask)
-{
-	if (debugKeyBitmask & KeyMask)
-	{
-		if (AfxMessageBox(str,(MB_OKCANCEL | MB_ICONQUESTION)) == IDCANCEL)
-		{
-			// 'Cancel' stops further debug messages
-			debugKeyBitmask &= ~KeyMask;
-		}
-	}
-}
-
-void DMD::DebugShiftKeyMsgStrPrint(CString str)
+void DMD::DebugShiftKeyMsgStrPrint(const QString& str)
 {
 	DebugKeyMsgStrPrint(str, DEBUG_KEY_BIT_SHIFTKEYS);
 }
 
-void DMD::DebugControlKeyMsgStrPrint(CString str)
+void DMD::DebugControlKeyMsgStrPrint(const QString& str)
 {
 	DebugKeyMsgStrPrint(str, DEBUG_KEY_BIT_CONTROLKEYS);
 }
 
-BOOL DMD::OnInitDialog() 
+DMD::DMD()
 {
-	int WindowVerticalShift = 0;
-	int WindowHorizontalShift = 0;
-
-	CDialog::OnInitDialog();
-	
-	m_PixelColor.AddString("Black&White");
-	m_PixelColor.AddString("Red");
-	m_PixelColor.AddString("Yellow");
-	m_PixelColor.AddString("Green");
-	m_PixelColor.AddString("Teal");
-	m_PixelColor.AddString("Blue");
-	m_PixelColor.AddString("Violet");
-	m_PixelColor.SetTopIndex(PassedInPointer->PixelColor);
-	m_Spin.SetPos(PassedInPointer->PixelColor);
-/* // default: no checkbox, We now save previous frame pixel data
-	m_Xored.SetCheck(PassedInPointer->XoredCheckboxState);
-	m_Skipped.SetCheck(PassedInPointer->SkippedCheckboxState);
-*/
-
-	CString RegString;
-	RegString.Format("%s %.1f %s %s",APPLICATION_TITLE,APPLICATION_VERSION,APPLICATION_COPYRIGHT,APPLICATION_AUTHOR);
-	m_UserReg.SetWindowText(RegString);
-
-	switch (dialogType)
-	{
-		case DMD_DIALOG_TYPE_GRAPHICS:
-			SetWindowText("Dot Matrix Display, Full Frame Graphic Data");
-			GetDlgItem(IDC_STATIC_DMD1_HEADER)->SetWindowText("Medium Pixels Plane");
-			GetDlgItem(IDC_STATIC_DMD2_HEADER)->SetWindowText("Dim Pixels Plane");
-			GetDlgItem(IDC_STATIC_DMD3_HEADER)->SetWindowText("Blended Planes");
-			GetDlgItem(IDC_BUTTON_PREVIOUS_GRAPHIC)->SetWindowText("<- Prev");
-			GetDlgItem(IDC_BUTTON_NEXT_GRAPHIC)->SetWindowText("Next ->");
-			GetDlgItem(IDC_CHECK_XORED)->ShowWindow(SW_SHOW);
-			GetDlgItem(IDC_CHECK_SKIPPED)->ShowWindow(SW_SHOW);
-			WindowVerticalShift = 30;
-			WindowHorizontalShift = 20;
-			break;
-
-		case DMD_DIALOG_TYPE_FONTDATA:
-			SetWindowText("Dot Matrix Display, Font Data");
-			GetDlgItem(IDC_BUTTON_PREVIOUS_GRAPHIC)->SetWindowText("<--Previous Char");
-			GetDlgItem(IDC_BUTTON_NEXT_GRAPHIC)->SetWindowText("Next Char -->");
-			GetDlgItem(IDC_CHECK_XORED)->ShowWindow(SW_HIDE);
-			GetDlgItem(IDC_CHECK_SKIPPED)->ShowWindow(SW_HIDE);
-			GetDlgItem(IDC_CHECK_XORED)->ShowWindow(SW_HIDE);
-			GetDlgItem(IDC_CHECK_SKIPPED)->ShowWindow(SW_HIDE);
-			WindowVerticalShift = 80;
-			WindowHorizontalShift = 60;
-			break;
-
-		case DMD_DIALOG_TYPE_ANIDATA:
-			SetWindowText("Dot Matrix Display, Animation Data");
-			GetDlgItem(IDC_BUTTON_PREVIOUS_GRAPHIC)->SetWindowText("<--Previous Frame");
-			GetDlgItem(IDC_BUTTON_NEXT_GRAPHIC)->SetWindowText("Next Frame -->");
-			GetDlgItem(IDC_CHECK_XORED)->ShowWindow(SW_HIDE);
-			GetDlgItem(IDC_CHECK_SKIPPED)->ShowWindow(SW_HIDE);
-			GetDlgItem(IDC_CHECK_XORED)->ShowWindow(SW_HIDE);
-			GetDlgItem(IDC_CHECK_SKIPPED)->ShowWindow(SW_HIDE);
-			WindowVerticalShift = 130;
-			WindowHorizontalShift = 100;
-			break;
-
-		default:
-			AfxMessageBox("Error, unrecognized dialogType!");
-			break;
-	}
-
-	if ((WindowHorizontalShift != 0) || (WindowVerticalShift != 0))
-	{
-		WINDOWPLACEMENT wp;
-		if (GetWindowPlacement(&wp))
-		{
-			SetWindowPos(NULL, (wp.rcNormalPosition.left + WindowHorizontalShift), (wp.rcNormalPosition.top + WindowVerticalShift),0,0,SWP_NOSIZE);
-		}
-	}
-
-//    m_PreviousGraphicX2.SetWindowText("2<<");
-//    m_NextGraphicX2.SetWindowText(">>2");
-    m_PreviousGraphicX2.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON3)));
-    m_NextGraphicX2.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON2)));
-
-    m_Wipe.SetIcon(::LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON1)));
-	m_Wipe.EnableWindow(FALSE);
-    bWiped = FALSE;
-
-
-#if ALLOW_MOUSE_TO_REPEAT
-	TimerIDDMD = SetTimer(TIMER_DMD, TIMER_DMD_UPDATE, NULL);
-	NextDebounce =
-	PreviousDebounce = 0;
-	NextDebounceState =
-	PreviousDebounceState = DEBOUNCE_STATE_IDLE;
-#endif
-
-    // init clipboard selector
-    selectedTitleBox = 0;
-
 	memset(PreviousPlaneDataPane0,0,sizeof(PreviousPlaneDataPane0));
 	memset(PreviousPlaneDataPane1,0,sizeof(PreviousPlaneDataPane1));
 
 	UpdateControls();
-
-	return TRUE;  // return TRUE unless you set the focus to a control
-	              // EXCEPTION: OCX Property Pages should return FALSE
 } 
 
+/*
 void DMD::PaintDMDPanelImage(CPaintDC *pDc, DMDPlanes* pPlanes, unsigned char PaneMask) 
 {
 	int i,j,k;
@@ -1373,7 +1177,9 @@ void DMD::PaintDMDPanelImage(CPaintDC *pDc, DMDPlanes* pPlanes, unsigned char Pa
     // We know the "Previous" data has been filled in, so make sure the Wipe button is enabled
 	m_Wipe.EnableWindow((((bAnySkippedPixel == TRUE) || (bAnyXoredPixel == TRUE)) && (bWiped != TRUE)) ? TRUE : FALSE);
 }
+*/
 
+/* TODO
 void DMD::OnPaint() 
 {
 	CPaintDC dc(this); // device context for painting
@@ -1400,22 +1206,23 @@ void DMD::OnPaint()
 			break;
 	}
 }
-
+*/
 int DMD::PreAnalyzeVariableSizedImageTable()
 {
-	LPTSTR Ptr;
+	unsigned char* Ptr; // TODO 8 bit?
 	unsigned long Addr;
 	int TableCount = 0;
-
+	QString TmpStr;
 	// Standard validations and sanity checks
 	if (!VariableSizedImageData.TableAddress)
 	{
-		TmpStr.Format("Unexpected NULL VariableSizedImageData.TableAddress");
+		TmpStr = ("Unexpected NULL VariableSizedImageData.TableAddress");
 		DebugControlKeyMsgStrPrint(TmpStr);
 	}
 	if (VariableSizedImageData.TableAddress >= CommonData.ROMSize)
 	{
-		TmpStr.Format("Unexpected table address 0x%x is >= ROMSize 0x%x",VariableSizedImageData.TableAddress,CommonData.ROMSize);
+		TmpStr = QString("Unexpected table address 0x%1 is >= ROMSize 0x%2").arg(VariableSizedImageData.TableAddress, 0, 16).arg(CommonData.ROMSize, 0, 16);
+
 		DebugControlKeyMsgStrPrint(TmpStr);
 	}
 
@@ -1428,7 +1235,7 @@ int DMD::PreAnalyzeVariableSizedImageTable()
 		if (GetLastImageIndex(NULL, (VariableSizedImageData.maxTableIndex-1)) != 0)
 		{
 			VariableSizedImageData.maxTableIndex--;
-			TmpStr.Format("Stopped looking for image tables due to GetLastImageIndex() error on TableIndex %d",VariableSizedImageData.maxTableIndex);
+			TmpStr = QString("Stopped looking for image tables due to GetLastImageIndex() error on TableIndex %1").arg(VariableSizedImageData.maxTableIndex);
 			DebugControlKeyMsgStrPrint(TmpStr);
 			break;
 		}
@@ -1441,8 +1248,8 @@ int DMD::PreAnalyzeVariableSizedImageTable()
 
 	if (TableCount == 0)
 	{
-		TmpStr.Format("Found 0 table entries");
-		AfxMessageBox(TmpStr);
+		TmpStr = ("Found 0 table entries");
+		DebugControlKeyMsgStrPrint(TmpStr);
 		return -1;
 	}
 
@@ -1451,28 +1258,23 @@ int DMD::PreAnalyzeVariableSizedImageTable()
 	VariableSizedImageData.maxTableIndex = (TableCount - 1);
 
 	// Backup to the last valid image table, for purposes of debug message/validation
-	//TmpStr.Format("Last Table: 0x%02x 0x%02x 0x%02x, ROM Addr 0x%x",(*(Ptr-3))&0xFF,(*((Ptr-2)))&0xFF,(*((Ptr-1)))&0xFF,Addr);
-	//DebugControlKeyMsgStrPrint(TmpStr);
 
-	//
 	if (GetLastImageIndex(&VariableSizedImageData.maxImageIndex, VariableSizedImageData.maxTableIndex) != 0)
 	{
-		TmpStr.Format("Error looking up max image index for last table index %d\n",VariableSizedImageData.maxTableIndex);
-		AfxMessageBox(TmpStr);
+		TmpStr = QString("Error looking up max image index for last table index %1\n").arg(VariableSizedImageData.maxTableIndex);
+		DebugControlKeyMsgStrPrint(TmpStr);
 		return -1;
 	}
 
 	//
 	if (GetFirstImageIndex(&VariableSizedImageData.minImageIndex, VariableSizedImageData.minTableIndex) != 0)
 	{
-		TmpStr.Format("Error looking up min image index for first table index %d\n",VariableSizedImageData.maxTableIndex);
-		AfxMessageBox(TmpStr);
+		TmpStr = QString("Error looking up min image index for first table index %d\n").arg(VariableSizedImageData.maxTableIndex);
+		DebugControlKeyMsgStrPrint(TmpStr);
 		return -1;
 	}
 
 	//
-	//TmpStr.Format("Determined maxTableIndex %d, maxImageIndex 0x%02x",VariableSizedImageData.maxTableIndex,(VariableSizedImageData.maxImageIndex&0xFF));
-	//DebugControlKeyMsgStrPrint(TmpStr);
 
 	return 0;
 }
@@ -1520,7 +1322,7 @@ int DMD::GetLastImageIndex(int *pImageIndex, int TableIndex)
 int DMD::GetPrevImageIndex(int *pImageIndex, int TableIndex)
 {
 	unsigned long Addr;
-	LPTSTR Ptr;
+	unsigned char* Ptr; // TODO 8 bit?
 	unsigned char ImageIndexMin;
 	unsigned char ImageIndexMax;
 	int windUp;
@@ -1589,7 +1391,7 @@ int DMD::GetPrevImageIndex(int *pImageIndex, int TableIndex)
 int DMD::GetNextImageIndex(int *pImageIndex, int TableIndex)
 {
 	unsigned long Addr;
-	LPTSTR Ptr;
+	unsigned char* Ptr; // TODO 8 bit?
 	unsigned char ImageIndexMin;
 	unsigned char ImageIndexMax;
 
@@ -1679,7 +1481,7 @@ int DMD::GetAddrToWPCAddressOfVariableSizedImageTable(unsigned long *pAddr, int 
 int DMD::ExtractWPCAddrAndPageOfImageTable(int *pAddr, int *pPage, int TableIndex)
 {
 	unsigned long romAddr;
-	LPTSTR Ptr;
+	unsigned char* Ptr; // TODO 8 bit?
 	int Addr;
 	int Page;
 
@@ -1728,16 +1530,14 @@ int DMD::ExtractWPCAddrAndPageOfImageTable(int *pAddr, int *pPage, int TableInde
 		TempAddr &= 0xFFFF;
 		TempPage = (*(Ptr+2)) & 0xFF;
 
-		TmpStr.Format("Testing Tempaddr 0x%04x and Page 0x%02x",TempAddr,TempPage);
-		DebugShiftKeyMsgStrPrint(TmpStr);
+		DebugShiftKeyMsgStrPrint(QString("Testing Tempaddr 0x%1 and Page 0x%2").arg(TempAddr, 0, 16).arg(TempPage, 0, 16));
 
 		if (((TempAddr >= BASE_CODE_ADDR_PAGED_ROM) && (TempAddr < (BASE_CODE_ADDR_PAGED_ROM + PAGE_LENGTH))) 
 			/*&& (TempPage == 0x00)*/)
 		{
 			Addr = TempAddr;
 		}
-		TmpStr.Format("ExtractWPCAddrAndPageOfImageTable() FIXUP, Addr fixed to $%04x,%02x",Addr,Page);
-		DebugShiftKeyMsgStrPrint(TmpStr);
+		DebugShiftKeyMsgStrPrint(QString("ExtractWPCAddrAndPageOfImageTable() FIXUP, Addr fixed to $%1,%2").arg(Addr, 0, 16).arg(Page, 0, 16));
 	}
 
 	if (pAddr != NULL)
@@ -1773,7 +1573,7 @@ int DMD::GetROMAddressOfVariableSizedImageTable(unsigned long *pRomAddr, int Tab
 int DMD::GetVariableSizedImageTableMetadata(int TableIndex, int *pTableHeight, int *pTableSpacing)
 {
 	unsigned long Addr;
-	LPTSTR Ptr;
+	unsigned char* Ptr; // TODO 8 bit?
 	int TableHeight;
 	int TableSpacing;  // not sure at this point, 0x01 follows TableHeight
 
@@ -1813,7 +1613,7 @@ int DMD::GetROMAddressOfVariableSizedImageIndex(unsigned long *pRomAddr, int Tab
 {
 	unsigned long Addr;
 	int Page;
-	LPTSTR Ptr;
+	unsigned char* Ptr; // TODO 8 bit?
 	int TableHeight;
 	int TableSpacing;  // not sure at this point, 0x01 follows TableHeight
 	int ImageIndexMin, ImageIndexMax, ImageNum, ImageFound;
@@ -1919,8 +1719,7 @@ int DMD::GetROMAddressFromWPCAddrAndPage(unsigned long *pRomAddr, unsigned long 
 	{
 		if (Page != NONPAGED_BANK_INDICATOR)
 		{
-			TmpStr.Format("GetROMAddressFromWPCAddrAndPage() Non-banked WPC addr 0x%04x followed by page byte 0x%02x, normal when reading from opcode or some ROMs with 2-byte table addr entries. Forcing page to 0x%02x",Addr,Page,NONPAGED_BANK_INDICATOR);
-			DebugShiftKeyMsgStrPrint(TmpStr);
+			DebugShiftKeyMsgStrPrint(QString("GetROMAddressFromWPCAddrAndPage() Non-banked WPC addr 0x%1 followed by page byte 0x%2, normal when reading from opcode or some ROMs with 2-byte table addr entries. Forcing page to 0x%3").arg(Addr, 0, 16).arg(Page, 0, 16).arg(NONPAGED_BANK_INDICATOR, 0, 16));
 			Page = NONPAGED_BANK_INDICATOR;
 		}
 	}
@@ -1940,15 +1739,13 @@ int DMD::GetROMAddressFromWPCAddrAndPage(unsigned long *pRomAddr, unsigned long 
 	}
 	else
 	{
-		TmpStr.Format("Invalid WPC Addr and Page, $%04x,%02x, BasePage 0x%02x, TotalPages 0x%02x",
-			          Addr,Page,CommonData.BasePageIndex,CommonData.TotalPages);
-		DebugShiftKeyMsgStrPrint(TmpStr);
+		DebugShiftKeyMsgStrPrint(QString("Invalid WPC Addr and Page, $%1,%2, BasePage 0x%3, TotalPages 0x%4").arg(Addr, 0, 16).arg(Page, 0, 16).arg(CommonData.BasePageIndex, 0, 16).arg(CommonData.TotalPages, 0, 16));
 		return -1;
 	}
 	if (romAddr >= CommonData.ROMSize)
 	{
-		TmpStr.Format("Unexpected: Calculated addr in ROM 0x%x is greater than determined ROM size 0x%x",romAddr,CommonData.ROMSize);
-		DebugShiftKeyMsgStrPrint(TmpStr);
+		
+		DebugShiftKeyMsgStrPrint(QString("Unexpected: Calculated addr in ROM 0x%1 is greater than determined ROM size 0x%2").arg(romAddr, 0, 16).arg(CommonData.ROMSize, 0, 16));
 		return -1;
 	}
 
@@ -1959,7 +1756,7 @@ int DMD::GetROMAddressFromWPCAddrAndPage(unsigned long *pRomAddr, unsigned long 
 	return 0;
 }
 
-int DMD::ExtractWPCAddrAndPageFromBuffer(LPTSTR pSrc, unsigned long *pDstAddr, unsigned char *pDstPage)
+int DMD::ExtractWPCAddrAndPageFromBuffer(unsigned char* pSrc, unsigned long *pDstAddr, unsigned char *pDstPage)
 {
 	// In  : Address of memory containg a 3-byte WPC Address notation
 	// Out : The raw 16-bit address and 8-bit page from the WPC 3-byte address
@@ -1977,8 +1774,7 @@ int DMD::ExtractWPCAddrAndPageFromBuffer(LPTSTR pSrc, unsigned long *pDstAddr, u
 	{
 		if (Page != NONPAGED_BANK_INDICATOR)
 		{
-			TmpStr.Format("ExtractWPCAddrAndPageFromBuffer() Non-banked WPC addr 0x%04x followed by page byte 0x%02x, normal when reading from opcode or some ROMs with 2-byte table addr entries. Forcing page to 0x%02x",Addr,Page,NONPAGED_BANK_INDICATOR);
-			DebugShiftKeyMsgStrPrint(TmpStr);
+			DebugShiftKeyMsgStrPrint(QString("ExtractWPCAddrAndPageFromBuffer() Non-banked WPC addr 0x%1 followed by page byte 0x%2, normal when reading from opcode or some ROMs with 2-byte table addr entries. Forcing page to 0x%3").arg(Addr, 0, 16).arg(Page, 0, 16).arg(NONPAGED_BANK_INDICATOR, 0, 16));
 			Page = NONPAGED_BANK_INDICATOR;
 		}
 	}
@@ -1993,8 +1789,7 @@ int DMD::ExtractWPCAddrAndPageFromBuffer(LPTSTR pSrc, unsigned long *pDstAddr, u
 		}
 		else
 		{
-			TmpStr.Format("Expected a WPC Addr, but read 0x%04x",Addr);
-			DebugShiftKeyMsgStrPrint(TmpStr);
+			DebugShiftKeyMsgStrPrint(QString("Expected a WPC Addr, but read 0x%1").arg(Addr, 0, 16));
 			return -1;
 		}
 	}
@@ -2008,15 +1803,14 @@ int DMD::ExtractWPCAddrAndPageFromBuffer(LPTSTR pSrc, unsigned long *pDstAddr, u
 		}
 		else
 		{
-			TmpStr.Format("Expected a WPC Page Number, but read 0x%02x, Base is 0x%02x, Total Pages 0x%02x",Page,CommonData.BasePageIndex,CommonData.TotalPages);
-			DebugShiftKeyMsgStrPrint(TmpStr);
+			DebugShiftKeyMsgStrPrint(QString("Expected a WPC Page Number, but read 0x%1, Base is 0x%2, Total Pages 0x%3").arg(Page, 0, 16).arg(CommonData.BasePageIndex, 0, 16).arg(CommonData.TotalPages, 0, 16));
 			return -1;
 		}
 	}
 	return 0;
 }
 
-int DMD::GetROMAddressFromAddrOf3ByteWPCAddrPage(LPTSTR pSrc, unsigned long *pDst)
+int DMD::GetROMAddressFromAddrOf3ByteWPCAddrPage(unsigned char* pSrc, unsigned long *pDst)
 {
 	// In  : Address of memory containg a 3-byte WPC Address notation
 	// Out : Address in ROM image to which the WPC 3-byte address refers
@@ -2026,23 +1820,19 @@ int DMD::GetROMAddressFromAddrOf3ByteWPCAddrPage(LPTSTR pSrc, unsigned long *pDs
 
 	if (ExtractWPCAddrAndPageFromBuffer(pSrc, &Addr, &Page) != 0)
 	{
-		TmpStr.Format("Error from ExtractWPCAddrAndPageFromBuffer(), Passed it ptr to: 0x%02x 0x%02x 0x%02x",(*pSrc)&0xFF,(*(pSrc+1))&0xFF,(*(pSrc+2))&0xFF);
-		DebugShiftKeyMsgStrPrint(TmpStr);
+		DebugShiftKeyMsgStrPrint(QString("Error from ExtractWPCAddrAndPageFromBuffer(), Passed it ptr to: 0x%1 0x%2 0x%3").arg((*pSrc) & 0xFF, 0, 16).arg((*(pSrc + 1)) & 0xFF, 0, 16).arg((*(pSrc + 2)) & 0xFF, 0, 16));
 		return -1;
 	}
 
-	TmpStr.Format("GetROMAddressFromAddrOf3ByteWPCAddrPage() WPC TableAddress $%04x,%02x",Addr,Page);
-	DebugShiftKeyMsgStrPrint(TmpStr);
+	DebugShiftKeyMsgStrPrint(QString("GetROMAddressFromAddrOf3ByteWPCAddrPage() WPC TableAddress $%1,%2").arg(Addr, 0, 16).arg(Page, 0, 16));
 
 	if (GetROMAddressFromWPCAddrAndPage(&Addr, Addr, Page) != 0)
 	{
-		TmpStr.Format("Error from GetROMAddressFromWPCAddrAndPage(), Passed it WPC Addr $%04x,%02x",Addr,Page);
-		DebugShiftKeyMsgStrPrint(TmpStr);
+		DebugShiftKeyMsgStrPrint(QString("Error from GetROMAddressFromWPCAddrAndPage(), Passed it WPC Addr $%1,%2").arg(Addr, 0, 16).arg(Page, 0, 16));
 		return -1;
 	}
 
-	TmpStr.Format("GetROMAddressFromAddrOf3ByteWPCAddrPage() ROM TableAddress 0x%x",Addr);
-	DebugShiftKeyMsgStrPrint(TmpStr);
+	DebugShiftKeyMsgStrPrint(QString("GetROMAddressFromAddrOf3ByteWPCAddrPage() ROM TableAddress 0x%1").arg(Addr, 0, 16));
 
 	if (pDst != NULL)
 	{
@@ -2052,7 +1842,7 @@ int DMD::GetROMAddressFromAddrOf3ByteWPCAddrPage(LPTSTR pSrc, unsigned long *pDs
 	return 0;
 }
 
-int DMD::ProcessHitType(int HitType, LPTSTR HitTablePtr, LPTSTR HitPagePtr, LPTSTR Ptr, unsigned long *pTbl)
+int DMD::ProcessHitType(int HitType, unsigned char* HitTablePtr, unsigned char* HitPagePtr, unsigned char* Ptr, unsigned long *pTbl)
 {
 	unsigned long Addr;
 	char HitBuf[3];
@@ -2062,39 +1852,34 @@ int DMD::ProcessHitType(int HitType, LPTSTR HitTablePtr, LPTSTR HitPagePtr, LPTS
 		// this not used at this time...
 		case HITTYPE_TBL_ADDR_ADDR_ADDR :
 			//
-			TmpStr.Format("Potential Match. HitType 0x%02x, HitBytes 0x%02x 0x%02x",(*(Ptr-1))&0xFF,(*HitTablePtr)&0xFF,(*(HitTablePtr+1))&0xFF);
-			DebugShiftKeyMsgStrPrint(TmpStr);
+			
+			DebugShiftKeyMsgStrPrint(QString("Potential Match. HitType 0x%1, HitBytes 0x%2 0x%3").arg(*(Ptr - 1) & 0xFF, 0, 16).arg((*HitTablePtr) & 0xFF, 0, 16).arg((*(HitTablePtr + 1)) & 0xFF, 0, 16));
 
 			//
 			if (GetROMAddressFromAddrOf3ByteWPCAddrPage(HitTablePtr, &Addr) != 0)
 			{
-				TmpStr.Format("Error from GetROMAddressFromAddrOf3ByteWPCAddrPage(), Passed it WPC Ptr to $%02x %02x",(*HitTablePtr)&0xFF,(*(HitTablePtr+1))&0xFF);
-				DebugShiftKeyMsgStrPrint(TmpStr);
+				DebugShiftKeyMsgStrPrint(QString("Error from GetROMAddressFromAddrOf3ByteWPCAddrPage(), Passed it WPC Ptr to $%1 %2").arg((*HitTablePtr) & 0xFF, 0, 16).arg((*(HitTablePtr + 1)) & 0xFF, 0, 16));
 				return -1;
 			}
 
 			//
-			TmpStr.Format("HITTYPE_TBL_ADDR_ADDR_ADDR derived ROM TableAddressAddress 0x%04x, going to HITTYPE_TBL_ADDR_ADDR",Addr);
-			DebugShiftKeyMsgStrPrint(TmpStr);
+			DebugShiftKeyMsgStrPrint(QString("HITTYPE_TBL_ADDR_ADDR_ADDR derived ROM TableAddressAddress 0x%1, going to HITTYPE_TBL_ADDR_ADDR").arg(Addr, 0, 16));
 
 			HitTablePtr = &CommonData.StartPtr[Addr];
 			// no break!  now that we have the table address address, go to the following to get WPC address of the table, and then ROM address of the table
 
 		case HITTYPE_TBL_ADDR_ADDR :
 			//
-			TmpStr.Format("Potential Match. HitType 0x%02x, HitBytes 0x%02x 0x%02x",(*(Ptr-1))&0xFF,(*HitTablePtr)&0xFF,(*(HitTablePtr+1))&0xFF);
-			DebugShiftKeyMsgStrPrint(TmpStr);
+			DebugShiftKeyMsgStrPrint(QString("Potential Match. HitType 0x%1, HitBytes 0x%2 0x%3").arg((*(Ptr - 1)) & 0xFF, 0, 16).arg((*HitTablePtr) & 0xFF, 0, 16).arg((*(HitTablePtr + 1)) & 0xFF, 0, 16));
 			//
 			if (GetROMAddressFromAddrOf3ByteWPCAddrPage(HitTablePtr, &Addr) != 0)
 			{
-				TmpStr.Format("Error from GetROMAddressFromAddrOf3ByteWPCAddrPage(), Passed it WPC Ptr to $%02x %02x",(*HitTablePtr)&0xFF,(*(HitTablePtr+1))&0xFF);
-				DebugShiftKeyMsgStrPrint(TmpStr);
+				DebugShiftKeyMsgStrPrint(QString("Error from GetROMAddressFromAddrOf3ByteWPCAddrPage(), Passed it WPC Ptr to $%1 %2").arg((*HitTablePtr) & 0xFF, 0, 16).arg((*(HitTablePtr + 1)) & 0xFF, 0, 16));
 				return -1;
 			}
 
 			//
-			TmpStr.Format("HITTYPE_TBL_ADDR_ADDR derived TableAddress of 0x%04x, going to HITTYPE_TBL_ADDR",Addr);
-			DebugShiftKeyMsgStrPrint(TmpStr);
+			DebugShiftKeyMsgStrPrint(QString("HITTYPE_TBL_ADDR_ADDR derived TableAddress of 0x%1, going to HITTYPE_TBL_ADDR").arg(Addr, 0, 16));
 
 			HitTablePtr = &CommonData.StartPtr[Addr];
 			HitPagePtr = &CommonData.StartPtr[Addr+2]; // in some cases when addr is in non-banked ROM this byte will get ignored
@@ -2104,8 +1889,7 @@ int DMD::ProcessHitType(int HitType, LPTSTR HitTablePtr, LPTSTR HitPagePtr, LPTS
 			//
 			if (HitTablePtr == NULL)
 			{
-				TmpStr.Format("HITTYPE_TBL_ADDR, but HitTablePtr is NULL");
-				DebugShiftKeyMsgStrPrint(TmpStr);
+				DebugShiftKeyMsgStrPrint("HITTYPE_TBL_ADDR, but HitTablePtr is NULL");
 				return -1;
 			}
 			//
@@ -2124,8 +1908,7 @@ int DMD::ProcessHitType(int HitType, LPTSTR HitTablePtr, LPTSTR HitPagePtr, LPTS
 
 				if (!((Addr >= BASE_CODE_ADDR_NONPAGED_ROM) && (Addr < (BASE_CODE_ADDR_NONPAGED_ROM + NONPAGED_LENGTH))))
 				{
-					TmpStr.Format("HITTYPE_TBL_ADDR, but HitPagePtr is NULL, and Addr is in paged ROM");
-					DebugShiftKeyMsgStrPrint(TmpStr);
+					DebugShiftKeyMsgStrPrint("HITTYPE_TBL_ADDR, but HitPagePtr is NULL, and Addr is in paged ROM");
 					return -1;
 				}
 
@@ -2143,25 +1926,22 @@ HitBuf[1] = 0x39;
 HitBuf[2] = 0x30;
 #endif
 			//
-			TmpStr.Format("Potential Match. HitType 0x%02x, HitBytes 0x%02x 0x%02x 0x%02x",(*(Ptr-1))&0xFF,(*HitBuf)&0xFF,(*(HitBuf+1))&0xFF,(*(HitBuf+2))&0xFF);
-			DebugShiftKeyMsgStrPrint(TmpStr);
+			DebugShiftKeyMsgStrPrint(QString("Potential Match. HitType 0x%1, HitBytes 0x%2 0x%3 0x%4").arg((*(Ptr - 1)) & 0xFF, 0, 16).arg((*HitBuf) & 0xFF, 0, 16).arg((*(HitBuf + 1)) & 0xFF, 0, 16).arg((*(HitBuf + 2)) & 0xFF, 0, 16));
 			//
-			if (GetROMAddressFromAddrOf3ByteWPCAddrPage(HitBuf, pTbl) == 0)
+			if (GetROMAddressFromAddrOf3ByteWPCAddrPage((unsigned char*)HitBuf, pTbl) == 0) // TODO cast
 			{
-				TmpStr.Format("Table Found!");
-				DebugShiftKeyMsgStrPrint(TmpStr);
+				DebugShiftKeyMsgStrPrint("Table Found!");
 				return 0;
 			}
 			//
-			TmpStr.Format("Error deriving table addr from hit, HitType 0x%02x, HitBytes 0x%02x 0x%02x 0x%02x. Will keep looking. May need to debug by opening window while pressing <shift>",(*(Ptr-1))&0xFF,(*HitBuf)&0xFF,(*(HitBuf+1))&0xFF,(*(HitBuf+2))&0xFF);
-			DebugShiftKeyMsgStrPrint(TmpStr);
+			DebugShiftKeyMsgStrPrint(QString("Error deriving table addr from hit, HitType 0x%1, HitBytes 0x%2 0x%3 0x%4. Will keep looking. May need to debug by opening window while pressing <shift>").arg((*(Ptr - 1)) & 0xFF, 0, 16).arg((*HitBuf) & 0xFF, 0, 16).arg((*(HitBuf + 1)) & 0xFF, 0, 16).arg((*(HitBuf + 2)) & 0xFF, 0, 16));
 			break;
 
 		case HITTYPE_NONE:
 			return 0;
 
 		default:
-			AfxMessageBox("Unexpected HitType");
+			DebugShiftKeyMsgStrPrint("Unexpected HitType");
 			break;
 	}
 	return -1;
@@ -2169,25 +1949,24 @@ HitBuf[2] = 0x30;
 
 int DMD::InitCommon()
 {
-	CHexEditorDoc *DocPtr = (((CHexEditorView *)((CFrameWnd*)(AfxGetApp()->m_pMainWnd))->GetActiveView())->GetDocument());
-	ASSERT_VALID(DocPtr);
-	unsigned long Length = DocPtr->m_nBufferLength;
+	// TODO get data here
+	unsigned long Length = 0;
 
 
 	if ((Length != 0x40000) && (Length != 0x80000) && (Length != 0x100000))
 	{
-		AfxMessageBox("ROM doesn't appear to be a WPC rom image");
+		DebugShiftKeyMsgStrPrint("ROM doesn't appear to be a WPC rom image");
 		return -1;
 	}
 
 	CommonData.ROMSize = Length;
 	CommonData.TotalPages = (unsigned char)((Length + (PAGE_LENGTH - 1)) / PAGE_LENGTH);
-	CommonData.StartPtr = DocPtr->m_szDataBuffer.GetBuffer(Length);
+	CommonData.StartPtr = 0; // TODO
     CommonData.EndPtr = (unsigned char *)&CommonData.StartPtr[(CommonData.ROMSize-1)];
 
 	if (CommonData.StartPtr == NULL)
 	{
-		AfxMessageBox("Unexpected NULL pointer for ROM data");
+		DebugShiftKeyMsgStrPrint("Unexpected NULL pointer for ROM data");
 		return -1;
 	}
 
@@ -2195,987 +1974,6 @@ int DMD::InitCommon()
 
 	return 0;
 }
-
-#if 0
-int DMD::InitGraphics()
-{
-	// Example assembly for loading graphics table (IJ_L7):
-	//-------------------------------------------------------------------------------------------------------------------------
-	// EB1A: 34 76       PSHS  U,Y,X,B,A        ; Save U,Y,X,D onto stack
-	// EB1C: BE 82 AC    LDX   $82AC            ; Load from Graphic table 82AC into X, 82AC has 4001, Top of Paged RAM
-	// EB1F: 30 8B       LEAX  D,X              ; Advance X by D
-	// EB21: 58          ASLB                   ; Multiply D by 2
-	// EB22: 49          ROLA                   ; Multiply D by 2
-	// EB23: 30 8B       LEAX  D,X              ; Advance X by (D * 2)
-	// EB25: F6 82 AE    LDB   $82AE            ; Load B with BANK/Page for graphic table from 82AE (0x29)
-	// EB28: BD 90 4D    JSR   $904D            ; Get the 2 graphic table entry bytes into Y and advance X pointer by 2.
-	// EB2B: BD 90 2B    JSR   $902B            ; Get the 3rd graphic table entry byte into A
-	// EB2E: 1F 21       TFR   Y,X              ; Transfer Y to X (2 graphic table entry bytes and the address of the 3rd byte)
-	// EB30: 1F 89       TFR   A,B              ; Transfer A to B (3rd graphic table entry byte and the graphic table bank)
-	//-------------------------------------------------------------------------------------------------------------------------
-	// Search for: BE xx xx 30 8B 58 49 yy yy F6 yy yy F6 yy yy, WPC Table address address is xxxx in non-banked ROM
-	// Search for: BE xx xx 30 8B 58 49 yy yy BD yy yy BD yy yy, WPC Table address address is xxxx in non-banked ROM
-	// Search for: BE xx xx 30 8B 58 49 yy yy F6 yy yy BD yy yy, WPC Table address address is xxxx in non-banked ROM
-	// Search for: BE xx xx 30 8B 58 49 yy yy BD yy yy F6 yy yy, WPC Table address address is xxxx in non-banked ROM
-	//
-	//
-	//
-	// Example assembly for loading graphics table (CFTBL_L4):
-	//-------------------------------------------------------------------------------------------------------------------------
-	// F19C: 34 76       PSHS  U,Y,X,B,A        ; Save registers
-	// F19E: EE 68       LDU   $0008,S          ; Get stack
-	// F1A0: E6 C4       LDB   ,U               ; Get 1-byte parameter to this function call
-	// F1A2: 33 41       LEAU  $0001,U          ; Fixup stack
-	// F1A4: EF 68       STU   $0008,S          ; 
-	// F1A6: BE 82 8E    LDX   $828E            ; X gets address of graphic table
-	// F1A9: 3A          ABX                    ;
-	// F1AA: 3A          ABX                    ;
-	// F1AB: 3A          ABX                    ;
-	// F1AC: D6 11       LDB   $11              ; Get current bank
-	// F1AE: 34 04       PSHS  B                ; Save it
-	// F1B0: C6 29       LDB   #$29             ; Load fixed number of graphic table bank
-	// F1B2: BD 8F D1    JSR   $8FD1            ; Set bank
-	//-------------------------------------------------------------------------------------------------------------------------
-	// Search for: EE yy E6 C4 33 41 EF yy BE xx xx 3A 3A 3A D6 yy 34 04 C6 zz, WPC Table address address is xxxx in non-banked ROM
-	//
-	//
-	//
-	// Example assembly for loading graphics table (FishTales_L5):
-	//-------------------------------------------------------------------------------------------------------------------------
-	// ECD1: 34 76       PSHS  U,Y,X,B,A        ; Save registers
-	// ECD3: EE 68       LDU   $0008,S          ;
-	// ECD5: E6 C0       LDB   ,U+              ; Get 1-byte parameter from function call
-	// ECD7: EF 68       STU   $0008,S          ;
-	// ECD9: BE 82 88    LDX   $8288            ; X gets table address
-	// ECDC: 3A          ABX                    ;
-	// ECDD: 3A          ABX                    ;
-	// ECDE: 3A          ABX                    ;
-	// ECDF: D6 11       LDB   $11              ; Get current bank
-	// ECE1: 34 04       PSHS  B                ; Save it
-	// ECE3: C6 2B       LDB   #$2B             ; Set Table bank value
-	// ECE5: BD 91 0D    JSR   $910D            ; Set bank
-	//-------------------------------------------------------------------------------------------------------------------------
-	// Search for: EE yy E6 C0 EF yy BE xx xx 3A 3A 3A D6 yy 34 04 C6 zz, WPC Table address address is xxxx in non-banked ROM
-	//
-	//
-	//
-	//
-	// Example assembly for loading graphics table (CFTBL_L4):
-	//-------------------------------------------------------------------------------------------------------------------------
-	// E8C5: 34 16       PSHS  X,B,A            ; Save registers
-	// E8C7: 8E 53 6A    LDX   #$536A           ; X gets address of graphic table
-	// E8CA: CB 02       ADDB  #$02             ; 
-	// E8CC: 3A          ABX                    ;
-	// E8CD: 3A          ABX                    ;
-	// E8CE: 3A          ABX                    ;
-	// E8CF: D6 13       LDB   $13              ; Get current bank
-	// E8D1: 34 04       PSHS  B                ; Save it
-	// E8D3: C6 22       LDB   #$22             ; Load fixed number of graphic table bank
-	// E8D5: BD 8F E1    JSR   $8FE1            ; Set bank
-	//-------------------------------------------------------------------------------------------------------------------------
-	// Search for: 34 16 8E xx xx CB yy 3A 3A 3A D6 yy 34 04 C6 zz BD yy yy, WPC Table address is $xxxx,zz
-	//
-	//
-	//
-	// Example assembly for loading graphics table (DRWHO_L2):
-	//-------------------------------------------------------------------------------------------------------------------------
-	// F08F: 34 76       PSHS  U,Y,X,B,A        ; Save registers
-	// F091: EE 68       LDU   $0008,S          ;
-	// F093: E6 C0       LDB   ,U+              ; Get 1-byte param from function call
-	// F095: EF 68       STU   $0008,S          ;
-	// F097: 8E 54 BB    LDX   #$54BB           ; X gets table addr
-	// F09A: C1 DE       CMPB  #$DE             ;
-	// F09C: 25 02       BCS   $F0A0            ;
-	// F09E: 3F          SWI                    ;
-	// F09F: 5F          CLRB                   ;
-	// F0A0: 3A          ABX                    ;
-	// F0A1: 3A          ABX                    ;
-	// F0A2: 3A          ABX                    ;
-	// F0A3: D6 13       LDB   $13              ; Get current bank
-	// F0A5: 34 04       PSHS  B                ; Save it
-	// F0A7: C6 22       LDB   #$22             ; Set Table bank value
-	// F0A9: BD 91 1D    JSR   $911D            ; Set bank
-	//-------------------------------------------------------------------------------------------------------------------------
-	// Search for: 34 76 EE 68 E6 C0 EF 68 8E xx xx C1 yy 25 02 3F 5F 3A 3A 3A D6 yy 34 04 C6 zz BD, WPC Table address is $xxxx,zz
-	//
-	//
-	//
-	// Example assembly for loading graphics table (Gilligan's Island L9):
-	//-------------------------------------------------------------------------------------------------------------------------
-	// E3E9: 34 76       PSHS  U,Y,X,B,A        ; Save registers
-	// E3EB: EE 68       LDU   $0008,S          ;
-	// E3ED: E6 C4       LDB   ,U               ; Get 1-byte param from function call
-	// E3EF: 33 41       LEAU  $0001,U          ;
-	// E3F1: EF 68       STU   $0008,S          ;
-	// E3F3: 8E E7 48    LDX   #$E748           ; X gets table addr
-	// E3F6: 3A          ABX                    ;
-	// E3F7: 3A          ABX                    ;
-	// E3F8: 3A          ABX                    ;
-	// E3F9: D6 11       LDB   $11              ; Get current bank
-	// E3FB: 34 04       PSHS  B                ; Save it
-	// E3FD: BD 91 16    JSR   $9116            ; 
-	//-------------------------------------------------------------------------------------------------------------------------
-	// Search for: 34 76 EE 68 E6 C4 33 41 EF 68 8E xx xx 3A 3A 3A D6 yy 34 04 BD, WPC Table address is xxxx in non-banked ROM
-	//
-	//
-	//
-	// Example assembly for loading graphics table (Gilligan's Island L9):
-	//-------------------------------------------------------------------------------------------------------------------------
-	// E7EB: 34 76       PSHS  U,Y,X,B,A        ;
-	// E7ED: EE 68       LDU   $0008,S          ; 
-	// E7EF: E6 C4       LDB   ,U               ;
-	// E7F1: 33 41       LEAU  $0001,U          ;
-	// E7F3: EF 68       STU   $0008,S          ;
-	// E7F5: BE 82 2D    LDX   $822D            ;
-	// E7F8: 3A          ABX                    ;
-	// E7F9: 3A          ABX                    ;
-	// E7FA: 3A          ABX                    ;
-	// E7FB: D6 12       LDB   $12              ;
-	// E7FD: 34 04       PSHS  B                ;
-	// E7FF: BD 90 C0    JSR   $90C0            ;
-	//-------------------------------------------------------------------------------------------------------------------------
-	// Search for: 34 76 EE 68 E6 C4 33 41 EF 68 BE xx xx 3A 3A 3A D6 yy 34 04 BD, WPC Table address address is xxxx in non-banked ROM
-	//
-	//
-	// Example assembly for loading graphics table (Hurricane_L2):
-	//-------------------------------------------------------------------------------------------------------------------------
-	// FB79: 34 76       PSHS  U,Y,X,B,A        ; Save registers
-	// FB7B: EE 68       LDU   $0008,S          ;
-	// FB7D: E6 C0       LDB   ,U+              ;
-	// FB7F: EF 68       STU   $0008,S          ;
-	// FB81: BE 82 63    LDX   $8263            ;
-	// FB84: 30 89 03 00 LEAX  $0300,X          ;
-	// FB88: 3A          ABX                    ;
-	// FB89: 3A          ABX                    ;
-	// FB8A: 3A          ABX                    ;
-	// FB8B: D6 14       LDB   $14              ;
-	// FB8D: 34 04       PSHS  B                ;
-	// FB8F: BD 91 41    JSR   $9141            ;
-	//-------------------------------------------------------------------------------------------------------------------------
-	// Search for: 34 76 EE 68 E6 C0 EF 68 BE xx xx 30 89 yy yy 3A 3A 3A D6 yy 34 04 BD, WPC Table address address address is xxxx in non-banked ROM
-	//
-	//
-	//
-	// Example assembly for loading graphics table (AddamsFamily_H4):
-	//-------------------------------------------------------------------------------------------------------------------------
-	// E456: 34 76       PSHS  U,Y,X,B,A        ; Save registers
-	// E458: EE 68       LDU   $0008,S          ;
-	// E45A: E6 C0       LDB   ,U+              ;
-	// E45C: EF 68       STU   $0008,S          ;
-	// E45E: 8E E5 91    LDX   #$E591           ;
-	// E461: 20 0F       BRA   $E472            ;
-	// E463: CF 74                              ;
-	// E465: 34 76       PSHS  U,Y,X,B,A        ; Save registers
-	// E467: EE 68       LDU   $0008,S          ;
-	// E469: E6 C4       LDB   ,U               ;
-	// E46B: 33 41       LEAU  $0001,U          ;
-	// E46D: EF 68       STU   $0008,S          ;
-	// E46F: 8E E7 56    LDX   #$E756           ;
-	// E472: 3A          ABX                    ;
-	// E473: 3A          ABX                    ;
-	// E474: 3A          ABX                    ;
-	// E475: D6 11       LDB   $11              ;
-	// E477: 34 04       PSHS  B                ;
-	// E479: BD 90 46    JSR   $9046            ;
-	//-------------------------------------------------------------------------------------------------------------------------
-	// Search for: 34 76 EE 68 E6 C0 EF 68 8E xx xx 20 0F yy yy 34 76 EE 68 E6 C4 33 41 EF 68 8E yy yy 3A 3A 3A D6 zz 34 04 BD, WPC Table address is xxxx in non-banked ROM
-	//
-	//
-	//
-	// Example assembly for loading graphics table (AddamsFamilyGold_H3):
-	//-------------------------------------------------------------------------------------------------------------------------
-	// E322: 34 76       PSHS  U,Y,X,B,A        ;
-	// E324: EE 68       LDU   $0008,S          ;
-	// E326: E6 C0       LDB   ,U+              ;
-	// E328: EF 68       STU   $0008,S          ;
-	// E32A: 8E 40 01    LDX   #$4001           ;
-	// E32D: 20 0F       BRA   $E33E            ;
-	// E32F: CF 74                              ;
-	// E331: 34 76       PSHS  U,Y,X,B,A        ;
-	// E333: EE 68       LDU   $0008,S          ;
-	// E335: E6 C4       LDB   ,U               ;
-	// E337: 33 41       LEAU  $0001,U          ;
-	// E339: EF 68       STU   $0008,S          ;
-	// E33B: 8E 42 80    LDX   #$4280           ;
-	// E33E: 3A          ABX                    ;
-	// E33F: 3A          ABX                    ;
-	// E340: 3A          ABX                    ;
-	// E341: D6 11       LDB   $11              ;
-	// E343: 34 04       PSHS  B                ;
-	// E345: C6 36       LDB   #$36             ;
-	// E347: BD 90 3A    JSR   $903A            ;
-	//-------------------------------------------------------------------------------------------------------------------------
-	// Search for: 34 76 EE 68 E6 C0 EF 68 8E xx xx 20 0F yy yy 34 76 EE 68 E6 C4 33 41 EF 68 8E yy yy 3A 3A 3A D6 zz 34 04 C6 zz BD, WPC Table address is $xxxx,zz in banked ROM
-	//
-	//
-	//
-	// Example assembly for loading graphics table (BlackRose_L4):
-	//-------------------------------------------------------------------------------------------------------------------------
-	// EE51: 34 76       PSHS  U,Y,X,B,A        ;
-	// EE53: EE 68       LDU   $0008,S          ;
-	// EE55: E6 C4       LDB   ,U               ;
-	// EE57: 33 41       LEAU  $0001,U          ;
-	// EE59: EF 68       STU   $0008,S          ;
-	// EE5B: 8E E8 B2    LDX   #$E8B2           ;
-	// EE5E: 20 0D       BRA   $EE6D            ;
-	// EE60: 34 76       PSHS  U,Y,X,B,A        ;
-	// EE62: EE 68       LDU   $0008,S          ;
-	// EE64: E6 C4       LDB   ,U               ;
-	// EE66: 33 41       LEAU  $0001,U          ;
-	// EE68: EF 68       STU   $0008,S          ;
-	// EE6A: BE 82 88    LDX   $8288            ;
-	// EE6D: 3A          ABX                    ;
-	// EE6E: 3A          ABX                    ;
-	// EE6F: 3A          ABX                    ;
-	// EE70: D6 11       LDB   $11              ;
-	// EE72: 34 04       PSHS  B                ;
-	// EE74: BD 91 16    JSR   $9116            ;
-	//-------------------------------------------------------------------------------------------------------------------------
-	// Search for: 34 76 EE 68 E6 C4 33 41 EF 68 8E yy yy 20 yy 34 76 EE 68 E6 C4 33 41 EF 68 BE xx xx 3A 3A 3A D6 zz 34 04 BD, WPC Table address address address is xxxx in non-banked ROM
-	//
-	//
-	//
-	// Example assembly for loading graphics table (Terminator2_L8):
-	//-------------------------------------------------------------------------------------------------------------------------
-	// EF40: 34 76       PSHS  U,Y,X,B,A        ;
-	// EF42: 8E 40 01    LDX   #$4001           ;
-	// EF45: 20 0B       BRA   $EF52            ;
-	// EF47: 34 76       PSHS  U,Y,X,B,A        ;
-	// EF49: EE 68       LDU   $0008,S          ;
-	// EF4B: E6 C0       LDB   ,U+              ;
-	// EF4D: EF 68       STU   $0008,S          ;
-	// EF4F: 8E 40 01    LDX   #$4001           ;
-	// EF52: 3A          ABX                    ;
-	// EF53: 3A          ABX                    ;
-	// EF54: 3A          ABX                    ;
-	// EF55: D6 11       LDB   $11              ;
-	// EF57: 34 04       PSHS  B                ;
-	// EF59: C6 22       LDB   #$22             ;
-	// EF5B: BD 90 BC    JSR   $90BC            ;
-	//-------------------------------------------------------------------------------------------------------------------------
-	// Search for: 34 76 8E xx xx 20 0B 34 76 EE 68 E6 C0 EF 68 8E yy yy 3A 3A 3A D6 yy 34 04 C6 zz BD, WPC Table address is $xxxx,zz
-	//
-	//
-	//
-	// Example assembly for loading graphics table (Getaway_L5):
-	//-------------------------------------------------------------------------------------------------------------------------
-	// F540: 34 76       PSHS  U,Y,X,B,A        ;
-	// F542: 8E 42 41    LDX   #$4241           ;
-	// F545: 20 07       BRA   $F54E            ;
-	// F547: 34 76       PSHS  U,Y,X,B,A        ;
-	// F549: 8E 40 01    LDX   #$4001           ;
-	// F54C: 20 00       BRA   $F54E            ;
-	// F54E: 3A          ABX                    ;
-	// F54F: 3A          ABX                    ;
-	// F550: 3A          ABX                    ;
-	// F551: D6 11       LDB   $11              ;
-	// F553: 34 04       PSHS  B                ;
-	// F555: C6 2F       LDB   #$2F             ;
-	// F557: BD 91 0D    JSR   $910D            ;
-	//-------------------------------------------------------------------------------------------------------------------------
-	// Search for: 34 76 8E xx xx 20 00 3A 3A 3A D6 11 34 04 C6 yy BD, WPC Table address $xxxx,yy
-	//
-	//
-	//
-	// Example assembly for loading graphics table (Whitewater_L5):  *** Special, unique coding ***
-	//-------------------------------------------------------------------------------------------------------------------------
-	// 6653: BD D4 4D    JSR   $D44D            ;
-	// 6656: CE 44 4A    LDU   #$444A           ; Address of Graphics Table itself, $E5B7 knows to set bank to 0x26
-	// 6659: BD E5 B7    JSR   $E5B7		 ;
-	// 665C: 00 1F       NEG   $1F
-	//-------------------------------------------------------------------------------------------------------------------------
-	// E5B7: 34 76       PSHS  U,Y,X,B,A        ;
-	// E5B9: 1F 31       TFR   U,X              ;
-	// E5BB: EE 68       LDU   $0008,S          ;
-	// E5BD: E6 C0       LDB   ,U+              ;
-	// E5BF: EF 68       STU   $0008,S          ;
-	// E5C1: 20 0C       BRA   $E5CF            ;
-	// E5C3: 34 76       PSHS  U,Y,X,B,A        ; 
-	// E5C5: 1F 31       TFR   U,X              ;
-	// E5C7: 20 06       BRA   $E5CF            ;
-	// E5C9: 34 76       PSHS  U,Y,X,B,A        ;
-	// E5CB: 1F 89       TFR   A,B              ;
-	// E5CD: 1F 31       TFR   U,X              ;
-	// E5CF: 3A          ABX                    ;
-	// E5D0: 3A          ABX                    ;
-	// E5D1: 3A          ABX                    ;
-	// E5D2: D6 11       LDB   $11              ;
-	// E5D4: 34 04       PSHS  B                ;
-	// E5D6: C6 26       LDB   #$26             ;
-	// E5D8: BD 8F E9    JSR   $8FE9            ;
-	//-------------------------------------------------------------------------------------------------------------------------
-	// Search for: 34 76 1F 31 EE 68 E6 C0 EF 68 20 0C 34 76 1F 31 20 06 34 76 1F 89 1F 31 3A 3A 3A D6 zz 34 04 C6 26 BD yy yy
-	// Then Search entire ROM for: BD yy yy CE xx xx BD ww ww 00, where $wwww is address if previous line. WPC Table Address is $xxxx,zz
-    //
-	//
-	int Page,PageByteIdx;
-	LPTSTR Ptr = CommonData.StartPtr;
-	LPTSTR HitTablePtr,HitPagePtr;
-	int HitType,HitId;
-
-	TmpStr.Format("Searching ROM for Master Graphic Table Address");
-	DebugShiftKeyMsgStrPrint(TmpStr);
-
-	for (Page = 0; Page < CommonData.TotalPages; Page++)
-	{
-		for (PageByteIdx = 0; PageByteIdx < PAGE_LENGTH; PageByteIdx++)
-		{
-			HitType = HITTYPE_NONE;
-			HitTablePtr = HitPagePtr = NULL;
-			HitId = 1;
-
-			switch ((*Ptr++) & 0xFF)
-			{
-				case 0xBE :
-					//
-					//             -1 +0 +1  2  3  4  5  6  7  8  9 10 11 12 13
-					// Search for: BE xx xx 30 8B 58 49 yy yy F6 yy yy F6 yy yy, WPC Table address address is xxxx in non-banked ROM
-					// Search for: BE xx xx 30 8B 58 49 yy yy BD yy yy BD yy yy, WPC Table address address is xxxx in non-banked ROM
-					// Search for: BE xx xx 30 8B 58 49 yy yy F6 yy yy BD yy yy, WPC Table address address is xxxx in non-banked ROM
-					// Search for: BE xx xx 30 8B 58 49 yy yy BD yy yy F6 yy yy, WPC Table address address is xxxx in non-banked ROM
-					//
-					if (PageByteIdx >= (PAGE_LENGTH-16)) // don't try to read out of bounds, going to read up to 16 bytes after Ptr
-					{
-						break;
-					}
-					if (((*(Ptr+2) & 0xFF) == 0x30) &&
-						((*(Ptr+3) & 0xFF) == 0x8B) &&
-						((*(Ptr+4) & 0xFF) == 0x58) &&
-						((*(Ptr+5) & 0xFF) == 0x49) &&
-						(((*(Ptr+8) & 0xFF) == 0xF6) || ((*(Ptr+9) & 0xFF) == 0xBD)) &&
-						(((*(Ptr+11) & 0xFF) == 0xBD) || ((*(Ptr+12) & 0xFF) == 0xF6)))
-					{
-						//
-						HitType = HITTYPE_TBL_ADDR_ADDR;
-						HitTablePtr = Ptr;
-						//
-						//TmpStr.Format("0x%02X HitId %d",(*(Ptr-1))&0xFF,HitId);
-						//DebugShiftKeyMsgStrPrint(TmpStr);
-					}
-					//HitId++;
-					break;
-
-				case 0xEE:
-					//
-					//             -1 +0 +1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18
-					// Search for: EE yy E6 C4 33 41 EF yy BE xx xx 3A 3A 3A D6 yy 34 04 C6 zz, WPC Table address address is xxxx in non-banked ROM
-					if (PageByteIdx >= (PAGE_LENGTH-32)) // don't try to read out of bounds, going to read up to 16 bytes after Ptr
-					{
-						break;
-					}
-					if (((*(Ptr+1) & 0xFF) == 0xE6) &&
-						((*(Ptr+2) & 0xFF) == 0xC4) &&
-						((*(Ptr+3) & 0xFF) == 0x33) &&
-						((*(Ptr+4) & 0xFF) == 0x41) &&
-						((*(Ptr+5) & 0xFF) == 0xEF) &&
-						((*(Ptr+7) & 0xFF) == 0xBE) &&
-						((*(Ptr+10) & 0xFF) == 0x3A) &&
-						((*(Ptr+11) & 0xFF) == 0x3A) &&
-						((*(Ptr+12) & 0xFF) == 0x3A) &&
-						((*(Ptr+13) & 0xFF) == 0xD6) &&
-						((*(Ptr+15) & 0xFF) == 0x34) &&
-						((*(Ptr+16) & 0xFF) == 0x04) &&
-						((*(Ptr+17) & 0xFF) == 0xC6))
-					{
-						//
-						HitType = HITTYPE_TBL_ADDR_ADDR;
-						HitTablePtr = Ptr+8;
-						//
-						TmpStr.Format("0xEE HitId %d",HitId);
-						DebugShiftKeyMsgStrPrint(TmpStr);
-					}
-					HitId++;
-					//
-					//---------------------------------------------------------------------------------------------------------
-					//---------------------------------------------------------------------------------------------------------
-					//
-					//             -1 +0 +1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16
-					// Search for: EE yy E6 C0 EF yy BE xx xx 3A 3A 3A D6 yy 34 04 C6 zz, WPC Table address address is xxxx in non-banked ROM
-					if (((*(Ptr+1) & 0xFF) == 0xE6) &&
-						((*(Ptr+2) & 0xFF) == 0xC0) &&
-						((*(Ptr+3) & 0xFF) == 0xEF) &&
-						((*(Ptr+5) & 0xFF) == 0xBE) &&
-						((*(Ptr+8) & 0xFF) == 0x3A) &&
-						((*(Ptr+9) & 0xFF) == 0x3A) &&
-						((*(Ptr+10) & 0xFF) == 0x3A) &&
-						((*(Ptr+11) & 0xFF) == 0xD6) &&
-						((*(Ptr+13) & 0xFF) == 0x34) &&
-						((*(Ptr+14) & 0xFF) == 0x04) &&
-						((*(Ptr+15) & 0xFF) == 0xC6))
-					{
-						//
-						HitType = HITTYPE_TBL_ADDR_ADDR;
-						HitTablePtr = Ptr+6;
-						//
-						TmpStr.Format("0x%02X HitId %d",(*(Ptr-1))&0xFF,HitId);
-						DebugShiftKeyMsgStrPrint(TmpStr);
-					}
-					//HitId++;
-					break;
-
-				case 0x34:
-					//
-					//             -1 +0 +1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17
-					// Search for: 34 16 8E xx xx CB yy 3A 3A 3A D6 yy 34 04 C6 zz BD yy yy, WPC Table address is $xxxx,zz
-					// Search for: 34 16 8E xx xx CB yy 3A 3A 3A D6 yy 34 04 C6 zz F6 yy yy, WPC Table address is $xxxx,zz
-
-					if (PageByteIdx >= (PAGE_LENGTH-32)) // don't try to read out of bounds, going to read up to 16 bytes after Ptr
-					{
-						break;
-					}
-					if (((*(Ptr+0) & 0xFF) == 0x16) &&
-						((*(Ptr+1) & 0xFF) == 0x8E) &&
-						((*(Ptr+4) & 0xFF) == 0xCB) &&
-						((*(Ptr+6) & 0xFF) == 0x3A) &&
-						((*(Ptr+7) & 0xFF) == 0x3A) &&
-						((*(Ptr+8) & 0xFF) == 0x3A) &&
-						((*(Ptr+9) & 0xFF) == 0xD6) &&
-						((*(Ptr+11) & 0xFF) == 0x34) &&
-						((*(Ptr+12) & 0xFF) == 0x04) &&
-						((*(Ptr+13) & 0xFF) == 0xC6) &&
-						(((*(Ptr+15) & 0xFF) == 0xBD) || ((*(Ptr+15) & 0xFF) == 0xF6)))
-					{
-						//
-						HitType = HITTYPE_TBL_ADDR;
-						HitTablePtr = Ptr+2;
-						HitPagePtr = Ptr+14;
-						//
-						TmpStr.Format("0x%02X HitId %d",(*(Ptr-1))&0xFF,HitId);
-						DebugShiftKeyMsgStrPrint(TmpStr);
-					}
-					HitId++;
-					//
-					//---------------------------------------------------------------------------------------------------------
-					//---------------------------------------------------------------------------------------------------------
-					//
-					//             -1 +0 +1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25
-					// Search for: 34 76 EE 68 E6 C0 EF 68 8E xx xx C1 yy 25 02 3F 5F 3A 3A 3A D6 yy 34 04 C6 zz BD, WPC Table address is $xxxx,zz
-					if (((*(Ptr+0) & 0xFF) == 0x76) &&
-						((*(Ptr+1) & 0xFF) == 0xEE) &&
-						((*(Ptr+2) & 0xFF) == 0x68) &&
-						((*(Ptr+3) & 0xFF) == 0xE6) &&
-						((*(Ptr+4) & 0xFF) == 0xC0) &&
-						((*(Ptr+5) & 0xFF) == 0xEF) &&
-						((*(Ptr+6) & 0xFF) == 0x68) &&
-						((*(Ptr+7) & 0xFF) == 0x8E) &&
-						((*(Ptr+10) & 0xFF) == 0xC1) &&
-						((*(Ptr+12) & 0xFF) == 0x25) &&
-						((*(Ptr+13) & 0xFF) == 0x02) &&
-						((*(Ptr+14) & 0xFF) == 0x3F) &&
-						((*(Ptr+15) & 0xFF) == 0x5F) &&
-						((*(Ptr+16) & 0xFF) == 0x3A) &&
-						((*(Ptr+17) & 0xFF) == 0x3A) &&
-						((*(Ptr+18) & 0xFF) == 0x3A) &&
-						((*(Ptr+19) & 0xFF) == 0xD6) &&
-						((*(Ptr+21) & 0xFF) == 0x34) &&
-						((*(Ptr+22) & 0xFF) == 0x04) &&
-						((*(Ptr+23) & 0xFF) == 0xC6) &&
-						(((*(Ptr+25) & 0xFF) == 0xBD) || ((*(Ptr+25) & 0xFF) == 0xF6)))
-					{
-						//
-						HitType = HITTYPE_TBL_ADDR;
-						HitTablePtr = Ptr+8;
-						HitPagePtr = Ptr+24;
-						//
-						TmpStr.Format("0x%02X HitId %d",(*(Ptr-1))&0xFF,HitId);
-						DebugShiftKeyMsgStrPrint(TmpStr);
-					}
-					HitId++;
-					//
-					//---------------------------------------------------------------------------------------------------------
-					//---------------------------------------------------------------------------------------------------------
-					//
-					//             -1 +0 +1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19
-					// Search for: 34 76 EE 68 E6 C4 33 41 EF 68 8E xx xx 3A 3A 3A D6 yy 34 04 BD, WPC Table address is xxxx in non-banked ROM
-					if (((*(Ptr+0) & 0xFF) == 0x76) &&
-						((*(Ptr+1) & 0xFF) == 0xEE) &&
-						((*(Ptr+2) & 0xFF) == 0x68) &&
-						((*(Ptr+3) & 0xFF) == 0xE6) &&
-						((*(Ptr+4) & 0xFF) == 0xC4) &&
-						((*(Ptr+5) & 0xFF) == 0x33) &&
-						((*(Ptr+6) & 0xFF) == 0x41) &&
-						((*(Ptr+7) & 0xFF) == 0xEF) &&
-						((*(Ptr+8) & 0xFF) == 0x68) &&
-						((*(Ptr+9) & 0xFF) == 0x8E) &&
-						((*(Ptr+12) & 0xFF) == 0x3A) &&
-						((*(Ptr+13) & 0xFF) == 0x3A) &&
-						((*(Ptr+14) & 0xFF) == 0x3A) &&
-						((*(Ptr+15) & 0xFF) == 0xD6) &&
-						((*(Ptr+17) & 0xFF) == 0x34) &&
-						((*(Ptr+18) & 0xFF) == 0x04) &&
-						((*(Ptr+19) & 0xFF) == 0xBD))
-					{
-						//
-						HitType = HITTYPE_TBL_ADDR;
-						HitTablePtr = Ptr+10;
-						//
-						TmpStr.Format("0x%02X HitId %d",(*(Ptr-1))&0xFF,HitId);
-						DebugShiftKeyMsgStrPrint(TmpStr);
-					}
-					HitId++;
-					//
-					//---------------------------------------------------------------------------------------------------------
-					//---------------------------------------------------------------------------------------------------------
-					//
-					//             -1 +0 +1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19
-					// Search for: 34 76 EE 68 E6 C4 33 41 EF 68 BE xx xx 3A 3A 3A D6 yy 34 04 BD, WPC Table address address is xxxx in non-banked ROM
-					if (((*(Ptr+0) & 0xFF) == 0x76) &&
-						((*(Ptr+1) & 0xFF) == 0xEE) &&
-						((*(Ptr+2) & 0xFF) == 0x68) &&
-						((*(Ptr+3) & 0xFF) == 0xE6) &&
-						((*(Ptr+4) & 0xFF) == 0xC4) &&
-						((*(Ptr+5) & 0xFF) == 0x33) &&
-						((*(Ptr+6) & 0xFF) == 0x41) &&
-						((*(Ptr+7) & 0xFF) == 0xEF) &&
-						((*(Ptr+8) & 0xFF) == 0x68) &&
-						((*(Ptr+9) & 0xFF) == 0xBE) &&
-						((*(Ptr+12) & 0xFF) == 0x3A) &&
-						((*(Ptr+13) & 0xFF) == 0x3A) &&
-						((*(Ptr+14) & 0xFF) == 0x3A) &&
-						((*(Ptr+15) & 0xFF) == 0xD6) &&
-						((*(Ptr+17) & 0xFF) == 0x34) &&
-						((*(Ptr+18) & 0xFF) == 0x04) &&
-						((*(Ptr+19) & 0xFF) == 0xBD))
-					{
-						//
-						HitType = HITTYPE_TBL_ADDR_ADDR;
-						HitTablePtr = Ptr+10;
-						//
-						TmpStr.Format("0x%02X HitId %d",(*(Ptr-1))&0xFF,HitId);
-						DebugShiftKeyMsgStrPrint(TmpStr);
-					}
-					HitId++;
-					//
-					//---------------------------------------------------------------------------------------------------------
-					//---------------------------------------------------------------------------------------------------------
-					//
-					//             -1 +0 +1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21
-					// Search for: 34 76 EE 68 E6 C0 EF 68 BE xx xx 30 89 yy yy 3A 3A 3A D6 yy 34 04 BD, WPC Table address address address is xxxx in non-banked ROM
-					if (((*(Ptr+0) & 0xFF) == 0x76) &&
-						((*(Ptr+1) & 0xFF) == 0xEE) &&
-						((*(Ptr+2) & 0xFF) == 0x68) &&
-						((*(Ptr+3) & 0xFF) == 0xE6) &&
-						((*(Ptr+4) & 0xFF) == 0xC0) &&
-						((*(Ptr+5) & 0xFF) == 0xEF) &&
-						((*(Ptr+6) & 0xFF) == 0x68) &&
-						((*(Ptr+7) & 0xFF) == 0xBE) &&
-						((*(Ptr+10) & 0xFF) == 0x30) &&
-						((*(Ptr+11) & 0xFF) == 0x89) &&
-						((*(Ptr+14) & 0xFF) == 0x3A) &&
-						((*(Ptr+15) & 0xFF) == 0x3A) &&
-						((*(Ptr+16) & 0xFF) == 0x3A) &&
-						((*(Ptr+17) & 0xFF) == 0xD6) &&
-						((*(Ptr+19) & 0xFF) == 0x34) &&
-						((*(Ptr+20) & 0xFF) == 0x04) &&
-						((*(Ptr+21) & 0xFF) == 0xBD))
-					{
-						//
-						HitType = HITTYPE_TBL_ADDR_ADDR;
-						HitTablePtr = Ptr+8;
-						//
-						TmpStr.Format("0x%02X HitId %d",(*(Ptr-1))&0xFF,HitId);
-						DebugShiftKeyMsgStrPrint(TmpStr);
-					}
-					HitId++;
-					//
-					//---------------------------------------------------------------------------------------------------------
-					//---------------------------------------------------------------------------------------------------------
-					//
-					//             -1 +0  +1 2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34
-					// Search for: 34 76 EE 68 E6 C0 EF 68 8E xx xx 20 0F yy yy 34 76 EE 68 E6 C4 33 41 EF 68 8E yy yy 3A 3A 3A D6 zz 34 04 BD, WPC Table address is xxxx in non-banked ROM
-					if (((*(Ptr+0) & 0xFF) == 0x76) &&
-						((*(Ptr+1) & 0xFF) == 0xEE) &&
-						((*(Ptr+2) & 0xFF) == 0x68) &&
-						((*(Ptr+3) & 0xFF) == 0xE6) &&
-						((*(Ptr+4) & 0xFF) == 0xC0) &&
-						((*(Ptr+5) & 0xFF) == 0xEF) &&
-						((*(Ptr+6) & 0xFF) == 0x68) &&
-						((*(Ptr+7) & 0xFF) == 0x8E) &&
-						((*(Ptr+10) & 0xFF) == 0x20) &&
-						((*(Ptr+11) & 0xFF) == 0x0F) &&
-						((*(Ptr+14) & 0xFF) == 0x34) &&
-						((*(Ptr+15) & 0xFF) == 0x76) &&
-						((*(Ptr+16) & 0xFF) == 0xEE) &&
-						((*(Ptr+17) & 0xFF) == 0x68) &&
-						((*(Ptr+18) & 0xFF) == 0xE6) &&
-						((*(Ptr+19) & 0xFF) == 0xC4) &&
-						((*(Ptr+20) & 0xFF) == 0x33) &&
-						((*(Ptr+21) & 0xFF) == 0x41) &&
-						((*(Ptr+22) & 0xFF) == 0xEF) &&
-						((*(Ptr+23) & 0xFF) == 0x68) &&
-						((*(Ptr+24) & 0xFF) == 0x8E) &&
-						((*(Ptr+27) & 0xFF) == 0x3A) &&
-						((*(Ptr+28) & 0xFF) == 0x3A) &&
-						((*(Ptr+29) & 0xFF) == 0x3A) &&
-						((*(Ptr+30) & 0xFF) == 0xD6) &&
-						((*(Ptr+32) & 0xFF) == 0x34) &&
-						((*(Ptr+33) & 0xFF) == 0x04) &&
-						((*(Ptr+34) & 0xFF) == 0xBD))
-					{
-						//
-						HitType = HITTYPE_TBL_ADDR;
-						HitTablePtr = Ptr+8;
-						//
-						TmpStr.Format("0x%02X HitId %d",(*(Ptr-1))&0xFF,HitId);
-						DebugShiftKeyMsgStrPrint(TmpStr);
-					}
-					HitId++;
-					//
-					//---------------------------------------------------------------------------------------------------------
-					//---------------------------------------------------------------------------------------------------------
-					//
-					//             -1 +0  +1 2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36
-					// Search for: 34 76 EE 68 E6 C0 EF 68 8E xx xx 20 0F yy yy 34 76 EE 68 E6 C4 33 41 EF 68 8E yy yy 3A 3A 3A D6 zz 34 04 C6 zz BD, WPC Table address is $xxxx,zz in banked ROM
-					if (((*(Ptr+0) & 0xFF) == 0x76) &&
-						((*(Ptr+1) & 0xFF) == 0xEE) &&
-						((*(Ptr+2) & 0xFF) == 0x68) &&
-						((*(Ptr+3) & 0xFF) == 0xE6) &&
-						((*(Ptr+4) & 0xFF) == 0xC0) &&
-						((*(Ptr+5) & 0xFF) == 0xEF) &&
-						((*(Ptr+6) & 0xFF) == 0x68) &&
-						((*(Ptr+7) & 0xFF) == 0x8E) &&
-						((*(Ptr+10) & 0xFF) == 0x20) &&
-						((*(Ptr+11) & 0xFF) == 0x0F) &&
-						((*(Ptr+14) & 0xFF) == 0x34) &&
-						((*(Ptr+15) & 0xFF) == 0x76) &&
-						((*(Ptr+16) & 0xFF) == 0xEE) &&
-						((*(Ptr+17) & 0xFF) == 0x68) &&
-						((*(Ptr+18) & 0xFF) == 0xE6) &&
-						((*(Ptr+19) & 0xFF) == 0xC4) &&
-						((*(Ptr+20) & 0xFF) == 0x33) &&
-						((*(Ptr+21) & 0xFF) == 0x41) &&
-						((*(Ptr+22) & 0xFF) == 0xEF) &&
-						((*(Ptr+23) & 0xFF) == 0x68) &&
-						((*(Ptr+24) & 0xFF) == 0x8E) &&
-						((*(Ptr+27) & 0xFF) == 0x3A) &&
-						((*(Ptr+28) & 0xFF) == 0x3A) &&
-						((*(Ptr+29) & 0xFF) == 0x3A) &&
-						((*(Ptr+30) & 0xFF) == 0xD6) &&
-						((*(Ptr+32) & 0xFF) == 0x34) &&
-						((*(Ptr+33) & 0xFF) == 0x04) &&
-						((*(Ptr+34) & 0xFF) == 0xC6) &&
-						((*(Ptr+36) & 0xFF) == 0xBD))
-					{
-						//
-						HitType = HITTYPE_TBL_ADDR;
-						HitTablePtr = Ptr+8;
-						HitPagePtr = Ptr+35;
-						//
-						TmpStr.Format("0x%02X HitId %d",(*(Ptr-1))&0xFF,HitId);
-						DebugShiftKeyMsgStrPrint(TmpStr);
-					}
-					HitId++;
-					//
-					//---------------------------------------------------------------------------------------------------------
-					//---------------------------------------------------------------------------------------------------------
-					//
-					//             -1 +0 +1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34
-					// Search for: 34 76 EE 68 E6 C4 33 41 EF 68 8E yy yy 20 yy 34 76 EE 68 E6 C4 33 41 EF 68 BE xx xx 3A 3A 3A D6 zz 34 04 BD, WPC Table address address address is xxxx in non-banked ROM
-					if (((*(Ptr+0) & 0xFF) == 0x76) &&
-						((*(Ptr+1) & 0xFF) == 0xEE) &&
-						((*(Ptr+2) & 0xFF) == 0x68) &&
-						((*(Ptr+3) & 0xFF) == 0xE6) &&
-						((*(Ptr+4) & 0xFF) == 0xC4) &&
-						((*(Ptr+5) & 0xFF) == 0x33) &&
-						((*(Ptr+6) & 0xFF) == 0x41) &&
-						((*(Ptr+7) & 0xFF) == 0xEF) &&
-						((*(Ptr+8) & 0xFF) == 0x68) &&
-						((*(Ptr+9) & 0xFF) == 0x8E) &&
-						((*(Ptr+12) & 0xFF) == 0x20) &&
-						((*(Ptr+14) & 0xFF) == 0x34) &&
-						((*(Ptr+15) & 0xFF) == 0x76) &&
-						((*(Ptr+16) & 0xFF) == 0xEE) &&
-						((*(Ptr+17) & 0xFF) == 0x68) &&
-						((*(Ptr+18) & 0xFF) == 0xE6) &&
-						((*(Ptr+19) & 0xFF) == 0xC4) &&
-						((*(Ptr+20) & 0xFF) == 0x33) &&
-						((*(Ptr+21) & 0xFF) == 0x41) &&
-						((*(Ptr+22) & 0xFF) == 0xEF) &&
-						((*(Ptr+23) & 0xFF) == 0x68) &&
-						((*(Ptr+24) & 0xFF) == 0xBE) &&
-						((*(Ptr+27) & 0xFF) == 0x3A) &&
-						((*(Ptr+28) & 0xFF) == 0x3A) &&
-						((*(Ptr+29) & 0xFF) == 0x3A) &&
-						((*(Ptr+30) & 0xFF) == 0xD6) &&
-						((*(Ptr+32) & 0xFF) == 0x34) &&
-						((*(Ptr+33) & 0xFF) == 0x04) &&
-						((*(Ptr+34) & 0xFF) == 0xBD))
-					{
-						//
-						HitType = HITTYPE_TBL_ADDR_ADDR;
-						HitTablePtr = Ptr+25;
-						//
-						TmpStr.Format("0x%02X HitId %d",(*(Ptr-1))&0xFF,HitId);
-						DebugShiftKeyMsgStrPrint(TmpStr);
-					}
-					HitId++;
-					//
-					//---------------------------------------------------------------------------------------------------------
-					//---------------------------------------------------------------------------------------------------------
-					//
-					//             -1 +0 +1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
-					// Search for: 34 76 8E xx xx 20 0B 34 76 EE 68 E6 C0 EF 68 8E yy yy 3A 3A 3A D6 yy 34 04 C6 zz BD, WPC Table address is $xxxx,zz
-					if (((*(Ptr+0) & 0xFF) == 0x76) &&
-						((*(Ptr+1) & 0xFF) == 0x8E) &&
-						((*(Ptr+4) & 0xFF) == 0x20) &&
-						((*(Ptr+5) & 0xFF) == 0x0B) &&
-						((*(Ptr+6) & 0xFF) == 0x34) &&
-						((*(Ptr+7) & 0xFF) == 0x76) &&
-						((*(Ptr+8) & 0xFF) == 0xEE) &&
-						((*(Ptr+9) & 0xFF) == 0x68) &&
-						((*(Ptr+10) & 0xFF) == 0xE6) &&
-						((*(Ptr+11) & 0xFF) == 0xC0) &&
-						((*(Ptr+12) & 0xFF) == 0xEF) &&
-						((*(Ptr+13) & 0xFF) == 0x68) &&
-						((*(Ptr+14) & 0xFF) == 0x8E) &&
-						((*(Ptr+17) & 0xFF) == 0x3A) &&
-						((*(Ptr+18) & 0xFF) == 0x3A) &&
-						((*(Ptr+19) & 0xFF) == 0x3A) &&
-						((*(Ptr+20) & 0xFF) == 0xD6) &&
-						((*(Ptr+22) & 0xFF) == 0x34) &&
-						((*(Ptr+23) & 0xFF) == 0x04) &&
-						((*(Ptr+24) & 0xFF) == 0xC6) &&
-						((*(Ptr+26) & 0xFF) == 0xBD))
-					{
-						//
-						HitType = HITTYPE_TBL_ADDR;
-						HitTablePtr = Ptr+2;
-						HitPagePtr = Ptr+25;
-						//
-						TmpStr.Format("0x%02X HitId %d",(*(Ptr-1))&0xFF,HitId);
-						DebugShiftKeyMsgStrPrint(TmpStr);
-					}
-					HitId++;
-					//
-					//---------------------------------------------------------------------------------------------------------
-					//---------------------------------------------------------------------------------------------------------
-					//
-					//             -1 +0 +1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
-					// Search for: 34 76 8E xx xx 20 00 3A 3A 3A D6 11 34 04 C6 yy BD, WPC Table address $xxxx,yy
-					if (((*(Ptr+0) & 0xFF) == 0x76) &&
-						((*(Ptr+1) & 0xFF) == 0x8E) &&
-						((*(Ptr+4) & 0xFF) == 0x20) &&
-						((*(Ptr+5) & 0xFF) == 0x00) &&
-						((*(Ptr+6) & 0xFF) == 0x3A) &&
-						((*(Ptr+7) & 0xFF) == 0x3A) &&
-						((*(Ptr+8) & 0xFF) == 0x3A) &&
-						((*(Ptr+9) & 0xFF) == 0xD6) &&
-						((*(Ptr+10) & 0xFF) == 0x11) &&
-						((*(Ptr+11) & 0xFF) == 0x34) &&
-						((*(Ptr+12) & 0xFF) == 0x04) &&
-						((*(Ptr+13) & 0xFF) == 0xC6) &&
-						((*(Ptr+15) & 0xFF) == 0xBD))
-					{
-						//
-						HitType = HITTYPE_TBL_ADDR;
-						HitTablePtr = Ptr+2;
-						HitPagePtr = Ptr+14;
-						//
-						TmpStr.Format("0x%02X HitId %d",(*(Ptr-1))&0xFF,HitId);
-						DebugShiftKeyMsgStrPrint(TmpStr);
-					}
-					HitId++;
-					//
-					//---------------------------------------------------------------------------------------------------------
-					//---------------------------------------------------------------------------------------------------------
-					//
-					//             -1 +0 +1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 38 29 30 31 32 33 34
-					// Search for: 34 76 1F 31 EE 68 E6 C0 EF 68 20 0C 34 76 1F 31 20 06 34 76 1F 89 1F 31 3A 3A 3A D6 ww 34 04 C6 yy BD yy yy
-					//
-					//                             -1 +0 +1  2  3  4  5  6  7  8
-					// Then Search entire ROM for: BD yy yy CE xx xx BD ww ww 00, where $wwww is address if previous line. WPC Table Address is $xxxx,zz
-					if (((*(Ptr+0) & 0xFF) == 0x76) &&
-						((*(Ptr+1) & 0xFF) == 0x1F) &&
-						((*(Ptr+2) & 0xFF) == 0x31) &&
-						((*(Ptr+3) & 0xFF) == 0xEE) &&
-						((*(Ptr+4) & 0xFF) == 0x68) &&
-						((*(Ptr+5) & 0xFF) == 0xE6) &&
-						((*(Ptr+6) & 0xFF) == 0xC0) &&
-						((*(Ptr+7) & 0xFF) == 0xEF) &&
-						((*(Ptr+8) & 0xFF) == 0x68) &&
-						((*(Ptr+9) & 0xFF) == 0x20) &&
-						((*(Ptr+10) & 0xFF) == 0x0C) &&
-						((*(Ptr+11) & 0xFF) == 0x34) &&
-						((*(Ptr+12) & 0xFF) == 0x76) &&
-						((*(Ptr+13) & 0xFF) == 0x1F) &&
-						((*(Ptr+14) & 0xFF) == 0x31) &&
-						((*(Ptr+15) & 0xFF) == 0x20) &&
-						((*(Ptr+16) & 0xFF) == 0x06) &&
-						((*(Ptr+17) & 0xFF) == 0x34) &&
-						((*(Ptr+18) & 0xFF) == 0x76) &&
-						((*(Ptr+19) & 0xFF) == 0x1F) &&
-						((*(Ptr+20) & 0xFF) == 0x89) &&
-						((*(Ptr+21) & 0xFF) == 0x1F) &&
-						((*(Ptr+22) & 0xFF) == 0x31) &&
-						((*(Ptr+23) & 0xFF) == 0x3A) &&
-						((*(Ptr+24) & 0xFF) == 0x3A) &&
-						((*(Ptr+25) & 0xFF) == 0x3A) &&
-						((*(Ptr+26) & 0xFF) == 0xD6) &&
-						((*(Ptr+28) & 0xFF) == 0x34) &&
-						((*(Ptr+29) & 0xFF) == 0x04) &&
-						((*(Ptr+30) & 0xFF) == 0xC6) &&
-						((*(Ptr+32) & 0xFF) == 0xBD))
-					{
-						int FnAddr = PageByteIdx;
-						LPTSTR TmpPtr;
-						unsigned long TmpCnt;
-
-						if (Page < (CommonData.TotalPages - 2))
-						{
-							// Fixup FnAddr to represent a WPC address in paged ROM
-							FnAddr += BASE_CODE_ADDR_PAGED_ROM;
-						}
-						else
-						{
-							FnAddr += BASE_CODE_ADDR_NONPAGED_ROM;
-							if (Page == (CommonData.TotalPages - 1))
-							{
-								// This is somewhat hard coded with knowledge that the nonbanked memory takes up the
-								// last 2 banks, and if we're in the last (conceptual) page in ROM then we're actually
-								// in the last half of the non-paged ROM, which means if 
-								FnAddr += PAGE_LENGTH;
-							}
-						}
-						TmpStr.Format("Special Hit Part 1, found function at WPC Addr $%04x, WPC Page 0x%02x",FnAddr,(*(Ptr+31)));
-						DebugShiftKeyMsgStrPrint(TmpStr);
-						//
-						for (TmpCnt = 0, TmpPtr = CommonData.StartPtr; TmpCnt < CommonData.ROMSize; TmpCnt++)
-						{
-							switch ((*TmpPtr++) & 0xFF)
-							{
-								case 0xBD:
-									if (((*(TmpPtr+2) & 0xFF) == 0xCE) &&
-										((*(TmpPtr+5) & 0xFF) == 0xBD) &&
-										((*(TmpPtr+6) & 0xFF) == ((FnAddr>>8)&0xFF)) &&
-										((*(TmpPtr+7) & 0xFF) == ((FnAddr&0xFF))) &&
-										((*(TmpPtr+8) & 0xFF) == 0x00))
-									{
-										//
-										HitType = HITTYPE_TBL_ADDR;
-										HitTablePtr = TmpPtr+3;
-										HitPagePtr = Ptr+31;
-										//
-										TmpCnt = CommonData.ROMSize; // exit inner for-loop
-										//
-										TmpStr.Format("Special Hit Part 2, $%02x%02x,%02x",(*HitTablePtr)&0xFF,(*(HitTablePtr+1))&0xFF,(*HitPagePtr)&0xFF);
-										DebugShiftKeyMsgStrPrint(TmpStr);
-										//
-										TmpStr.Format("0x%02X HitId %d",(*(Ptr-1))&0xFF,HitId);
-										DebugShiftKeyMsgStrPrint(TmpStr);
-									}
-									break;
-								default:
-									break;
-							}
-						}
-					}
-					//HitId++;
-
-					break;
-				default :
-					break;
-			}
-			if (HitType != HITTYPE_NONE)
-			{
-				if (ProcessHitType(HitType, HitTablePtr, HitPagePtr, Ptr, &FullFrameImageData.TableAddress) != 0)
-				{
-					TmpStr.Format("ProcessHitType() error");
-					DebugShiftKeyMsgStrPrint(TmpStr);
-					break;
-				}
-				return 0;
-			}
-		}
-	}
-	return -1;
-}
-int DMD::InitFonts()
-{
-	// Example assembly for loading font table (IJ_L7):
-	//-------------------------------------------------------------------------------------------------------------------------
-	// D891: BE 82 A9    LDX   $82A9            ; X gets bytes from $82A9 Font Table pointer address
-	// D894: 3A          ABX                    ; 
-	// D895: 58          ASLB                   ;
-	// D896: 3A          ABX                    ; B was index of the font to use, so X pointed to font byte and 2 bytes that were put at $04EE
-	// D897: D6 11       LDB   $11              ; B gets current ROM bank
-	// D899: 34 04       PSHS  B                ; Save it
-	// D89B: F6 82 AB    LDB   $82AB            ; B gets ROM bank of the font table
-	// D89E: BD 8F FB    JSR   $8FFB            ; Set ROM bank to font table
-	//-------------------------------------------------------------------------------------------------------------------------
-	//
-	// Some variations found among different ROMS:
-	//
-	// Search for: BE xx xx 3A 58 3A D6 yy 34 04 F6 zz zz BD ww ww, WPC Table address address is xxxx in non-banked ROM
-	// Search for: BE xx xx 3A 58 3A D6 yy 34 04 BD zz zz BD ww ww, WPC Table address address is xxxx in non-banked ROM
-	// Search for: BE xx xx 3A 58 3A D6 yy 34 04 BD zz zz F6 ww ww, WPC Table address address is xxxx in non-banked ROM
-	// Search for: BE xx xx 3A 58 3A D6 yy 34 04 F6 zz zz F6 ww ww, WPC Table address address is xxxx in non-banked ROM
-	//
-	//
-	// The above appears to successfully find the Font table pointer on all ROMs.
-	// Following that appears to always be the Graphics table.
-	// Following that appears to be the Animation table on some ROMs.
-	// 
-	int Page,PageByteIdx;
-	LPTSTR Ptr = CommonData.StartPtr;
-	LPTSTR HitTablePtr,HitPagePtr;
-	int HitType;
-
-	TmpStr.Format("Searching ROM for Master Font Table Address");
-	DebugShiftKeyMsgStrPrint(TmpStr);
-
-	for (Page = 0; Page < CommonData.TotalPages; Page++)
-	{
-		for (PageByteIdx = 0; PageByteIdx < PAGE_LENGTH; PageByteIdx++)
-		{
-			HitType = HITTYPE_NONE;
-			HitTablePtr = HitPagePtr = NULL;
-
-			switch ((*Ptr++) & 0xFF)
-			{
-				case 0xBE :
-					//
-					//             -1 +0 +1  2  3  4  5  6  7  8  9 10 11 12 13 14
-					// Search for: BE xx xx 3A 58 3A D6 yy 34 04 F6 zz zz BD ww ww, WPC Table address address is xxxx in non-banked ROM
-					// Search for: BE xx xx 3A 58 3A D6 yy 34 04 BD zz zz BD ww ww, WPC Table address address is xxxx in non-banked ROM
-					// Search for: BE xx xx 3A 58 3A D6 yy 34 04 BD zz zz F6 ww ww, WPC Table address address is xxxx in non-banked ROM
-					// Search for: BE xx xx 3A 58 3A D6 yy 34 04 F6 zz zz F6 ww ww, WPC Table address address is xxxx in non-banked ROM
-					if (PageByteIdx >= (PAGE_LENGTH-16)) // don't try to read out of bounds, going to read up to 16 bytes after Ptr
-					{
-						break;
-					}
-					if (((*(Ptr+2) & 0xFF) == 0x3A) &&
-						((*(Ptr+3) & 0xFF) == 0x58) &&
-						((*(Ptr+4) & 0xFF) == 0x3A) &&
-						((*(Ptr+5) & 0xFF) == 0xD6) &&
-						((*(Ptr+7) & 0xFF) == 0x34) &&
-						((*(Ptr+8) & 0xFF) == 0x04) &&
-						(((*(Ptr+9) & 0xFF) == 0xF6) || ((*(Ptr+9) & 0xFF) == 0xBD)) &&
-						(((*(Ptr+12) & 0xFF) == 0xBD) || ((*(Ptr+12) & 0xFF) == 0xF6)))
-					{
-						//
-						HitType = HITTYPE_TBL_ADDR_ADDR;
-						HitTablePtr = Ptr;
-					}
-					break;
-
-				default :
-					break;
-			}
-			if (HitType != HITTYPE_NONE)
-			{
-				if (ProcessHitType(HitType, HitTablePtr, HitPagePtr, Ptr, &VariableSizedImageData.TableAddress) != 0)
-				{
-					TmpStr.Format("ProcessHitType() error");
-					DebugShiftKeyMsgStrPrint(TmpStr);
-					break;
-				}
-				return 0;
-			}
-		}
-	}
-	return -1;
-}
-#endif // instead of looking for Graphics/Font/Animation tables separately from opcodes, just find Font table then Graphics/Animation tables usually follow
 
 int DMD::InitTableAddrs()
 {
@@ -3204,13 +2002,13 @@ int DMD::InitTableAddrs()
 	// Following that appears to be the Animation table on some ROMs.
 	// 
 	int Page,PageByteIdx;
-	LPTSTR Ptr = CommonData.StartPtr;
-	LPTSTR HitTablePtr,HitPagePtr;
+	unsigned char* Ptr = CommonData.StartPtr; // TODO 8 bit?
+	unsigned char* HitTablePtr;
+	unsigned char* HitPagePtr;
 	unsigned long RomAddr;
 	int WpcAddr;
 
-	TmpStr.Format("Searching ROM for Master Animation Table Address");
-	DebugShiftKeyMsgStrPrint(TmpStr);
+	DebugShiftKeyMsgStrPrint("Searching ROM for Master Animation Table Address");
 
 	for (Page = 0; Page < CommonData.TotalPages; Page++)
 	{
@@ -3246,26 +2044,22 @@ int DMD::InitTableAddrs()
 					
 						if (GetROMAddressFromAddrOf3ByteWPCAddrPage(HitTablePtr, &RomAddr) != 0)
 						{
-							TmpStr.Format("Error from GetROMAddressFromAddrOf3ByteWPCAddrPage(), Passed it WPC Font Table Pointer opcode: $%02x %02x",(*HitTablePtr)&0xFF,(*(HitTablePtr+1))&0xFF);
-							DebugShiftKeyMsgStrPrint(TmpStr);
+							DebugShiftKeyMsgStrPrint(QString("Error from GetROMAddressFromAddrOf3ByteWPCAddrPage(), Passed it WPC Font Table Pointer opcode: $%1 %2").arg((*HitTablePtr) & 0xFF, 0, 16).arg((*(HitTablePtr + 1)) & 0xFF, 0, 16));
 							return -1;
 						}
 
 						//
-						TmpStr.Format("Address in ROM of Font Table Pointer 0x%05x",RomAddr);
-						DebugShiftKeyMsgStrPrint(TmpStr);
+						DebugShiftKeyMsgStrPrint(QString("Address in ROM of Font Table Pointer 0x%1").arg(RomAddr, 0, 16));
 
 						if (dialogType == DMD_DIALOG_TYPE_FONTDATA)
 						{
 							if (ProcessHitType(HITTYPE_TBL_ADDR_ADDR, HitTablePtr, HitPagePtr, Ptr, &VariableSizedImageData.TableAddress) != 0)
 							{
-								TmpStr.Format("Error from ProcessHitType while trying to process Font Table Pointer opcode: $%02x %02x",(*HitTablePtr)&0xFF,(*(HitTablePtr+1))&0xFF);
-								DebugShiftKeyMsgStrPrint(TmpStr);
+								DebugShiftKeyMsgStrPrint(QString("Error from ProcessHitType while trying to process Font Table Pointer opcode: $%1 %2").arg((*HitTablePtr) & 0xFF, 0, 16).arg((*(HitTablePtr + 1)) & 0xFF, 0, 16));
 								return -1;
 							}
 							//
-							TmpStr.Format("Found Address in ROM of Font Table 0x%05x",VariableSizedImageData.TableAddress);
-							DebugShiftKeyMsgStrPrint(TmpStr);
+							DebugShiftKeyMsgStrPrint(QString("Found Address in ROM of Font Table 0x%1").arg(VariableSizedImageData.TableAddress, 0, 16));
 						}
 
 						// Now re-load Font table Addr Pointer and advance to Graphic Table....
@@ -3282,8 +2076,7 @@ int DMD::InitTableAddrs()
 						}
 
 						//
-						TmpStr.Format("Address in ROM of Graphics Table Pointer 0x%05x",RomAddr);
-						DebugShiftKeyMsgStrPrint(TmpStr);
+						DebugShiftKeyMsgStrPrint(QString("Address in ROM of Graphics Table Pointer 0x%1").arg(RomAddr, 0, 16));
 
 						//
 						HitTablePtr = &CommonData.StartPtr[RomAddr];
@@ -3292,8 +2085,7 @@ int DMD::InitTableAddrs()
 						//
 						if (ProcessHitType(HITTYPE_TBL_ADDR, HitTablePtr, HitPagePtr, Ptr, &FullFrameImageData.TableAddress) != 0)
 						{
-							TmpStr.Format("Error from ProcessHitType while trying to process Graphic Table Pointer: $%02x %02x",(*HitTablePtr)&0xFF,(*(HitTablePtr+1))&0xFF);
-							DebugShiftKeyMsgStrPrint(TmpStr);
+							DebugShiftKeyMsgStrPrint(QString("Error from ProcessHitType while trying to process Graphic Table Pointer: $%1 %").arg((*HitTablePtr) & 0xFF, 0, 16).arg((*(HitTablePtr + 1)) & 0xFF, 0, 16));
 							if (dialogType == DMD_DIALOG_TYPE_FONTDATA)
 							{
 								return 0; // just return, we found font addr but couldn't find graphic table, no big deal
@@ -3301,8 +2093,7 @@ int DMD::InitTableAddrs()
 							return -1;  // looking for graphics or animation table, some problem happened, return error
 						}
 						//
-						TmpStr.Format("Found Address in ROM of Graphics Table 0x%05x",FullFrameImageData.TableAddress);
-						DebugShiftKeyMsgStrPrint(TmpStr);
+						DebugShiftKeyMsgStrPrint(QString("Found Address in ROM of Graphics Table 0x%1").arg(FullFrameImageData.TableAddress, 0, 16));
 
 						if (dialogType != DMD_DIALOG_TYPE_ANIDATA)
 						{
@@ -3322,8 +2113,7 @@ int DMD::InitTableAddrs()
 							RomAddr+=3;
 						}
 
-						TmpStr.Format("Address in ROM of Animation Table Pointer 0x%05x",RomAddr);
-						DebugShiftKeyMsgStrPrint(TmpStr);
+						DebugShiftKeyMsgStrPrint(QString("Address in ROM of Animation Table Pointer 0x%1").arg(RomAddr, 0, 16));
 
 						//
 						HitTablePtr = &CommonData.StartPtr[RomAddr];
@@ -3332,13 +2122,11 @@ int DMD::InitTableAddrs()
 						//
 						if (ProcessHitType(HITTYPE_TBL_ADDR, HitTablePtr, HitPagePtr, Ptr, &VariableSizedImageData.TableAddress) != 0)
 						{
-							TmpStr.Format("Error from ProcessHitType while trying to process Animation Table Pointer: $%02x %02x",(*HitTablePtr)&0xFF,(*(HitTablePtr+1))&0xFF);
-							DebugShiftKeyMsgStrPrint(TmpStr);
+							DebugShiftKeyMsgStrPrint(QString("Error from ProcessHitType while trying to process Animation Table Pointer: $%1 %2").arg((*HitTablePtr) & 0xFF, 0, 16).arg((*(HitTablePtr + 1)) & 0xFF, 0, 16));
 							return -1;  // looking for animation table, some problem happened, return error
 						}
 						//
-						TmpStr.Format("Found Address in ROM of Animation Table 0x%05x",VariableSizedImageData.TableAddress);
-						DebugShiftKeyMsgStrPrint(TmpStr);
+						DebugShiftKeyMsgStrPrint(QString("Found Address in ROM of Animation Table 0x%1").arg(VariableSizedImageData.TableAddress, 0, 16));
 
 						return 0;
 					}
@@ -3354,11 +2142,14 @@ int DMD::InitTableAddrs()
 
 void DMD::CheckKeyStateForDebugFlags()
 {
-	// if shift is pressed, we'll show some debug messages
-	debugKeyBitmask |= ((GetKeyState(VK_LSHIFT) & 0x8000) || (GetKeyState(VK_RSHIFT) & 0x8000))?DEBUG_KEY_BIT_SHIFTKEYS:0;
+	// TODO add some nice way of doing this
+	//// if shift is pressed, we'll show some debug messages
+	//debugKeyBitmask |= ((GetKeyState(VK_LSHIFT) & 0x8000) || (GetKeyState(VK_RSHIFT) & 0x8000))?DEBUG_KEY_BIT_SHIFTKEYS:0;
 
-	// if control is pressed, we'll show some debug messages
-	debugKeyBitmask |= ((GetKeyState(VK_LCONTROL) & 0x8000) || (GetKeyState(VK_RCONTROL) & 0x8000))?DEBUG_KEY_BIT_CONTROLKEYS:0;
+	//// if control is pressed, we'll show some debug messages
+	//debugKeyBitmask |= ((GetKeyState(VK_LCONTROL) & 0x8000) || (GetKeyState(VK_RCONTROL) & 0x8000))?DEBUG_KEY_BIT_CONTROLKEYS:0;
+
+	debugKeyBitmask = DEBUG_KEY_BIT_SHIFTKEYS | DEBUG_KEY_BIT_CONTROLKEYS;
 }
 
 int DMD::Init()
@@ -3376,7 +2167,7 @@ int DMD::Init()
 
 	if (InitTableAddrs() != 0)
 	{
-		AfxMessageBox("Could not determine data table location in ROM image");
+		DebugShiftKeyMsgStrPrint("Could not determine data table location in ROM image");
 		return -1;
 	}
 
@@ -3402,8 +2193,7 @@ int DMD::Init()
 			//
 			if (GetFirstImageIndex(&VariableSizedImageData.CurrentImageIndex,VariableSizedImageData.CurrentTableIndex) != 0)
 			{
-				TmpStr.Format("Error setting up first image index");
-				DebugControlKeyMsgStrPrint(TmpStr);
+				DebugShiftKeyMsgStrPrint("Error setting up first image index");
 			}
 
 			//
@@ -3414,7 +2204,7 @@ int DMD::Init()
 			break;
 
 		default:
-			AfxMessageBox("Unexpected error, dialogType should have already been validated.");
+			DebugShiftKeyMsgStrPrint("Unexpected error, dialogType should have already been validated.");
 			return -1;
 	}
 
@@ -3423,264 +2213,265 @@ int DMD::Init()
 
 	return 0;
 }
-void DMD::exportCurrent() {
+void DMD::exportCurrent()
+{
 
-	FILE *file;
-	DWORD tick;
+	//FILE *file;
+	//DWORD tick;
 
-	DMDPlanes* pPlanes = &FullFrameImageData.Planes;
-	unsigned char *Plane_0Ptr      = pPlanes->Plane0.Plane_Data;
-	unsigned char *Plane_0XorFlags = pPlanes->Plane0.Plane_XorFlags;
-	unsigned char *Plane_0XorBits  = pPlanes->Plane0.Plane_XorBits;
-	unsigned char *Plane_0Skipped  = pPlanes->Plane0.Plane_Skipped;
-	unsigned char *Plane_1Ptr      = pPlanes->Plane1.Plane_Data;
-	unsigned char *Plane_1XorFlags = pPlanes->Plane1.Plane_XorFlags;
-	unsigned char *Plane_1XorBits  = pPlanes->Plane1.Plane_XorBits;
-	unsigned char *Plane_1Skipped  = pPlanes->Plane1.Plane_Skipped;
-    unsigned char *Plane_0Previous = PreviousPlaneDataPane0;
-    unsigned char *Plane_1Previous = PreviousPlaneDataPane1;
-	int i,j,k;
-	int RowIndex, ColumnIndex;
-    ThisPixel thisPixel0;
-    ThisPixel thisPixel1;
-	unsigned char ReadMask;
-	unsigned char PLANE_BITS;
+	//DMDPlanes* pPlanes = &FullFrameImageData.Planes;
+	//unsigned char *Plane_0Ptr      = pPlanes->Plane0.Plane_Data;
+	//unsigned char *Plane_0XorFlags = pPlanes->Plane0.Plane_XorFlags;
+	//unsigned char *Plane_0XorBits  = pPlanes->Plane0.Plane_XorBits;
+	//unsigned char *Plane_0Skipped  = pPlanes->Plane0.Plane_Skipped;
+	//unsigned char *Plane_1Ptr      = pPlanes->Plane1.Plane_Data;
+	//unsigned char *Plane_1XorFlags = pPlanes->Plane1.Plane_XorFlags;
+	//unsigned char *Plane_1XorBits  = pPlanes->Plane1.Plane_XorBits;
+	//unsigned char *Plane_1Skipped  = pPlanes->Plane1.Plane_Skipped;
+ //   unsigned char *Plane_0Previous = PreviousPlaneDataPane0;
+ //   unsigned char *Plane_1Previous = PreviousPlaneDataPane1;
+	//int i,j,k;
+	//int RowIndex, ColumnIndex;
+ //   ThisPixel thisPixel0;
+ //   ThisPixel thisPixel1;
+	//unsigned char ReadMask;
+	//unsigned char PLANE_BITS;
 
-	if( FullFrameImageData.Planes.Plane0.Plane_Status ==  PLANE_STATUS_VALID ) {
-		// create a RGBA char array from both planes and encode it with LodePNG
-		// then save to disk
-		int w = 128; int h = 32;
-		unsigned char* image = (unsigned char*)malloc( w * h );
-		memset(image, 0, w*h);
-		unsigned char* p = image;
-		unsigned char* pSrc = FullFrameImageData.Planes.Plane0.Plane_Data;
-		unsigned char* pSrc1 = FullFrameImageData.Planes.Plane1.Plane_Data;
+	//if( FullFrameImageData.Planes.Plane0.Plane_Status ==  PLANE_STATUS_VALID ) {
+	//	// create a RGBA char array from both planes and encode it with LodePNG
+	//	// then save to disk
+	//	int w = 128; int h = 32;
+	//	unsigned char* image = (unsigned char*)malloc( w * h );
+	//	memset(image, 0, w*h);
+	//	unsigned char* p = image;
+	//	unsigned char* pSrc = FullFrameImageData.Planes.Plane0.Plane_Data;
+	//	unsigned char* pSrc1 = FullFrameImageData.Planes.Plane1.Plane_Data;
 
-	for (i = 0; i < DMD_ROWS; i++)
-	{
-		for (j = 0; j < (DMD_COLUMNS/8); j++)
-		{
-			for (ReadMask = 0x01, k = 0; k < 8; k++,ReadMask <<= 1)
-			{
-				PLANE_BITS = 0x00;
-				if (*Plane_0Ptr & ReadMask)
-				{
-					PLANE_BITS |= PLANE0_ON;
-				}
-				if (*Plane_0Skipped & ReadMask)
-				{
-					PLANE_BITS |= PLANE0_SKIPPED;
-				}
-				if (*Plane_0XorFlags & ReadMask)
-				{
-                    if (*Plane_0XorBits & ReadMask)
-                    {
-					   PLANE_BITS |= PLANE0_XORED; // XOR flag <and> XOR bit then flip bit from previous display
-                    }
-                    else
-                    {
-                       PLANE_BITS |= PLANE0_SKIPPED; // XOR flag <and NOT> XOR bit, then treat it as a skip
-                    }
-				}
-				if (*Plane_1Ptr & ReadMask)
-				{
-					PLANE_BITS |= PLANE1_ON;
-				}
-				if (*Plane_1Skipped & ReadMask)
-				{
-					PLANE_BITS |= PLANE1_SKIPPED;
-				}
-				if (*Plane_1XorFlags & ReadMask)
-				{
-                    if (*Plane_1XorBits & ReadMask)
-                    {
-					   PLANE_BITS |= PLANE1_XORED; // XOR flag <and> XOR bit then flip bit from previous display
-                    }
-                    else
-                    {
-                       PLANE_BITS |= PLANE1_SKIPPED; // XOR flag <and NOT> XOR bit, then treat it as a skip
-                    }
-				}
+	//for (i = 0; i < DMD_ROWS; i++)
+	//{
+	//	for (j = 0; j < (DMD_COLUMNS/8); j++)
+	//	{
+	//		for (ReadMask = 0x01, k = 0; k < 8; k++,ReadMask <<= 1)
+	//		{
+	//			PLANE_BITS = 0x00;
+	//			if (*Plane_0Ptr & ReadMask)
+	//			{
+	//				PLANE_BITS |= PLANE0_ON;
+	//			}
+	//			if (*Plane_0Skipped & ReadMask)
+	//			{
+	//				PLANE_BITS |= PLANE0_SKIPPED;
+	//			}
+	//			if (*Plane_0XorFlags & ReadMask)
+	//			{
+ //                   if (*Plane_0XorBits & ReadMask)
+ //                   {
+	//				   PLANE_BITS |= PLANE0_XORED; // XOR flag <and> XOR bit then flip bit from previous display
+ //                   }
+ //                   else
+ //                   {
+ //                      PLANE_BITS |= PLANE0_SKIPPED; // XOR flag <and NOT> XOR bit, then treat it as a skip
+ //                   }
+	//			}
+	//			if (*Plane_1Ptr & ReadMask)
+	//			{
+	//				PLANE_BITS |= PLANE1_ON;
+	//			}
+	//			if (*Plane_1Skipped & ReadMask)
+	//			{
+	//				PLANE_BITS |= PLANE1_SKIPPED;
+	//			}
+	//			if (*Plane_1XorFlags & ReadMask)
+	//			{
+ //                   if (*Plane_1XorBits & ReadMask)
+ //                   {
+	//				   PLANE_BITS |= PLANE1_XORED; // XOR flag <and> XOR bit then flip bit from previous display
+ //                   }
+ //                   else
+ //                   {
+ //                      PLANE_BITS |= PLANE1_SKIPPED; // XOR flag <and NOT> XOR bit, then treat it as a skip
+ //                   }
+	//			}
 
-				//
-				ColumnIndex = ((((j * 8) + k)) * PIXEL_WIDTH);
-				RowIndex = (i * PIXEL_HEIGHT);
+	//			//
+	//			ColumnIndex = ((((j * 8) + k)) * PIXEL_WIDTH);
+	//			RowIndex = (i * PIXEL_HEIGHT);
 
-				//
-				// Determine what color to show for medium colored plane
-				//
-				if (true)
-				{
-                    thisPixel0 = ThisPixel_Off;
-					if (PLANE_BITS & PLANE0_ON)
-					{
-                       thisPixel0 = ThisPixel_On;
-					}
-					else if (PLANE_BITS & PLANE0_SKIPPED)
-					{
-						if (false)
-						{
-                           thisPixel0 = ThisPixel_Skipped;
-						}
-						else if (*Plane_0Previous & ReadMask)
-                        {
-                           thisPixel0 = ThisPixel_On;
-						}
-					}
-					else if (PLANE_BITS & PLANE0_XORED)
-					{
-						if (false)
-						{
-                           thisPixel0 = ThisPixel_Xored;
-						}
-						else if (!(*Plane_0Previous & ReadMask))
-                        {
-                           thisPixel0 = ThisPixel_On;
-						}
-					}
-				}
-				
-				RowIndex += ((DMD_ROWS + 1) * PIXEL_HEIGHT);
+	//			//
+	//			// Determine what color to show for medium colored plane
+	//			//
+	//			if (true)
+	//			{
+ //                   thisPixel0 = ThisPixel_Off;
+	//				if (PLANE_BITS & PLANE0_ON)
+	//				{
+ //                      thisPixel0 = ThisPixel_On;
+	//				}
+	//				else if (PLANE_BITS & PLANE0_SKIPPED)
+	//				{
+	//					if (false)
+	//					{
+ //                          thisPixel0 = ThisPixel_Skipped;
+	//					}
+	//					else if (*Plane_0Previous & ReadMask)
+ //                       {
+ //                          thisPixel0 = ThisPixel_On;
+	//					}
+	//				}
+	//				else if (PLANE_BITS & PLANE0_XORED)
+	//				{
+	//					if (false)
+	//					{
+ //                          thisPixel0 = ThisPixel_Xored;
+	//					}
+	//					else if (!(*Plane_0Previous & ReadMask))
+ //                       {
+ //                          thisPixel0 = ThisPixel_On;
+	//					}
+	//				}
+	//			}
+	//			
+	//			RowIndex += ((DMD_ROWS + 1) * PIXEL_HEIGHT);
 
-				//
-				// Determine what color to show for dim plane
-				//
-				if (true)
-				{
-                    thisPixel1 = ThisPixel_Off;
-					if (PLANE_BITS & PLANE1_ON)
-					{
-                       thisPixel1 = ThisPixel_On;
-					}
-					else if (PLANE_BITS & PLANE1_SKIPPED)
-					{
-						if (false)
-						{
-                           thisPixel1 = ThisPixel_Skipped;
-						}
-						else if (*Plane_1Previous & ReadMask)
-						{
-                           thisPixel1 = ThisPixel_On;
-						}
-					}
-					else if (PLANE_BITS & PLANE1_XORED)
-					{
-						if (false)
-						{
-                           thisPixel1 = ThisPixel_Xored;
-						}
-						else if (!(*Plane_1Previous & ReadMask))
-						{
-                           thisPixel1 = ThisPixel_On;
-						}
-					}
-                    
-				}
+	//			//
+	//			// Determine what color to show for dim plane
+	//			//
+	//			if (true)
+	//			{
+ //                   thisPixel1 = ThisPixel_Off;
+	//				if (PLANE_BITS & PLANE1_ON)
+	//				{
+ //                      thisPixel1 = ThisPixel_On;
+	//				}
+	//				else if (PLANE_BITS & PLANE1_SKIPPED)
+	//				{
+	//					if (false)
+	//					{
+ //                          thisPixel1 = ThisPixel_Skipped;
+	//					}
+	//					else if (*Plane_1Previous & ReadMask)
+	//					{
+ //                          thisPixel1 = ThisPixel_On;
+	//					}
+	//				}
+	//				else if (PLANE_BITS & PLANE1_XORED)
+	//				{
+	//					if (false)
+	//					{
+ //                          thisPixel1 = ThisPixel_Xored;
+	//					}
+	//					else if (!(*Plane_1Previous & ReadMask))
+	//					{
+ //                          thisPixel1 = ThisPixel_On;
+	//					}
+	//				}
+ //                   
+	//			}
 
-                // Save "previous" frame data
-                if (thisPixel0 == ThisPixel_Off)
-                {
-                   *Plane_0Previous &= ~ReadMask;
-                }
-                else if (thisPixel0 == ThisPixel_On)
-                {
-                   *Plane_0Previous |= ReadMask;
-                }
+ //               // Save "previous" frame data
+ //               if (thisPixel0 == ThisPixel_Off)
+ //               {
+ //                  *Plane_0Previous &= ~ReadMask;
+ //               }
+ //               else if (thisPixel0 == ThisPixel_On)
+ //               {
+ //                  *Plane_0Previous |= ReadMask;
+ //               }
 
-                if (thisPixel1 == ThisPixel_Off)
-                {
-                   *Plane_1Previous &= ~ReadMask;
-                }
-                else if (thisPixel1 == ThisPixel_On)
-                {
-                   *Plane_1Previous |= ReadMask;
-                }
+ //               if (thisPixel1 == ThisPixel_Off)
+ //               {
+ //                  *Plane_1Previous &= ~ReadMask;
+ //               }
+ //               else if (thisPixel1 == ThisPixel_On)
+ //               {
+ //                  *Plane_1Previous |= ReadMask;
+ //               }
 
-				RowIndex += ((DMD_ROWS + 1) * PIXEL_HEIGHT);
+	//			RowIndex += ((DMD_ROWS + 1) * PIXEL_HEIGHT);
 
-				//
-				// Determine what color to show for blended plane
-				//
-				if (true)
-				{
-                   if ((thisPixel0 == ThisPixel_On) && (thisPixel1 == ThisPixel_On))
-                   {
- 					   *p = 3;
-                   }
-                   else if (thisPixel0 == ThisPixel_On)
-                   {
- 					   *p = 2;
-                   }
-                   else if (thisPixel1 == ThisPixel_On)
-                   {
-     				   *p = 1;
-                   }
-                   else
-                   {
-     				   *p = 0;
-				   }
-				}
-				p ++;
-			} // for mask
-			Plane_0Ptr++;
-			Plane_1Ptr++;
-			Plane_0Skipped++;
-			Plane_1Skipped++;
-			Plane_0XorFlags++;
-			Plane_1XorFlags++;
-			Plane_0XorBits++;
-			Plane_1XorBits++;
-            Plane_0Previous++;
-            Plane_1Previous++;
+	//			//
+	//			// Determine what color to show for blended plane
+	//			//
+	//			if (true)
+	//			{
+ //                  if ((thisPixel0 == ThisPixel_On) && (thisPixel1 == ThisPixel_On))
+ //                  {
+ //					   *p = 3;
+ //                  }
+ //                  else if (thisPixel0 == ThisPixel_On)
+ //                  {
+ //					   *p = 2;
+ //                  }
+ //                  else if (thisPixel1 == ThisPixel_On)
+ //                  {
+ //    				   *p = 1;
+ //                  }
+ //                  else
+ //                  {
+ //    				   *p = 0;
+	//			   }
+	//			}
+	//			p ++;
+	//		} // for mask
+	//		Plane_0Ptr++;
+	//		Plane_1Ptr++;
+	//		Plane_0Skipped++;
+	//		Plane_1Skipped++;
+	//		Plane_0XorFlags++;
+	//		Plane_1XorFlags++;
+	//		Plane_0XorBits++;
+	//		Plane_1XorBits++;
+ //           Plane_0Previous++;
+ //           Plane_1Previous++;
 
-		}
-       
-	}
-	// write raw file format
-	char filename[100];
-	strftime(filename, sizeof(filename), "%d%m%y_%H%M%S_wpcedit_dump.raw", gmtime(&actTime));
-	file = fopen(filename, "rb");
-	if (file == NULL)
-	{
-		file = fopen(filename, "wb");
-		fputc(0x52, file);
-		fputc(0x41, file);
-		fputc(0x57, file);
-		fputc(0x00, file);
-		fputc(0x01, file);
-		fputc(128, file);
-		fputc(32, file);
-		fputc(3, file);
-	} else {
-		fclose(file);
-		file = fopen(filename, "ab");
-	}	
-	tick = GetTickCount();
-	fwrite(&tick, 1, 4, file);
-	fwrite(PreviousPlaneDataPane1, sizeof(char), 512, file);
-	fwrite(PreviousPlaneDataPane0, sizeof(char), 512, file);
-	fwrite(PreviousPlaneDataPane0, sizeof(char), 512, file);
-	fclose(file);
+	//	}
+ //      
+	//}
+	//// write raw file format
+	//char filename[100];
+	//strftime(filename, sizeof(filename), "%d%m%y_%H%M%S_wpcedit_dump.raw", gmtime(&actTime));
+	//file = fopen(filename, "rb");
+	//if (file == NULL)
+	//{
+	//	file = fopen(filename, "wb");
+	//	fputc(0x52, file);
+	//	fputc(0x41, file);
+	//	fputc(0x57, file);
+	//	fputc(0x00, file);
+	//	fputc(0x01, file);
+	//	fputc(128, file);
+	//	fputc(32, file);
+	//	fputc(3, file);
+	//} else {
+	//	fclose(file);
+	//	file = fopen(filename, "ab");
+	//}	
+	//tick = GetTickCount();
+	//fwrite(&tick, 1, 4, file);
+	//fwrite(PreviousPlaneDataPane1, sizeof(char), 512, file);
+	//fwrite(PreviousPlaneDataPane0, sizeof(char), 512, file);
+	//fwrite(PreviousPlaneDataPane0, sizeof(char), 512, file);
+	//fclose(file);
 
-	// write pinmame txt format
-	strftime(filename, sizeof(filename), "%d%m%y_%H%M%S_wpcedit_dump.txt", gmtime(&actTime));
-	file = fopen(filename, "a");
-	if (file) {
-	  fprintf(file, "0x%08x\n", tick);
-	  for (int jj = 0; jj < h; jj++) {
-		  for (int ii = 0; ii < w; ii++)
-		  {
-			  const UINT8 col = image[jj*w + ii];
-			  fprintf(file, "%01x", col);
-		  }
-		  fprintf(file, "\n");
-	  }
-	  fprintf(file, "\n");
-	  fclose(file);
-	}
-	free((void*)image);
+	//// write pinmame txt format
+	//strftime(filename, sizeof(filename), "%d%m%y_%H%M%S_wpcedit_dump.txt", gmtime(&actTime));
+	//file = fopen(filename, "a");
+	//if (file) {
+	//  fprintf(file, "0x%08x\n", tick);
+	//  for (int jj = 0; jj < h; jj++) {
+	//	  for (int ii = 0; ii < w; ii++)
+	//	  {
+	//		  const UINT8 col = image[jj*w + ii];
+	//		  fprintf(file, "%01x", col);
+	//	  }
+	//	  fprintf(file, "\n");
+	//  }
+	//  fprintf(file, "\n");
+	//  fclose(file);
+	//}
+	//free((void*)image);
 
-	}
+	//}
 
 }
 
@@ -3688,9 +2479,9 @@ void DMD::DecodeFullFrameGraphic(unsigned long GraphicIndex)
 {
 	DecodeImageToPlane(GraphicIndex, &FullFrameImageData.Planes.Plane0);
 	DecodeImageToPlane((GraphicIndex + 1), &FullFrameImageData.Planes.Plane1);
-	if( m_Export.GetCheck() ) {
-		exportCurrent();
-	}
+	//if( m_Export.GetCheck() ) {
+	//	exportCurrent();
+	//}
 }
 
 void DMD::DecodeVariableSizedImageData()
@@ -3710,7 +2501,7 @@ void DMD::DecodeVariableSizedImageData()
 void DMD::DecodeCurrentIndex(void)
 {
     // bWiped no longer needs to take precedence, if we're here it means somebody pressed Next/Previous
-    bWiped = FALSE;
+    bWiped = false;
 
 	switch (dialogType)
 	{
@@ -3970,8 +2761,7 @@ void DMD::DecodeVariableSizedImage(unsigned char **Source, DMDPlanes *pPlanes, i
 
 	if (GetVariableSizedImageTableMetadata(TableIndex, &TableHeight, &TableSpacing) != 0)
 	{
-		TmpStr.Format("Unexpected problem looking up TableIndex %d height & spacing",TableIndex);
-		DebugControlKeyMsgStrPrint(TmpStr);
+		DebugControlKeyMsgStrPrint(QString("Unexpected problem looking up TableIndex %1 height & spacing").arg(TableIndex));
 		return;
 	}
 
@@ -3989,8 +2779,7 @@ void DMD::DecodeVariableSizedImage(unsigned char **Source, DMDPlanes *pPlanes, i
 			case IMAGE_CODE_FD:                  // Unusre, but draws fine with 0x00 header processing (possibly inversed paint?)
 				break;
 			default:
-				TmpStr.Format("Unrecognized Header Byte 0x%02x",ch);
-				DebugControlKeyMsgStrPrint(TmpStr);
+				DebugControlKeyMsgStrPrint(QString("Unrecognized Header Byte 0x%1").arg(ch, 0, 16));
 				break;
 		}
 		DecodeVariableSizedImageIndex_Header(Source, pPlanes, TableHeight, TableIndex);
@@ -4227,8 +3016,7 @@ void DMD::DecodeVariableSizedImageIndex_Header(unsigned char **SourcePtr, DMDPla
 
 				if (ExtractWPCAddrAndPageOfImageTable(NULL, &Page, TableIndex) != 0)
 				{
-					TmpStr.Format("DecodeVariableSizedImageIndex_Header(), Unexpected problem looking up TableIndex %d WPC Page",TableIndex);
-					DebugControlKeyMsgStrPrint(TmpStr);
+					DebugControlKeyMsgStrPrint(QString("DecodeVariableSizedImageIndex_Header(), Unexpected problem looking up TableIndex %d WPC Page").arg(TableIndex));
 					return;
 				}
 
@@ -4246,10 +3034,9 @@ void DMD::DecodeVariableSizedImageIndex_Header(unsigned char **SourcePtr, DMDPla
                 }
 				TmpBuf[2] = (Page&0xFF);
 
-				if (GetROMAddressFromAddrOf3ByteWPCAddrPage(TmpBuf, &Addr) != 0)
+				if (GetROMAddressFromAddrOf3ByteWPCAddrPage((unsigned char*)TmpBuf, &Addr) != 0) // TODO cast
 				{
-					TmpStr.Format("DecodeVariableSizedImageIndex_Header(), Unexpected problem looking up ROM address of bi-color plane from 3-byte WPC Addr 0x%02x 0x%02x 0x%02x",(TmpBuf[0]&0xFF),(TmpBuf[1]&0xFF),(TmpBuf[2]&0xFF));
-					DebugControlKeyMsgStrPrint(TmpStr);
+					DebugControlKeyMsgStrPrint(QString("DecodeVariableSizedImageIndex_Header(), Unexpected problem looking up ROM address of bi-color plane from 3-byte WPC Addr 0x%1 0x%2 0x%3").arg((TmpBuf[0] & 0xFF), 0, 16).arg((TmpBuf[1] & 0xFF), 0, 16).arg((TmpBuf[2] & 0xFF), 0, 16));
 					return;
 				}
 
@@ -4291,8 +3078,7 @@ void DMD::DecodeImageToPlane(int Index, DMDPlane *pPlane)
 
 	if (GetROMAddressFromAddrOf3ByteWPCAddrPage(&CommonData.StartPtr[Addr], &Addr) != 0)
 	{
-		TmpStr.Format("DecodeImageToPlane() got error from GetROMAddressFromAddrOf3ByteWPCAddrPage()");
-		DebugShiftKeyMsgStrPrint(TmpStr);
+		DebugShiftKeyMsgStrPrint("DecodeImageToPlane() got error from GetROMAddressFromAddrOf3ByteWPCAddrPage()");
 		pPlane->Plane_Status = PLANE_STATUS_TABLEENTRYOUTOFRANGE;
 		return;
 	}
@@ -4323,8 +3109,7 @@ unsigned char DMD::DecodeFullFrameGraphicImage(unsigned char **Source, DMDPlane 
     }
 
 	//
-	TmpStr.Format("Type 0x%02x",ch);
-	DebugShiftKeyMsgStrPrint(TmpStr);
+	DebugShiftKeyMsgStrPrint(QString("Type 0x%1").arg(ch));
 
 	switch (ch&0x0F)
 	{
@@ -4365,8 +3150,8 @@ unsigned char DMD::DecodeFullFrameGraphicImage(unsigned char **Source, DMDPlane 
 			Decode_0B(Source, Dest, Skipped);
 			break;
 		default	:
-			TmpStr.Format("Unknown Image Type 0x%02x",ch);
-			DebugShiftKeyMsgStrPrint(TmpStr);
+			
+			DebugShiftKeyMsgStrPrint(QString("Unknown Image Type 0x%1").arg(ch, 0, 16));
 			return PLANE_STATUS_UNKNOWN_TYPE;
 	}
 
@@ -5290,31 +4075,35 @@ void DMD::ButtonHandlerNext(int count)
 			}
 		}
 	}*/
-	NaggedOnce = 1;
+	//NaggedOnce = 1; // TODO find out what this is for
 
 	DecodeNextIndex(count);
 }
 
-void DMD::OnButtonNextGraphic() 
-{
-   ButtonHandlerNext(1);
-}
+// TODO
+//void DMD::OnButtonNextGraphic() 
+//{
+//	// TODO call next button
+//   //ButtonHandlerNext(1);
+//}
+//
+//void DMD::OnButtonNextGraphicx2() 
+//{
+//	// TODO call next button 2 (inc 2)
+//   //ButtonHandlerNext(2);
+//}
 
-void DMD::OnButtonNextGraphicx2() 
-{
-   ButtonHandlerNext(2);
-}
-
-void DMD::OnButtonNextGraphicAll() 
-{
-	int countInvalid = 0;
-   unsigned long index = 0;
-   while( countInvalid<200 ) {
-	    DecodeFullFrameGraphic(index);
-		if( FullFrameImageData.Planes.Plane0.Plane_Status !=  PLANE_STATUS_VALID ) countInvalid++;
-		index += 2;	
-   }
-}
+// TODO
+//void DMD::OnButtonNextGraphicAll() 
+//{
+//	int countInvalid = 0;
+//   unsigned long index = 0;
+//   while( countInvalid<200 ) {
+//	    DecodeFullFrameGraphic(index);
+//		if( FullFrameImageData.Planes.Plane0.Plane_Status !=  PLANE_STATUS_VALID ) countInvalid++;
+//		index += 2;	
+//   }
+//}
 
 void DMD::ButtonHandlerPrevious(int count)
 {
@@ -5337,144 +4126,148 @@ void DMD::ButtonHandlerPrevious(int count)
 	DecodePreviousIndex(count);
 }
 
-void DMD::OnButtonPreviousGraphic() 
-{
-   ButtonHandlerPrevious(1);
-}
-
-void DMD::OnButtonPreviousGraphicx2() 
-{
-   ButtonHandlerPrevious(2);
-}
+//void DMD::OnButtonPreviousGraphic() 
+//{
+//   // ButtonHandlerPrevious(1); TODO
+//}
+//
+//void DMD::OnButtonPreviousGraphicx2() 
+//{
+//   // ButtonHandlerPrevious(2); TODO
+//}
 
 void DMD::InvalidateDMDPages()
 {
-	RECT ThisRect;
-	GetClientRect(&ThisRect);
-	//	
-	ThisRect.bottom = ((DMD_ROWS + 1 + DMD_ROWS + 1 + DMD_ROWS) * PIXEL_HEIGHT);
-	ThisRect.right = (DMD_COLUMNS * PIXEL_WIDTH);
-	//	
-	InvalidateRect(&ThisRect, FALSE);
+	//RECT ThisRect;
+	//GetClientRect(&ThisRect);
+
+	//	 TODO figure out what this does in ThisRect
+	//ThisRect.bottom = ((DMD_ROWS + 1 + DMD_ROWS + 1 + DMD_ROWS) * PIXEL_HEIGHT);
+	//ThisRect.right = (DMD_COLUMNS * PIXEL_WIDTH);
+	////	
+	//InvalidateRect(&ThisRect, FALSE);
 }
 
 void DMD::UpdateStaticTextBoxesFullFrameGraphics()
 {
-	CString str;
+	// TODO create 3 QLabels and fill them with the string here
+	//CString str;
 
-	if (FullFrameImageData.Planes.Plane0.Plane_Status > PLANE_STATUS_IMAGEOUTOFRANGE)
-	{
-		FullFrameImageData.Planes.Plane0.Plane_Status = PLANE_STATUS_IMAGEOUTOFRANGE;
-	}
-	if (FullFrameImageData.Planes.Plane1.Plane_Status > PLANE_STATUS_IMAGEOUTOFRANGE)
-	{
-		FullFrameImageData.Planes.Plane1.Plane_Status = PLANE_STATUS_IMAGEOUTOFRANGE;
-	}
+	//if (FullFrameImageData.Planes.Plane0.Plane_Status > PLANE_STATUS_IMAGEOUTOFRANGE)
+	//{
+	//	FullFrameImageData.Planes.Plane0.Plane_Status = PLANE_STATUS_IMAGEOUTOFRANGE;
+	//}
+	//if (FullFrameImageData.Planes.Plane1.Plane_Status > PLANE_STATUS_IMAGEOUTOFRANGE)
+	//{
+	//	FullFrameImageData.Planes.Plane1.Plane_Status = PLANE_STATUS_IMAGEOUTOFRANGE;
+	//}
 
-	str.Format("Index %1.1u\n\nROM Addr:\n0x%05x\n%1.1u Bytes\n\n%s",FullFrameImageData.CurrentImageIndex,(FullFrameImageData.TableAddress+(FullFrameImageData.CurrentImageIndex*3)),FullFrameImageData.Planes.Plane0.Plane_Size,StatusText[FullFrameImageData.Planes.Plane0.Plane_Status]);
-	m_Dmd1.SetWindowText(str);
-	str.Format("Index %1.1u\n\nROM Addr:\n0x%05x\n%1.1u Bytes\n\n%s",(FullFrameImageData.CurrentImageIndex + 1),(FullFrameImageData.TableAddress+((FullFrameImageData.CurrentImageIndex+1)*3)),FullFrameImageData.Planes.Plane1.Plane_Size,StatusText[FullFrameImageData.Planes.Plane1.Plane_Status]);
-	m_Dmd2.SetWindowText(str);
-	str.Format("Index %1.1u\n%s\n<and>\nIndex %1.1u\n%s",FullFrameImageData.CurrentImageIndex,StatusText[FullFrameImageData.Planes.Plane0.Plane_Status], (FullFrameImageData.CurrentImageIndex + 1),StatusText[FullFrameImageData.Planes.Plane1.Plane_Status]);
-	m_Dmd3.SetWindowText(str);
+	//str.Format("Index %1.1u\n\nROM Addr:\n0x%05x\n%1.1u Bytes\n\n%s",FullFrameImageData.CurrentImageIndex,(FullFrameImageData.TableAddress+(FullFrameImageData.CurrentImageIndex*3)),FullFrameImageData.Planes.Plane0.Plane_Size,StatusText[FullFrameImageData.Planes.Plane0.Plane_Status]);
+	//m_Dmd1.SetWindowText(str);
+	//str.Format("Index %1.1u\n\nROM Addr:\n0x%05x\n%1.1u Bytes\n\n%s",(FullFrameImageData.CurrentImageIndex + 1),(FullFrameImageData.TableAddress+((FullFrameImageData.CurrentImageIndex+1)*3)),FullFrameImageData.Planes.Plane1.Plane_Size,StatusText[FullFrameImageData.Planes.Plane1.Plane_Status]);
+	//m_Dmd2.SetWindowText(str);
+	//str.Format("Index %1.1u\n%s\n<and>\nIndex %1.1u\n%s",FullFrameImageData.CurrentImageIndex,StatusText[FullFrameImageData.Planes.Plane0.Plane_Status], (FullFrameImageData.CurrentImageIndex + 1),StatusText[FullFrameImageData.Planes.Plane1.Plane_Status]);
+	//m_Dmd3.SetWindowText(str);
 }
 
-void DMD::UpdateStaticTextBoxesVariableSizedImagePrint(int TableIndex, int ImageIndex, CStatic *pWnd, CStatic *pWndTitle, unsigned char Status)
-{
-	CString str;
-	CString strTableType;
-	CString strImageType;
-	CString strAscii;
-	CString strStatus;
-	unsigned long TableAddr;
-	unsigned long ImageAddr;
-
-	switch (dialogType)
-	{
-		case DMD_DIALOG_TYPE_FONTDATA:
-			strTableType = "Font";
-			strImageType = "Char";
-			strAscii.Format("ASCII: %c",((ImageIndex >= 0x20) && (ImageIndex < 0x7F))?ImageIndex:' ');
-			break;
-
-		case DMD_DIALOG_TYPE_ANIDATA:
-			strTableType = "Animation";
-			strImageType = "Frame";
-			strAscii = "";
-			break;
-
-		default:
-			strTableType = "Table";
-			strImageType = "Index";
-			strAscii = "";
-			break;
-	}
-
-	str.Format("%s\n %d of %d",strTableType,TableIndex+1,VariableSizedImageData.maxTableIndex+1);
-	pWndTitle->SetWindowText(str);
-
-	//
-	if (GetROMAddressOfVariableSizedImageTable(&TableAddr, TableIndex) != 0)
-	{
-		ImageAddr = 0;
-	}
-	if (GetROMAddressOfVariableSizedImageIndex(&ImageAddr, TableIndex, ImageIndex) != 0)
-	{
-		TableAddr = 0;
-	}
-
-	if (Status == PLANE_STATUS_VALID)
-	{
-		strStatus.Format("%d%s x %d%s",
-			VariableSizedImageData.CurrentImageXSize,
-			(VariableSizedImageData.CurrentImageXShift > 0)?"(+)":"",
-			VariableSizedImageData.CurrentImageYSize,
-			(VariableSizedImageData.CurrentImageYShift > 0)?"(+)":"");
-	}
-	else
-	{
-		strStatus = "**ERROR**";
-	}
-
-	str.Format("%s 0x%02x\n%s\nROM Addrs:\nTable:\n0x%05x\n%s:\n0x%05x\n%s",strImageType,ImageIndex,strAscii,TableAddr,strImageType,ImageAddr,strStatus);
-	pWnd->SetWindowText(str);
-}
+// TODO do this with QT components
+//void DMD::UpdateStaticTextBoxesVariableSizedImagePrint(int TableIndex, int ImageIndex, CStatic *pWnd, CStatic *pWndTitle, unsigned char Status)
+//{
+//	CString str;
+//	CString strTableType;
+//	CString strImageType;
+//	CString strAscii;
+//	CString strStatus;
+//	unsigned long TableAddr;
+//	unsigned long ImageAddr;
+//
+//	switch (dialogType)
+//	{
+//		case DMD_DIALOG_TYPE_FONTDATA:
+//			strTableType = "Font";
+//			strImageType = "Char";
+//			strAscii.Format("ASCII: %c",((ImageIndex >= 0x20) && (ImageIndex < 0x7F))?ImageIndex:' ');
+//			break;
+//
+//		case DMD_DIALOG_TYPE_ANIDATA:
+//			strTableType = "Animation";
+//			strImageType = "Frame";
+//			strAscii = "";
+//			break;
+//
+//		default:
+//			strTableType = "Table";
+//			strImageType = "Index";
+//			strAscii = "";
+//			break;
+//	}
+//
+//	str.Format("%s\n %d of %d",strTableType,TableIndex+1,VariableSizedImageData.maxTableIndex+1);
+//	pWndTitle->SetWindowText(str);
+//
+//	//
+//	if (GetROMAddressOfVariableSizedImageTable(&TableAddr, TableIndex) != 0)
+//	{
+//		ImageAddr = 0;
+//	}
+//	if (GetROMAddressOfVariableSizedImageIndex(&ImageAddr, TableIndex, ImageIndex) != 0)
+//	{
+//		TableAddr = 0;
+//	}
+//
+//	if (Status == PLANE_STATUS_VALID)
+//	{
+//		strStatus.Format("%d%s x %d%s",
+//			VariableSizedImageData.CurrentImageXSize,
+//			(VariableSizedImageData.CurrentImageXShift > 0)?"(+)":"",
+//			VariableSizedImageData.CurrentImageYSize,
+//			(VariableSizedImageData.CurrentImageYShift > 0)?"(+)":"");
+//	}
+//	else
+//	{
+//		strStatus = "**ERROR**";
+//	}
+//
+//	str.Format("%s 0x%02x\n%s\nROM Addrs:\nTable:\n0x%05x\n%s:\n0x%05x\n%s",strImageType,ImageIndex,strAscii,TableAddr,strImageType,ImageAddr,strStatus);
+//	pWnd->SetWindowText(str);
+//}
 
 void DMD::UpdateStaticTextBoxesVariableSizedImagePane(int Pane)
 {
-	CString str;
+	// TODO do this with QT components
+	//CString str;
 
-	switch (Pane)
-	{
-		case 1:
-			UpdateStaticTextBoxesVariableSizedImagePrint(VariableSizedImageData.CurrentTableIndex,VariableSizedImageData.CurrentImageIndex,&m_Dmd1,&m_Dmd1Title,VariableSizedImageData.Planes.Plane0.Plane_Status);
-			break;
-		case 2:
-			if (VariableSizedImageData.Planes.Plane1.Plane_Status == PLANE_STATUS_VALID)
-			{
-				UpdateStaticTextBoxesVariableSizedImagePrint(VariableSizedImageData.CurrentTableIndex,VariableSizedImageData.CurrentImageIndex,&m_Dmd2,&m_Dmd2Title,VariableSizedImageData.Planes.Plane1.Plane_Status);
-			}
-			else
-			{
-				m_Dmd2Title.SetWindowText("");
-				m_Dmd2.SetWindowText("");
-			}
-			break;
-		case 3:
-			if (VariableSizedImageData.Planes.Plane1.Plane_Status == PLANE_STATUS_VALID)
-			{
-				UpdateStaticTextBoxesVariableSizedImagePrint(VariableSizedImageData.CurrentTableIndex,VariableSizedImageData.CurrentImageIndex,&m_Dmd3,&m_Dmd3Title,
-					((VariableSizedImageData.Planes.Plane0.Plane_Status == PLANE_STATUS_VALID)&&(VariableSizedImageData.Planes.Plane1.Plane_Status == PLANE_STATUS_VALID))?PLANE_STATUS_VALID:PLANE_STATUS_INVALID);;
-			}
-			else
-			{
-				m_Dmd3Title.SetWindowText("");
-				m_Dmd3.SetWindowText("");
-			}
-			break;
-		default:
-			break;
-	}
+	//switch (Pane)
+	//{
+	//	case 1:
+	//		UpdateStaticTextBoxesVariableSizedImagePrint(VariableSizedImageData.CurrentTableIndex,VariableSizedImageData.CurrentImageIndex,&m_Dmd1,&m_Dmd1Title,VariableSizedImageData.Planes.Plane0.Plane_Status);
+	//		break;
+	//	case 2:
+	//		if (VariableSizedImageData.Planes.Plane1.Plane_Status == PLANE_STATUS_VALID)
+	//		{
+	//			UpdateStaticTextBoxesVariableSizedImagePrint(VariableSizedImageData.CurrentTableIndex,VariableSizedImageData.CurrentImageIndex,&m_Dmd2,&m_Dmd2Title,VariableSizedImageData.Planes.Plane1.Plane_Status);
+	//		}
+	//		else
+	//		{
+	//			m_Dmd2Title.SetWindowText("");
+	//			m_Dmd2.SetWindowText("");
+	//		}
+	//		break;
+	//	case 3:
+	//		if (VariableSizedImageData.Planes.Plane1.Plane_Status == PLANE_STATUS_VALID)
+	//		{
+	//			UpdateStaticTextBoxesVariableSizedImagePrint(VariableSizedImageData.CurrentTableIndex,VariableSizedImageData.CurrentImageIndex,&m_Dmd3,&m_Dmd3Title,
+	//				((VariableSizedImageData.Planes.Plane0.Plane_Status == PLANE_STATUS_VALID)&&(VariableSizedImageData.Planes.Plane1.Plane_Status == PLANE_STATUS_VALID))?PLANE_STATUS_VALID:PLANE_STATUS_INVALID);;
+	//		}
+	//		else
+	//		{
+	//			m_Dmd3Title.SetWindowText("");
+	//			m_Dmd3.SetWindowText("");
+	//		}
+	//		break;
+	//	default:
+	//		break;
+	//}
 }
 
 void DMD::UpdateStaticTextBoxesVariableSizedImage()
@@ -5504,26 +4297,26 @@ void DMD::UpdateStaticTextBoxes()
 
 void DMD::UpdateControls()
 {
-	BOOL bEnablePrev = FALSE;
-	BOOL bEnablePrevX2 = FALSE;
-	BOOL bEnableNext = FALSE;
-	BOOL bEnableNextX2 = FALSE;
+	bool bEnablePrev = false;
+	bool bEnablePrevX2 = false;
+	bool bEnableNext = false;
+	bool bEnableNextX2 = false;
 
 	switch (dialogType)
 	{
 		case DMD_DIALOG_TYPE_GRAPHICS:
 			if (FullFrameImageData.CurrentImageIndex > 0)
 			{
-				bEnablePrev = TRUE;
+				bEnablePrev = true;
 			}
             if (FullFrameImageData.CurrentImageIndex > 1)
             {
-                bEnablePrevX2 = TRUE;
+                bEnablePrevX2 = true;
             }
-			//if (FullFrameImageData.CurrentImageIndex < MAX_GRAPHIC_INDEX)
+			//if (FullFrameImageData.CurrentImageIndex < MAX_GRAPHIC_INDEX) // TODO..... 
 			{
-				bEnableNext = TRUE;
-                bEnableNextX2= TRUE;
+				bEnableNext = true;
+                bEnableNextX2= true;
 			}
 			break;
 
@@ -5531,19 +4324,19 @@ void DMD::UpdateControls()
 		case DMD_DIALOG_TYPE_ANIDATA:
 			if ((VariableSizedImageData.CurrentTableIndex > VariableSizedImageData.minTableIndex) || ((VariableSizedImageData.CurrentTableIndex == VariableSizedImageData.minTableIndex) && (VariableSizedImageData.CurrentImageIndex > VariableSizedImageData.minImageIndex)))
 			{
-				bEnablePrev = TRUE;
+				bEnablePrev = true;
 			}
 			if ((VariableSizedImageData.CurrentTableIndex > VariableSizedImageData.minTableIndex) || ((VariableSizedImageData.CurrentTableIndex == VariableSizedImageData.minTableIndex) && (VariableSizedImageData.CurrentImageIndex > VariableSizedImageData.minImageIndex+1)))
 			{
-				bEnablePrevX2 = TRUE;
+				bEnablePrevX2 = true;
 			}
 			if ((VariableSizedImageData.CurrentTableIndex < VariableSizedImageData.maxTableIndex) || ((VariableSizedImageData.CurrentTableIndex == VariableSizedImageData.maxTableIndex) && (VariableSizedImageData.CurrentImageIndex < VariableSizedImageData.maxImageIndex)))
 			{
-				bEnableNext = TRUE;
+				bEnableNext = true;
 			}
 			if ((VariableSizedImageData.CurrentTableIndex < VariableSizedImageData.maxTableIndex) || ((VariableSizedImageData.CurrentTableIndex == VariableSizedImageData.maxTableIndex) && (VariableSizedImageData.CurrentImageIndex < VariableSizedImageData.maxImageIndex-1)))
 			{
-				bEnableNextX2 = TRUE;
+				bEnableNextX2 = true;
 			}
 			break;
 
@@ -5551,293 +4344,209 @@ void DMD::UpdateControls()
 			break;
 	}
 
-	//
-	m_PreviousGraphic.EnableWindow(bEnablePrev);
-	m_NextGraphic.EnableWindow(bEnableNext);
-	m_PreviousGraphicX2.EnableWindow(bEnablePrevX2);
-	m_NextGraphicX2.EnableWindow(bEnableNextX2);
+	// TODO do this with QT
+	//m_PreviousGraphic.EnableWindow(bEnablePrev);
+	//m_NextGraphic.EnableWindow(bEnableNext);
+	//m_PreviousGraphicX2.EnableWindow(bEnablePrevX2);
+	//m_NextGraphicX2.EnableWindow(bEnableNextX2);
 }
 
-void DMD::OnCheckSkipped() 
-{
-	InvalidateDMDPages();
-}
+// TODO remove or replace with QT checkboxes
+//void DMD::OnCheckSkipped() 
+//{
+//	InvalidateDMDPages();
+//}
+//
+//void DMD::OnCheckExport() {
+//	actTime = time(NULL);
+//}
+//
+//void DMD::OnCheckXored() 
+//{
+//	InvalidateDMDPages();
+//}
 
-void DMD::OnCheckExport() {
-	actTime = time(NULL);
-}
 
-void DMD::OnCheckXored() 
-{
-	InvalidateDMDPages();
-}
+//void DMD::OnSelchangeList1() 
+//{
+//	InvalidateDMDPages();
+//}
 
-
-void DMD::OnSelchangeList1() 
-{
-	InvalidateDMDPages();
-}
-
-void DMD::OnOK() 
-{
-	SaveDMDRegistrySettings();	
-	CDialog::OnOK();
-}
-
-void DMD::OnClose() 
-{
-	SaveDMDRegistrySettings();	
-	CDialog::OnClose();
-}
+//void DMD::OnOK() 
+//{
+//	SaveDMDRegistrySettings();	
+//	CDialog::OnOK();
+//}
+//
+//void DMD::OnClose() 
+//{
+//	SaveDMDRegistrySettings();	
+//	CDialog::OnClose();
+//}
 
 void DMD::SaveDMDRegistrySettings()
 {
-	PassedInPointer->PixelColor = m_PixelColor.GetTopIndex();
-	PassedInPointer->XoredCheckboxState = m_Xored.GetCheck();
-	PassedInPointer->SkippedCheckboxState = m_Skipped.GetCheck();
-	((CHexEditorApp *)AfxGetApp())->SaveProgramSettingsToRegistry(PassedInPointer);
+	// TODO settings for window
+	//PassedInPointer->PixelColor = m_PixelColor.GetTopIndex();
+	//PassedInPointer->XoredCheckboxState = m_Xored.GetCheck();
+	//PassedInPointer->SkippedCheckboxState = m_Skipped.GetCheck();
+	//((CHexEditorApp *)AfxGetApp())->SaveProgramSettingsToRegistry(PassedInPointer);
 }
 
+// TODO qt checkbox?
 void DMD::UpdateCheckboxText()
 {
-	CString CurrentText;
-	CString DesiredText;
-	int CurrentColor = m_PixelColor.GetTopIndex();
-	int TextStringColor;
-	TextStringColor = NORMAL_XORED_COLOR;
-	if (CurrentColor == NORMAL_XORED_COLOR)
-	{
-		TextStringColor = ALTERNATE_XORED_COLOR;
-	}
-	DesiredText.Format("Show XORed pixels as %s",ColorText[TextStringColor]);
-	m_Xored.GetWindowText(CurrentText);
-	if (CurrentText != DesiredText)
-	{
-		m_Xored.SetWindowText(DesiredText);
-	}
+	//CString CurrentText;
+	//CString DesiredText;
+	//int CurrentColor = m_PixelColor.GetTopIndex();
+	//int TextStringColor;
+	//TextStringColor = NORMAL_XORED_COLOR;
+	//if (CurrentColor == NORMAL_XORED_COLOR)
+	//{
+	//	TextStringColor = ALTERNATE_XORED_COLOR;
+	//}
+	//DesiredText.Format("Show XORed pixels as %s",ColorText[TextStringColor]);
+	//m_Xored.GetWindowText(CurrentText);
+	//if (CurrentText != DesiredText)
+	//{
+	//	m_Xored.SetWindowText(DesiredText);
+	//}
 
-	TextStringColor = NORMAL_SKIPPED_COLOR;
-	if (CurrentColor == NORMAL_SKIPPED_COLOR)
-	{
-		TextStringColor = ALTERNATE_SKIPPED_COLOR;
-	}
-	DesiredText.Format("Show Skipped pixels as %s",ColorText[TextStringColor]);
-	m_Skipped.GetWindowText(CurrentText);
-	if (CurrentText != DesiredText)
-	{
-		m_Skipped.SetWindowText(DesiredText);
-	}
+	//TextStringColor = NORMAL_SKIPPED_COLOR;
+	//if (CurrentColor == NORMAL_SKIPPED_COLOR)
+	//{
+	//	TextStringColor = ALTERNATE_SKIPPED_COLOR;
+	//}
+	//DesiredText.Format("Show Skipped pixels as %s",ColorText[TextStringColor]);
+	//m_Skipped.GetWindowText(CurrentText);
+	//if (CurrentText != DesiredText)
+	//{
+	//	m_Skipped.SetWindowText(DesiredText);
+	//}
 }
 
-HBRUSH DMD::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor) 
-{
-	HBRUSH hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+// TODO label coloring?
+//HBRUSH DMD::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor) 
+//{
+//	HBRUSH hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+//
+////#define CTLCOLOR_MSGBOX         0
+////#define CTLCOLOR_EDIT           1
+////#define CTLCOLOR_LISTBOX        2
+////#define CTLCOLOR_BTN            3
+////#define CTLCOLOR_DLG            4
+////#define CTLCOLOR_SCROLLBAR      5
+////#define CTLCOLOR_STATIC         6
+////#define CTLCOLOR_MAX            7
+////	if (nCtlColor == CTLCOLOR_DLG)
+////	{
+////		pDC->SetTextColor(GetSysColor(COLOR_INACTIVECAPTION));
+////		pDC->SetBkColor(RGB(0,0,0));
+////		return (HBRUSH)(m_pListBkBrush->GetSafeHandle());
+////	}
+//	return hbr;
+//}
 
-//#define CTLCOLOR_MSGBOX         0
-//#define CTLCOLOR_EDIT           1
-//#define CTLCOLOR_LISTBOX        2
-//#define CTLCOLOR_BTN            3
-//#define CTLCOLOR_DLG            4
-//#define CTLCOLOR_SCROLLBAR      5
-//#define CTLCOLOR_STATIC         6
-//#define CTLCOLOR_MAX            7
-//	if (nCtlColor == CTLCOLOR_DLG)
+// This is on opening TODO
+//void DMD::OnShowWindow(BOOL bShow, UINT nStatus) 
+//{
+//	CDialog::OnShowWindow(bShow, nStatus);
+//	UpdateControls();
+//	GotoDlgCtrl (GetDlgItem(IDC_BUTTON_NEXT_GRAPHIC));
+//}
+
+
+// TODO mouse handling
+//void DMD::OnLButtonDown(UINT nFlags, CPoint point) 
+//{
+//	CPoint pos;
+//	CRect rec;
+//	int InButton = 0;
+//    int InTitleBox = 0;
+//    CStatic *pTitleBox = NULL;
+//
+//	if (GetCursorPos(&pos))
 //	{
-//		pDC->SetTextColor(GetSysColor(COLOR_INACTIVECAPTION));
-//		pDC->SetBkColor(RGB(0,0,0));
-//		return (HBRUSH)(m_pListBkBrush->GetSafeHandle());
+//		m_NextGraphic.GetWindowRect(&rec);
+//		if (rec.PtInRect(pos))
+//		{
+//			InButton = 1;
+//		}
+//		m_NextGraphicX2.GetWindowRect(&rec);
+//		if (rec.PtInRect(pos))
+//		{
+//			InButton = 1;
+//		}
+//		m_PreviousGraphic.GetWindowRect(&rec);
+//		if (rec.PtInRect(pos))
+//		{
+//			InButton = 1;
+//		}
+//		m_PreviousGraphicX2.GetWindowRect(&rec);
+//		if (rec.PtInRect(pos))
+//		{
+//			InButton = 1;
+//		}
+//        m_Dmd1Title.GetWindowRect(&rec);
+//        if (rec.PtInRect(pos))
+//        {
+//            InTitleBox = 1;
+//            pTitleBox = &m_Dmd1Title;
+//        }
+//        m_Dmd2Title.GetWindowRect(&rec);
+//        if (rec.PtInRect(pos))
+//        {
+//            InTitleBox = 2;
+//            pTitleBox = &m_Dmd2Title;
+//        }
+//        m_Dmd3Title.GetWindowRect(&rec);
+//        if (rec.PtInRect(pos))
+//        {
+//            InTitleBox = 3;
+//            pTitleBox = &m_Dmd3Title;
+//        }
 //	}
-	return hbr;
-}
+//	if (!InButton && !InTitleBox)
+//	{
+//		PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
+//	}
+//    if (InTitleBox && (pTitleBox != NULL))
+//    {
+//        CString str;
+//        pTitleBox->GetWindowText(str);
+//        if (InTitleBox == selectedTitleBox)
+//        {
+//           // They re-clicked the currently selected title box, so unselect it
+//           pTitleBox->SetWindowText("Clipboard Off");
+//           selectedTitleBox = 0;
+//        }
+//        else
+//        {
+//           // They clicked a new title box, set it as the currently selected title box
+//           pTitleBox->SetWindowText("Clipboard On");
+//           selectedTitleBox = InTitleBox;
+//           OnPaint();  // get current clipboard pane data
+//        }
+//        Sleep(500);
+//        pTitleBox->SetWindowText(str);
+//    }
+//	CDialog::OnLButtonDown(nFlags, point);
+//}
 
-void DMD::OnShowWindow(BOOL bShow, UINT nStatus) 
-{
-	CDialog::OnShowWindow(bShow, nStatus);
-	UpdateControls();
-	GotoDlgCtrl (GetDlgItem(IDC_BUTTON_NEXT_GRAPHIC));
-}
-
-void DMD::OnTimer(UINT nIDEvent) 
-{
-#if ALLOW_MOUSE_TO_REPEAT
-#define CLEAR_NEXT      0x01
-#define CLEAR_PREVIOUS  0x02
-
-	unsigned char Clear = (CLEAR_NEXT | CLEAR_PREVIOUS);
-
-	if (nIDEvent == TIMER_DMD)
-	{
-		if (IsWindowVisible())
-		{
-			CPoint pos;
-			CRect rec;
-			BOOL LeftButtonDown = FALSE;
-			if (GetSystemMetrics(SM_SWAPBUTTON))
-			{
-				if ((GetAsyncKeyState(VK_RBUTTON)) < 0)
-					LeftButtonDown = TRUE;
-			}
-			else
-			{
-				if ((GetAsyncKeyState(VK_LBUTTON)) < 0)
-					LeftButtonDown = TRUE;
-			}
-			if (LeftButtonDown == TRUE)
-			{
-				if (GetCursorPos(&pos))
-				{
-					m_NextGraphic.GetWindowRect(&rec);
-					if (rec.PtInRect(pos)) 
-					{
-						Clear &= ~CLEAR_NEXT;
-						switch (NextDebounceState)
-						{
-							case DEBOUNCE_STATE_DONE        :
-								DecodeNextIndex(1);
-								break;
-							case DEBOUNCE_STATE_DEBOUNCING  :
-								if (NextDebounce)
-									NextDebounce--;
-								if (!NextDebounce)
-									NextDebounceState = DEBOUNCE_STATE_DONE;
-								break;
-							case DEBOUNCE_STATE_IDLE        :
-							default :
-								NextDebounce = (DEFAULT_DEBOUNCE_TIME / TIMER_DMD_UPDATE);
-								NextDebounceState = DEBOUNCE_STATE_DEBOUNCING;
-						}
-					}
-					else
-					{
-						m_PreviousGraphic.GetWindowRect(&rec);
-						if ((rec.PtInRect(pos)) && (m_PreviousGraphic.GetFocus()))
-						{
-							Clear &= ~CLEAR_PREVIOUS;
-							switch (PreviousDebounceState)
-							{
-								case DEBOUNCE_STATE_DONE        :
-									DecodePreviousIndex(1);
-									break;
-								case DEBOUNCE_STATE_DEBOUNCING  :
-									if (PreviousDebounce)
-										PreviousDebounce--;
-									if (!PreviousDebounce)
-										PreviousDebounceState = DEBOUNCE_STATE_DONE;
-									break;
-								case DEBOUNCE_STATE_IDLE        :
-								default :
-									PreviousDebounce = (DEFAULT_DEBOUNCE_TIME / TIMER_DMD_UPDATE);
-									PreviousDebounceState = DEBOUNCE_STATE_DEBOUNCING;
-							}
-						}
-					}
-				}
-			}
-		}
-	}	
-	if (Clear & CLEAR_NEXT)
-	{
-		NextDebounce = 0;
-		NextDebounceState = DEBOUNCE_STATE_IDLE;
-	}
-	if (Clear & CLEAR_PREVIOUS)
-	{
-		PreviousDebounce = 0;
-		PreviousDebounceState = DEBOUNCE_STATE_IDLE;
-	}
-	CDialog::OnTimer(nIDEvent);
-#endif
-}
-
-void DMD::OnLButtonDown(UINT nFlags, CPoint point) 
-{
-	CPoint pos;
-	CRect rec;
-	int InButton = 0;
-    int InTitleBox = 0;
-    CStatic *pTitleBox = NULL;
-
-	if (GetCursorPos(&pos))
-	{
-		m_NextGraphic.GetWindowRect(&rec);
-		if (rec.PtInRect(pos))
-		{
-			InButton = 1;
-		}
-		m_NextGraphicX2.GetWindowRect(&rec);
-		if (rec.PtInRect(pos))
-		{
-			InButton = 1;
-		}
-		m_PreviousGraphic.GetWindowRect(&rec);
-		if (rec.PtInRect(pos))
-		{
-			InButton = 1;
-		}
-		m_PreviousGraphicX2.GetWindowRect(&rec);
-		if (rec.PtInRect(pos))
-		{
-			InButton = 1;
-		}
-        m_Dmd1Title.GetWindowRect(&rec);
-        if (rec.PtInRect(pos))
-        {
-            InTitleBox = 1;
-            pTitleBox = &m_Dmd1Title;
-        }
-        m_Dmd2Title.GetWindowRect(&rec);
-        if (rec.PtInRect(pos))
-        {
-            InTitleBox = 2;
-            pTitleBox = &m_Dmd2Title;
-        }
-        m_Dmd3Title.GetWindowRect(&rec);
-        if (rec.PtInRect(pos))
-        {
-            InTitleBox = 3;
-            pTitleBox = &m_Dmd3Title;
-        }
-	}
-	if (!InButton && !InTitleBox)
-	{
-		PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
-	}
-    if (InTitleBox && (pTitleBox != NULL))
-    {
-        CString str;
-        pTitleBox->GetWindowText(str);
-        if (InTitleBox == selectedTitleBox)
-        {
-           // They re-clicked the currently selected title box, so unselect it
-           pTitleBox->SetWindowText("Clipboard Off");
-           selectedTitleBox = 0;
-        }
-        else
-        {
-           // They clicked a new title box, set it as the currently selected title box
-           pTitleBox->SetWindowText("Clipboard On");
-           selectedTitleBox = InTitleBox;
-           OnPaint();  // get current clipboard pane data
-        }
-        Sleep(500);
-        pTitleBox->SetWindowText(str);
-    }
-	CDialog::OnLButtonDown(nFlags, point);
-}
-
-void DMD::OnLButtonUp(UINT nFlags, CPoint point) 
-{
-	CDialog::OnLButtonUp(nFlags, point);
-}
+//void DMD::OnLButtonUp(UINT nFlags, CPoint point) 
+//{
+//	CDialog::OnLButtonUp(nFlags, point);
+//}
 
 
-void DMD::OnButtonWipe() 
-{
-	memset(PreviousPlaneDataPane0,0,sizeof(PreviousPlaneDataPane0));
-	memset(PreviousPlaneDataPane1,0,sizeof(PreviousPlaneDataPane1));
-
-	m_Wipe.EnableWindow(FALSE);
-    bWiped = TRUE;
-
-	InvalidateDMDPages();
-}
+// TODO this clears the DMD or something? (piano from twilight zone has partial frame updates)
+//void DMD::OnButtonWipe() 
+//{
+//	memset(PreviousPlaneDataPane0,0,sizeof(PreviousPlaneDataPane0));
+//	memset(PreviousPlaneDataPane1,0,sizeof(PreviousPlaneDataPane1));
+//
+//	m_Wipe.EnableWindow(FALSE);
+//    bWiped = true;
+//
+//	InvalidateDMDPages();
+//}

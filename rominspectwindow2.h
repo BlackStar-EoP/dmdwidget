@@ -73,15 +73,10 @@ private:
 };
 
 //////////////////////
-
-#if !defined(AFX_DMD_H__0169C360_5BDA_499F_89BA_3FE7FCB29D09__INCLUDED_)
-#define AFX_DMD_H__0169C360_5BDA_499F_89BA_3FE7FCB29D09__INCLUDED_
-
-#if _MSC_VER >= 1000
-#pragma once
-#endif // _MSC_VER >= 1000
-// DMD.h : header file
-//
+// TODO redefined original dialog types
+#define DMD_DIALOG_TYPE_GRAPHICS 0
+#define DMD_DIALOG_TYPE_FONTDATA 1
+#define DMD_DIALOG_TYPE_ANIDATA 2
 
 #define DMD_ROWS         32
 #define DMD_COLUMNS     128
@@ -161,8 +156,10 @@ struct COMMONData
 	unsigned long ROMSize;
 	unsigned char TotalPages;    // includes non-banked, conceptual pages (2 pages nonbanked)
 	unsigned char BasePageIndex;
-	LPTSTR StartPtr;
-	unsigned char *EndPtr;
+	
+	// todo refactor to index
+	unsigned char* StartPtr; // 8 bit TODO
+	unsigned char* EndPtr;
 };
 
 typedef unsigned char Plane[DMD_PAGE_BYTES];
@@ -233,14 +230,11 @@ Copyright (c) 2011
 Garrett Lee, mrglee@yahoo.com
 */
 
-class DMD : public CDialog
+class DMD
 {
-// Construction
+	// Construction
+	DMD();
 public:
-//	DMD(CWnd* pParent = NULL);   // standard constructor
-	DMD(CWnd* pParent = NULL, RegistrySettings *mainptr = NULL, int DialogType = DMD_DIALOG_TYPE_GRAPHICS);   // standard constructor
-	~DMD();
-	BOOL Create();
 	int Init();
 
 private:
@@ -249,49 +243,47 @@ private:
 	VARIABLESIZEDImageData VariableSizedImageData;;
 	int dialogType;
 	int debugKeyBitmask;
-    int selectedTitleBox;
-	CString TmpStr;
-    BOOL bWiped;
+	int selectedTitleBox;
 
 	Plane PreviousPlaneDataPane0;
 	Plane PreviousPlaneDataPane1;
 
 	void CheckKeyStateForDebugFlags();
-	void PaintDMDPanelImage(CPaintDC *pDc, DMDPlanes* pPlanes, unsigned char PaneMask);
-	void DecodePlaneInit(DMDPlane *pPlane);
+	//	void PaintDMDPanelImage(CPaintDC* pDc, DMDPlanes* pPlanes, unsigned char PaneMask);
+	void DecodePlaneInit(DMDPlane* pPlane);
 	void DecodeCurrentIndex(void);
 	void DecodePreviousIndex(int count);
 	void DecodeNextIndex(int count);
-    void ButtonHandlerNext(int count);
-    void ButtonHandlerPrevious(int count);
+	void ButtonHandlerNext(int count);
+	void ButtonHandlerPrevious(int count);
 
-	void DecodeVariableSizedImage(unsigned char **Source, DMDPlanes *pPlanes, int TableIndex);
-	unsigned char DecodeVariableSizedImage_Centered(unsigned char **SourcePtr, unsigned char **DestPtr, int ImageHeight, int ImageWidth);
-	void DecodeVariableSizedImageIndex_NoHeader(unsigned char **SourcePtr, DMDPlanes *pPlanes, int TableHeight);
-	void DecodeVariableSizedImageIndex_Header(unsigned char **SourcePtr, DMDPlanes *pPlanes, int TableHeight, int TableIndex);
+	void DecodeVariableSizedImage(unsigned char** Source, DMDPlanes* pPlanes, int TableIndex);
+	unsigned char DecodeVariableSizedImage_Centered(unsigned char** SourcePtr, unsigned char** DestPtr, int ImageHeight, int ImageWidth);
+	void DecodeVariableSizedImageIndex_NoHeader(unsigned char** SourcePtr, DMDPlanes* pPlanes, int TableHeight);
+	void DecodeVariableSizedImageIndex_Header(unsigned char** SourcePtr, DMDPlanes* pPlanes, int TableHeight, int TableIndex);
 	void DecodeFullFrameGraphic(unsigned long GraphicIndex);
-	void DecodeImageToPlane(int Index, DMDPlane *pPlane);
-	unsigned char DecodeFullFrameGraphicImage(unsigned char **Source, DMDPlane *pPlane);
-	void Decode_00(unsigned char **Source, unsigned char *Dest);
-	void Decode_01(unsigned char **Source, unsigned char *Dest);
-	void Decode_02(unsigned char **Source, unsigned char *Dest);
-	void Decode_03(unsigned char **Source, unsigned char *Dest);
-	void Decode_04(unsigned char **Source, unsigned char *Dest);
-	void Decode_05(unsigned char **Source, unsigned char *Dest);
-	void Decode_06(unsigned char **Source, unsigned char *Dest, unsigned char *XorFlags, unsigned char *XorBits);
-	void Decode_07(unsigned char **Source, unsigned char *Dest, unsigned char *XorFlags, unsigned char *XorBits);
-	void Decode_08(unsigned char **Source, unsigned char *Dest, unsigned char *Skipped);
-	void Decode_09(unsigned char **Source, unsigned char *Dest, unsigned char *Skipped);
-	void Decode_0A(unsigned char **Source, unsigned char *Dest, unsigned char *Skipped);
-	void Decode_0B(unsigned char **Source, unsigned char *Dest, unsigned char *Skipped);
-	unsigned char ReadNext8BitValue(struct ImageHeader *Header, unsigned char **SourcePtr);
-	unsigned char ReadNextBit(struct ImageHeader *Header, unsigned char **SourcePtr);
-	void WriteNext8BitValue(unsigned char **DestPtr, unsigned int *WriteCounterPtr,unsigned char ch, unsigned char Type);
-	void Decode_01or02(unsigned char **SourcePtr, unsigned char **DestPtr, unsigned char Type);
-	void Decode_04or05(unsigned char **SourcePtr, unsigned char **DestPtr, unsigned char Type);
-	void Decode_06or07(unsigned char **SourcePtr, unsigned char **DestPtr, unsigned char **XorFlagsPtr, unsigned char **XorBitsPtr, unsigned char Type);
-	void Decode_08or09(unsigned char **SourcePtr, unsigned char **DestPtr, unsigned char **Skipped, unsigned char Type);
-	void Decode_0Aor0B(unsigned char **SourcePtr, unsigned char **DestPtr, unsigned char **Skipped, unsigned char Type);
+	void DecodeImageToPlane(int Index, DMDPlane* pPlane);
+	unsigned char DecodeFullFrameGraphicImage(unsigned char** Source, DMDPlane* pPlane);
+	void Decode_00(unsigned char** Source, unsigned char* Dest);
+	void Decode_01(unsigned char** Source, unsigned char* Dest);
+	void Decode_02(unsigned char** Source, unsigned char* Dest);
+	void Decode_03(unsigned char** Source, unsigned char* Dest);
+	void Decode_04(unsigned char** Source, unsigned char* Dest);
+	void Decode_05(unsigned char** Source, unsigned char* Dest);
+	void Decode_06(unsigned char** Source, unsigned char* Dest, unsigned char* XorFlags, unsigned char* XorBits);
+	void Decode_07(unsigned char** Source, unsigned char* Dest, unsigned char* XorFlags, unsigned char* XorBits);
+	void Decode_08(unsigned char** Source, unsigned char* Dest, unsigned char* Skipped);
+	void Decode_09(unsigned char** Source, unsigned char* Dest, unsigned char* Skipped);
+	void Decode_0A(unsigned char** Source, unsigned char* Dest, unsigned char* Skipped);
+	void Decode_0B(unsigned char** Source, unsigned char* Dest, unsigned char* Skipped);
+	unsigned char ReadNext8BitValue(struct ImageHeader* Header, unsigned char** SourcePtr);
+	unsigned char ReadNextBit(struct ImageHeader* Header, unsigned char** SourcePtr);
+	void WriteNext8BitValue(unsigned char** DestPtr, unsigned int* WriteCounterPtr, unsigned char ch, unsigned char Type);
+	void Decode_01or02(unsigned char** SourcePtr, unsigned char** DestPtr, unsigned char Type);
+	void Decode_04or05(unsigned char** SourcePtr, unsigned char** DestPtr, unsigned char Type);
+	void Decode_06or07(unsigned char** SourcePtr, unsigned char** DestPtr, unsigned char** XorFlagsPtr, unsigned char** XorBitsPtr, unsigned char Type);
+	void Decode_08or09(unsigned char** SourcePtr, unsigned char** DestPtr, unsigned char** Skipped, unsigned char Type);
+	void Decode_0Aor0B(unsigned char** SourcePtr, unsigned char** DestPtr, unsigned char** Skipped, unsigned char Type);
 
 	void InvalidateDMDPages();
 	void UpdateStaticTextBoxes();
@@ -300,113 +292,39 @@ private:
 	void UpdateControls();
 	void SaveDMDRegistrySettings();
 	void UpdateStaticTextBoxesVariableSizedImagePane(int Pane);
-	void UpdateStaticTextBoxesVariableSizedImagePrint(int TableIndex, int ImageIndex, CStatic *pWnd, CStatic *pWndTitle, unsigned char Status);
+	//void UpdateStaticTextBoxesVariableSizedImagePrint(int TableIndex, int ImageIndex, CStatic* pWnd, CStatic* pWndTitle, unsigned char Status);
 	void UpdateCheckboxText();
 
-	void DebugKeyMsgStrPrint(CString str, int KeyMask);
-	void DebugShiftKeyMsgStrPrint(CString str);
-	void DebugControlKeyMsgStrPrint(CString str);
-	
-	int GetROMAddressFromWPCAddrAndPage(unsigned long *pRomAddr, unsigned long Addr, unsigned char Page);
-	int ExtractWPCAddrAndPageFromBuffer(LPTSTR pSrc, unsigned long *pDstAddr, unsigned char *pDstPage);
-	int GetROMAddressFromAddrOf3ByteWPCAddrPage(LPTSTR pSrc, unsigned long *pDst);
-	int ProcessHitType(int HitType, LPTSTR HitTablePtr, LPTSTR HitPagePtr, LPTSTR Ptr, unsigned long *pTbl);
-	
-    int InitCommon();
+	void DebugKeyMsgStrPrint(const QString& str, int KeyMask);
+	void DebugShiftKeyMsgStrPrint(const QString& str);
+	void DebugControlKeyMsgStrPrint(const QString& str);
+
+	int GetROMAddressFromWPCAddrAndPage(unsigned long* pRomAddr, unsigned long Addr, unsigned char Page);
+	int ExtractWPCAddrAndPageFromBuffer(unsigned char* pSrc, unsigned long* pDstAddr, unsigned char* pDstPage);
+	int GetROMAddressFromAddrOf3ByteWPCAddrPage(unsigned char* pSrc, unsigned long* pDst);
+	int ProcessHitType(int HitType, unsigned char* HitTablePtr, unsigned char* HitPagePtr, unsigned char* Ptr, unsigned long* pTbl);
+
+	int InitCommon();
 	int InitTableAddrs();
 
 	int PreAnalyzeVariableSizedImageTable();
-	int ExtractWPCAddrAndPageOfImageTable(int *pAddr, int *pPage, int TableIndex);
-	int GetROMAddressOfVariableSizedImageIndex(unsigned long *pRomAddr, int TableIndex, int ImageIndex);
-	int GetROMAddressOfVariableSizedImageTable(unsigned long *pRomAddr, int TableIndex);
-	int GetAddrToWPCAddressOfVariableSizedImageTable(unsigned long *pAddr, int TableIndex);
-	int GetVariableSizedImageTableMetadata(int TableIndex, int *pTableHeight, int *pTableSpacing);
-	int GetPrevImageIndex(int *pImageIndex, int TableIndex);
-	int GetNextImageIndex(int *pImageIndex, int TableIndex);
-	int GetFirstImageIndex(int *pImageIndex, int TableIndex);
-	int GetLastImageIndex(int *pImageIndex, int TableIndex);
-	int IncrementVariableSizedImageIndex(int *pTableIndex, int *pImageIndex);
-	int DecrementVariableSizedImageIndex(int *pTableIndex, int *pImageIndex);
+	int ExtractWPCAddrAndPageOfImageTable(int* pAddr, int* pPage, int TableIndex);
+	int GetROMAddressOfVariableSizedImageIndex(unsigned long* pRomAddr, int TableIndex, int ImageIndex);
+	int GetROMAddressOfVariableSizedImageTable(unsigned long* pRomAddr, int TableIndex);
+	int GetAddrToWPCAddressOfVariableSizedImageTable(unsigned long* pAddr, int TableIndex);
+	int GetVariableSizedImageTableMetadata(int TableIndex, int* pTableHeight, int* pTableSpacing);
+	int GetPrevImageIndex(int* pImageIndex, int TableIndex);
+	int GetNextImageIndex(int* pImageIndex, int TableIndex);
+	int GetFirstImageIndex(int* pImageIndex, int TableIndex);
+	int GetLastImageIndex(int* pImageIndex, int TableIndex);
+	int IncrementVariableSizedImageIndex(int* pTableIndex, int* pImageIndex);
+	int DecrementVariableSizedImageIndex(int* pTableIndex, int* pImageIndex);
 
 	void DecodeVariableSizedImageData();
-	void DecodeVariableSizedImageIndexToPlane(int TableIndex, int ImageIndex, DMDPlanes *pPlanes);
+	void DecodeVariableSizedImageIndexToPlane(int TableIndex, int ImageIndex, DMDPlanes* pPlanes);
 	void exportCurrent();
 
-// Dialog Data
-	//{{AFX_DATA(DMD)
-	enum { IDD = IDD_DMD };
-	CButton	m_Wipe;
-	CButton	m_PreviousGraphicX2;
-	CButton	m_NextGraphicX2;
-	CStatic	m_Dmd3Title;
-	CStatic	m_Dmd2Title;
-	CStatic	m_Dmd1Title;
-	CSpinButtonCtrl	m_Spin;
-	CListBox	m_PixelColor;
-	CButton	m_Xored;
-	CButton	m_Skipped;
-	CButton	m_Export;
-	CStatic	m_Dmd1;
-	CStatic	m_Dmd2;
-	CStatic	m_Dmd3;
-	CButton	m_NextGraphic;
-	CButton	m_PreviousGraphic;
-	CStatic	m_UserReg;
-	//}}AFX_DATA
+	// TODO
 
-
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(DMD)
-	public:
-	virtual BOOL Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID, CCreateContext* pContext = NULL);
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
-protected:
-	RegistrySettings *PassedInPointer;
-//    CBrush* m_pListBkBrush;
-#if ALLOW_MOUSE_TO_REPEAT
-	int TimerIDDMD;
-	unsigned int NextDebounce;
-	unsigned int PreviousDebounce;
-	unsigned char NextDebounceState;
-	unsigned char PreviousDebounceState;
-#endif
-	unsigned char NaggedOnce;
-//	unsigned char NextPressed;
-//	unsigned char PreviousPressed;
-	// Generated message map functions
-	//{{AFX_MSG(DMD)
-	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-	afx_msg void OnDestroy();
-	virtual BOOL OnInitDialog();
-	afx_msg void OnPaint();
-	afx_msg void OnButtonNextGraphic();
-	afx_msg void OnButtonPreviousGraphic();
-	afx_msg void OnCheckSkipped();
-	afx_msg void OnCheckXored();
-	afx_msg void OnCheckExport();
-	afx_msg void OnSelchangeList1();
-	virtual void OnOK();
-	afx_msg void OnClose();
-	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
-	afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
-	afx_msg void OnTimer(UINT nIDEvent);
-	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
-	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
-	afx_msg void OnButtonNextGraphicx2();
-	afx_msg void OnButtonNextGraphicAll();
-	afx_msg void OnButtonPreviousGraphicx2();
-	afx_msg void OnButtonWipe();
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
-
+	bool bWiped = false;
 };
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Developer Studio will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_DMD_H__0169C360_5BDA_499F_89BA_3FE7FCB29D09__INCLUDED_)

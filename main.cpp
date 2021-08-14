@@ -31,7 +31,7 @@ SOFTWARE.
 #include "fx3process.h"
 #include "animationwindow.h"
 #include "deviceconfigwindow.h"
-#include "rominspectwindow.h"
+#include "rominspectwindow2.h"
 #include "fantasieswindow.h"
 
 #include <QtWidgets>
@@ -168,7 +168,7 @@ int main(int argc, char *argv[])
 	app.set_animation_engine(&animation_engine);
 	AnimationWindow animation_window(nullptr, &animation_engine);
 	//DeviceConfigWindow config_window(nullptr);
-	ROMInspectWindow rom_window(nullptr, nullptr);
+	ROMInspectWindow2 rom_window(nullptr, nullptr);
 	//FantasiesWindow fantasies_window(nullptr, &animation_engine);
 
 	app.start_polling();
