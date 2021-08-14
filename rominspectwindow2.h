@@ -30,6 +30,7 @@ class DMDAnimationEngine;
 class QLabel;
 class QTextEdit;
 class DMD;
+class DMDFrame;
 
 class ROMInspectWindow2 : public QWidget
 {
@@ -39,43 +40,36 @@ public:
 	~ROMInspectWindow2();
 private:
 	void initUI();
-	void parse_image();
-	void update_index();
-	void inc_rom_index(uint32_t amount);
-	void dec_rom_index(uint32_t amount);
+	void updateImages();
+
+	QImage dmd_image(const DMDFrame& dmd_frame);
 
 private slots:
 	void file_open_button_clicked();
 
-	void reset_rom_index_button_clicked();
-	void dec_rom_index_button_clicked();
-	void dec_line_rom_index_button_clicked();
-	void pgdn_rom_index_button_clicked();
-	void pgup_rom_index_button_clicked();
-	void inc_rom_index_button_clicked();
-	void inc_line_rom_index_button_clicked();
-	void inc_bank_rom_index_button_clicked();
-	void dec_bank_rom_index_button_clicked();
-	void scan_rle_index_button_clicked();
-	void scan_sparse_index_button_clicked();
-	void scan_normal_index_button_clicked();
-	void bruteforce_table_button_clicked();
+	void dec2_button_clicked();
+	void dec_button_clicked();
+	void inc_button_clicked();
+	void inc2_button_clicked();
 
 private:
 	DMDAnimationEngine* m_animation_engine = nullptr;
-	uint32_t m_rom_index = 0;
 
 	static const uint32_t FRAME_IMAGE_HEIGHT = 128;
 	static const uint32_t FRAME_SIZE = 128 * FRAME_IMAGE_HEIGHT / 8;
-	QLabel* m_rom_index_label = nullptr;
 	QLabel* m_file_name_label = nullptr;
-	QLabel* m_image_label = nullptr;
 	
 	QTextEdit* m_debug_text_edit = nullptr;
+
+	QLabel* m_framecurrent_label = nullptr;
+	QLabel* m_framenext_label = nullptr;
+	QLabel* m_framemerged_label = nullptr;
+
 	uint8_t* m_rom_content = nullptr;
 	uint32_t m_rom_size = 0;
 
 	DMD* m_wpcedit_dmd = nullptr;
+	const int DMD_SIZE = 2; // Should be pixel size
 };
 
 //////////////////////
@@ -242,6 +236,11 @@ class DMD
 public:
 	DMD(QTextEdit* debug_text_edit);
 	int Init(unsigned char* data, uint32_t Length);
+
+	void OnButtonNextGraphic();
+	void OnButtonNextGraphicx2();
+	void OnButtonPreviousGraphic();
+	void OnButtonPreviousGraphicx2();
 
 private:
 	COMMONData CommonData;
