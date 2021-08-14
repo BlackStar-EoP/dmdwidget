@@ -108,6 +108,8 @@ void ROMInspectWindow2::updateImages()
 	DMDFrame framenext;
 	DMDFrame framemerged;
 
+	m_wpcedit_dmd->FillDMDFrames(framecurrent, framenext, framemerged);
+
 	QImage fc = dmd_image(framecurrent).scaled(DMDConfig::DMDWIDTH * DMD_SIZE, DMDConfig::DMDHEIGHT * DMD_SIZE, Qt::KeepAspectRatio, Qt::FastTransformation);
 	QImage fn = dmd_image(framenext).scaled(DMDConfig::DMDWIDTH * DMD_SIZE, DMDConfig::DMDHEIGHT * DMD_SIZE, Qt::KeepAspectRatio, Qt::FastTransformation);
 	QImage fm = dmd_image(framemerged).scaled(DMDConfig::DMDWIDTH * DMD_SIZE, DMDConfig::DMDHEIGHT * DMD_SIZE, Qt::KeepAspectRatio, Qt::FastTransformation);
@@ -290,7 +292,48 @@ DMD::DMD(QTextEdit* debug_text_edit)
 	UpdateControls();
 } 
 
-/*
+// TODO move up a bit
+void DMD::FillDMDFrames(DMDFrame& fc, DMDFrame& fn, DMDFrame& fm)
+{
+
+	uint32_t x = 0;
+	uint32_t y = 0;
+	uint32_t currentByteIndex = 0;
+
+	for (uint32_t i = 0; i < DMD_ROWS; i++)
+	{
+		for (uint32_t  j = 0; j < (DMD_COLUMNS / 8); j++)
+		{
+			unsigned char plane0byte = FullFrameImageData.Planes.Plane0.Plane_Data[currentByteIndex];
+			unsigned char plane1byte = FullFrameImageData.Planes.Plane1.Plane_Data[currentByteIndex++];
+
+			for (uint32_t bit = 0; bit < 8; ++bit)
+			{
+				uint8_t mergeval = 0;
+				if (plane0byte & (1 << bit))
+				{
+					fc.set_pixel(x, y, (uint8_t) 127);
+					mergeval += 170;
+				}
+
+				if (plane1byte & (1 << bit))
+				{
+					fn.set_pixel(x, y, (uint8_t) 127);
+					mergeval += 85;
+				}
+
+				fm.set_pixel(x, y, mergeval);
+				++x;
+			}
+		}
+		x = 0;
+		++y;
+	}
+}
+
+
+
+/* TODO remove this whole thing
 void DMD::PaintDMDPanelImage(CPaintDC *pDc, DMDPlanes* pPlanes, unsigned char PaneMask) 
 {
 	int i,j,k;

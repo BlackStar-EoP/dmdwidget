@@ -242,6 +242,8 @@ public:
 	void OnButtonPreviousGraphic();
 	void OnButtonPreviousGraphicx2();
 
+	void FillDMDFrames(DMDFrame& fc, DMDFrame& fn, DMDFrame& fm);
+
 private:
 	COMMONData CommonData;
 	FULLFRAMEImageData FullFrameImageData;
