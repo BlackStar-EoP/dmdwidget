@@ -28,6 +28,8 @@ SOFTWARE.
 
 class DMDAnimationEngine;
 class QLabel;
+class QTextEdit;
+class DMD;
 
 class ROMInspectWindow2 : public QWidget
 {
@@ -68,8 +70,12 @@ private:
 	QLabel* m_rom_index_label = nullptr;
 	QLabel* m_file_name_label = nullptr;
 	QLabel* m_image_label = nullptr;
+	
+	QTextEdit* m_debug_text_edit = nullptr;
 	uint8_t* m_rom_content = nullptr;
 	uint32_t m_rom_size = 0;
+
+	DMD* m_wpcedit_dmd = nullptr;
 };
 
 //////////////////////
@@ -233,9 +239,9 @@ Garrett Lee, mrglee@yahoo.com
 class DMD
 {
 	// Construction
-	DMD();
 public:
-	int Init();
+	DMD(QTextEdit* debug_text_edit);
+	int Init(unsigned char* data, uint32_t Length);
 
 private:
 	COMMONData CommonData;
@@ -304,7 +310,7 @@ private:
 	int GetROMAddressFromAddrOf3ByteWPCAddrPage(unsigned char* pSrc, unsigned long* pDst);
 	int ProcessHitType(int HitType, unsigned char* HitTablePtr, unsigned char* HitPagePtr, unsigned char* Ptr, unsigned long* pTbl);
 
-	int InitCommon();
+	int InitCommon(unsigned char* data, uint32_t Length); // TODO refactor to support better structure instead of start and end pointer hell
 	int InitTableAddrs();
 
 	int PreAnalyzeVariableSizedImageTable();
@@ -327,4 +333,7 @@ private:
 	// TODO
 
 	bool bWiped = false;
+
+	// BlackStar add stuff
+	QTextEdit* m_debug_text_edit = nullptr;
 };

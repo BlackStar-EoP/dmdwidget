@@ -31,6 +31,7 @@ SOFTWARE.
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QPainter>
+#include <QTextEdit>
 
 #include <assert.h>
 
@@ -40,6 +41,9 @@ ROMInspectWindow2::ROMInspectWindow2(QWidget* parent, DMDAnimationEngine* animat
 {
 	setWindowTitle("ROM Inspector");
 	initUI();
+
+	m_wpcedit_dmd = new DMD(m_debug_text_edit);
+
 	this->setGeometry(0, 0, 800, 600);
 
 	QRect screenGeometry = QApplication::desktop()->screenGeometry();
@@ -63,9 +67,13 @@ void ROMInspectWindow2::initUI()
 	QPushButton* file_open_button = new QPushButton("Open ROM", this);
 	file_open_button->setGeometry(220, 10, 120, 20);
 	connect(file_open_button, SIGNAL(clicked()), this, SLOT(file_open_button_clicked()));
+	
+	m_debug_text_edit = new QTextEdit(this);
+	m_debug_text_edit->setGeometry(10, 35, 800, 200);
+
 	m_image_label = new QLabel(this);
 	int32_t IMAGE_LABEL_HEIGHT = FRAME_IMAGE_HEIGHT * 4;
-	m_image_label->setGeometry(10, 30, 128 * 4, IMAGE_LABEL_HEIGHT);
+	m_image_label->setGeometry(10, 220, 128 * 4, IMAGE_LABEL_HEIGHT);
 	int32_t BUTTONS_Y = IMAGE_LABEL_HEIGHT + 35;
 
 	QPushButton* reset_rom_index_button = new QPushButton("Reset", this);
@@ -503,6 +511,10 @@ void ROMInspectWindow2::file_open_button_clicked()
 			m_rom_size = file.size();
 			update_index();
 			parse_image();
+
+			// Pass the ROM to wpc edit DMD class
+			m_wpcedit_dmd->Init((unsigned char*)m_rom_content, m_rom_size);
+
 		}
 	}
 }
@@ -693,6 +705,11 @@ void DMD::DebugKeyMsgStrPrint(const QString& str, int KeyMask)
 	//		debugKeyBitmask &= ~KeyMask;
 	//	}
 	//}
+
+	// BlackStar: of course QT does not have a get text method in text edit just toPlainText.. who knows what that does.
+	static QString text = "";
+	text += str + "\n";
+	m_debug_text_edit->setText(text);
 }
 
 void DMD::DebugShiftKeyMsgStrPrint(const QString& str)
@@ -705,7 +722,8 @@ void DMD::DebugControlKeyMsgStrPrint(const QString& str)
 	DebugKeyMsgStrPrint(str, DEBUG_KEY_BIT_CONTROLKEYS);
 }
 
-DMD::DMD()
+DMD::DMD(QTextEdit* debug_text_edit)
+: m_debug_text_edit(debug_text_edit)
 {
 	memset(PreviousPlaneDataPane0,0,sizeof(PreviousPlaneDataPane0));
 	memset(PreviousPlaneDataPane1,0,sizeof(PreviousPlaneDataPane1));
@@ -1947,11 +1965,8 @@ HitBuf[2] = 0x30;
 	return -1;
 }
 
-int DMD::InitCommon()
+int DMD::InitCommon(unsigned char* data, uint32_t Length)
 {
-	// TODO get data here
-	unsigned long Length = 0;
-
 
 	if ((Length != 0x40000) && (Length != 0x80000) && (Length != 0x100000))
 	{
@@ -1961,7 +1976,7 @@ int DMD::InitCommon()
 
 	CommonData.ROMSize = Length;
 	CommonData.TotalPages = (unsigned char)((Length + (PAGE_LENGTH - 1)) / PAGE_LENGTH);
-	CommonData.StartPtr = 0; // TODO
+	CommonData.StartPtr = data;
     CommonData.EndPtr = (unsigned char *)&CommonData.StartPtr[(CommonData.ROMSize-1)];
 
 	if (CommonData.StartPtr == NULL)
@@ -2152,7 +2167,7 @@ void DMD::CheckKeyStateForDebugFlags()
 	debugKeyBitmask = DEBUG_KEY_BIT_SHIFTKEYS | DEBUG_KEY_BIT_CONTROLKEYS;
 }
 
-int DMD::Init()
+int DMD::Init(unsigned char* data, uint32_t Length)
 {
 	memset(&CommonData,0,sizeof(CommonData));
 	memset(&FullFrameImageData,0,sizeof(FullFrameImageData));
@@ -2160,7 +2175,7 @@ int DMD::Init()
 
 	CheckKeyStateForDebugFlags();
 
-	if (InitCommon() != 0)
+	if (InitCommon(data, Length) != 0)
 	{
 		return -1;
 	}
