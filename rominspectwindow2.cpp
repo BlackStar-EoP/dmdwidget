@@ -32,9 +32,12 @@ SOFTWARE.
 #include <QDesktopWidget>
 #include <QPainter>
 #include <QTextEdit>
+#include <QVector>
 
 #include "dmdconfig.h"
 #include "dmdframe.h"
+#include "dmdanimationengine.h"
+#include "imageanimation.h"
 
 #include <assert.h>
 
@@ -104,16 +107,21 @@ void ROMInspectWindow2::initUI()
 
 void ROMInspectWindow2::updateImages()
 {
-	DMDFrame framecurrent;
-	DMDFrame framenext;
-	DMDFrame framemerged;
+	DMDFrame m_framecurrent;
+	DMDFrame m_framenext;
+	static DMDFrame m_framemerged;
 
-	m_wpcedit_dmd->FillDMDFrames(framecurrent, framenext, framemerged);
+	m_wpcedit_dmd->FillDMDFrames(m_framecurrent, m_framenext, m_framemerged);
 
-	QImage fc = dmd_image(framecurrent).scaled(DMDConfig::DMDWIDTH * DMD_SIZE, DMDConfig::DMDHEIGHT * DMD_SIZE, Qt::KeepAspectRatio, Qt::FastTransformation);
-	QImage fn = dmd_image(framenext).scaled(DMDConfig::DMDWIDTH * DMD_SIZE, DMDConfig::DMDHEIGHT * DMD_SIZE, Qt::KeepAspectRatio, Qt::FastTransformation);
-	QImage fm = dmd_image(framemerged).scaled(DMDConfig::DMDWIDTH * DMD_SIZE, DMDConfig::DMDHEIGHT * DMD_SIZE, Qt::KeepAspectRatio, Qt::FastTransformation);
+	QImage fc = dmd_image(m_framecurrent).scaled(DMDConfig::DMDWIDTH * DMD_SIZE, DMDConfig::DMDHEIGHT * DMD_SIZE, Qt::KeepAspectRatio, Qt::FastTransformation);
+	QImage fn = dmd_image(m_framenext).scaled(DMDConfig::DMDWIDTH * DMD_SIZE, DMDConfig::DMDHEIGHT * DMD_SIZE, Qt::KeepAspectRatio, Qt::FastTransformation);
+	QImage fm = dmd_image(m_framemerged).scaled(DMDConfig::DMDWIDTH * DMD_SIZE, DMDConfig::DMDHEIGHT * DMD_SIZE, Qt::KeepAspectRatio, Qt::FastTransformation);
 	
+	QVector<DMDFrame*> frames;
+	frames.push_back(&m_framemerged);
+	m_animation = new ImageAnimation(frames, 0);
+	m_animation_engine->show_animation(m_animation);
+
 	m_framecurrent_label->setPixmap(QPixmap::fromImage(fc));
 	m_framenext_label->setPixmap(QPixmap::fromImage(fn));
 	m_framemerged_label->setPixmap(QPixmap::fromImage(fm));

@@ -31,6 +31,7 @@ class QLabel;
 class QTextEdit;
 class DMD;
 class DMDFrame;
+class ImageAnimation;
 
 class ROMInspectWindow2 : public QWidget
 {
@@ -70,6 +71,9 @@ private:
 
 	DMD* m_wpcedit_dmd = nullptr;
 	const int DMD_SIZE = 2; // Should be pixel size
+
+	ImageAnimation* m_animation = nullptr;
+
 };
 
 //////////////////////
