@@ -131,6 +131,9 @@
     <ClCompile Include="fantasieswindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="futaba_naelw3601aa_outputdevice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="fx3animation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -268,6 +271,9 @@
     <CustomBuild Include="fantasieswindow.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <ClInclude Include="futaba_naelw3601aa_outputdevice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="fx3animation.h">
       <Filter>Header Files</Filter>
     </ClInclude>

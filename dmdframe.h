@@ -49,7 +49,7 @@ public:
 		m_grayscale_frame[y * DMDConfig::DMDWIDTH + x] = grayscale;
 	}
 
-	inline void set_pixel(int32_t x, int32_t y, uint32_t color)
+	inline void set_color_pixel(int32_t x, int32_t y, uint32_t color)
 	{
 		assert(x >= 0 && x < DMDConfig::DMDWIDTH);
 		assert(y >= 0 && y < DMDConfig::DMDHEIGHT);

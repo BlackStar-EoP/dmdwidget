@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'color_palette_widget.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.11
+** Created by: Qt User Interface Compiler version 5.15.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -205,31 +205,31 @@ public:
 
     void retranslateUi(QWidget *color_widgets__ColorPaletteWidget)
     {
-#ifndef QT_NO_TOOLTIP
-        button_palette_open->setToolTip(QApplication::translate("color_widgets::ColorPaletteWidget", "Open a new palette from file", nullptr));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        button_palette_new->setToolTip(QApplication::translate("color_widgets::ColorPaletteWidget", "Create a new palette", nullptr));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        button_palette_duplicate->setToolTip(QApplication::translate("color_widgets::ColorPaletteWidget", "Duplicate the current palette", nullptr));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        button_palette_delete->setToolTip(QApplication::translate("color_widgets::ColorPaletteWidget", "Delete the current palette", nullptr));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        button_palette_revert->setToolTip(QApplication::translate("color_widgets::ColorPaletteWidget", "Revert changes to the current palette", nullptr));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        button_palette_save->setToolTip(QApplication::translate("color_widgets::ColorPaletteWidget", "Save changes to the current palette", nullptr));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        button_color_add->setToolTip(QApplication::translate("color_widgets::ColorPaletteWidget", "Add a color to the palette", nullptr));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        button_color_remove->setToolTip(QApplication::translate("color_widgets::ColorPaletteWidget", "Remove the selected color from the palette", nullptr));
-#endif // QT_NO_TOOLTIP
-        Q_UNUSED(color_widgets__ColorPaletteWidget);
+#if QT_CONFIG(tooltip)
+        button_palette_open->setToolTip(QCoreApplication::translate("color_widgets::ColorPaletteWidget", "Open a new palette from file", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        button_palette_new->setToolTip(QCoreApplication::translate("color_widgets::ColorPaletteWidget", "Create a new palette", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        button_palette_duplicate->setToolTip(QCoreApplication::translate("color_widgets::ColorPaletteWidget", "Duplicate the current palette", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        button_palette_delete->setToolTip(QCoreApplication::translate("color_widgets::ColorPaletteWidget", "Delete the current palette", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        button_palette_revert->setToolTip(QCoreApplication::translate("color_widgets::ColorPaletteWidget", "Revert changes to the current palette", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        button_palette_save->setToolTip(QCoreApplication::translate("color_widgets::ColorPaletteWidget", "Save changes to the current palette", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        button_color_add->setToolTip(QCoreApplication::translate("color_widgets::ColorPaletteWidget", "Add a color to the palette", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        button_color_remove->setToolTip(QCoreApplication::translate("color_widgets::ColorPaletteWidget", "Remove the selected color from the palette", nullptr));
+#endif // QT_CONFIG(tooltip)
+        (void)color_widgets__ColorPaletteWidget;
     } // retranslateUi
 
 };

@@ -225,9 +225,9 @@ void FantasiesWindow::update_image()
 {
 	m_fantasies_DMD.clear();
 
-	QString filenamepng = QString("d:/pf/dmd/shot") + QString::number(m_current_file_nr) + ".dmd";
+	//QString filenamepng = QString("d:/pf/dmd/shot") + QString::number(m_current_file_nr) + ".dmd";
 
-	//QString filenamepng = QString("./dmd/shot") + QString::number(m_current_file_nr) + ".dmd";
+	QString filenamepng = QString("./dmd/shot") + QString::number(m_current_file_nr) + ".dmd";
 	m_file_name_label->setText(filenamepng);
 
 	if (m_fantasies_DMD.read_file(filenamepng))
@@ -244,8 +244,15 @@ void FantasiesWindow::update_image()
 	
 	const DMDFrame& parsed_dmd = m_fantasies_DMD.parse_DMD();
 	
+	DMDFrame* hack = (DMDFrame*)&parsed_dmd;
+
 	QImage parsed = m_fantasies_DMD.dmd_image().scaled(DMDConfig::DMDWIDTH * DMD_SIZE, DMDConfig::DMDHEIGHT * DMD_SIZE, Qt::KeepAspectRatio, Qt::FastTransformation);
 	m_parsed_image_label->setPixmap(QPixmap::fromImage(parsed));
+
+	QVector<DMDFrame*> frames;
+	frames.push_back(hack);
+
+	m_animation_engine->show_animation(new ImageAnimation(frames, 0));
 }
 
 void FantasiesWindow::paint_spans(const QImage& img)
@@ -394,19 +401,69 @@ void FantasiesWindow::save_png_button_clicked()
 
 void FantasiesWindow::create_animation_button_clicked()
 {
-	QVector<DMDFrame*> frames;
+	//QVector<DMDFrame*> frames;
 
-	for (uint32_t i = 0; i < 68999; ++i)
+	//for (uint32_t i = 0; i < 68999; ++i)
+	//{
+	//	QString filename = QString("./dmd/shot") + QString::number(i) + ".dmd";
+
+	//	if (m_fantasies_DMD.read_file(filename))
+	//	{
+	//		const DMDFrame& parsed_dmd = m_fantasies_DMD.parse_DMD();
+	//		frames.push_back(new DMDFrame(parsed_dmd));
+	//	}
+	//}
+
+	//ImageAnimation* anim = new ImageAnimation(frames, 0);
+	//m_animation_engine->show_animation(anim);
+
+
+	//void ROMInspectWindow::file_open_button_clicked()
+//{
+	QString filename = QFileDialog::getOpenFileName(this, tr("Open ZEN DMD animation"), "", tr("DMV (*.dmv)"));
+	if (filename != "")
 	{
-		QString filename = QString("./dmd/shot") + QString::number(i) + ".dmd";
-
-		if (m_fantasies_DMD.read_file(filename))
+		uint8_t* dmd;
+		QFile file(filename);
+		if (file.open(QIODevice::ReadOnly))
 		{
-			const DMDFrame& parsed_dmd = m_fantasies_DMD.parse_DMD();
-			frames.push_back(new DMDFrame(parsed_dmd));
+			dmd = new uint8_t[file.size()];
+			file.read(reinterpret_cast<char*>(dmd), file.size());
+			file.close();
 		}
-	}
 
-	ImageAnimation* anim = new ImageAnimation(frames, 0);
-	m_animation_engine->show_animation(anim);
+		uint16_t num_images = (uint16_t)dmd[1] << 8u | dmd[0];
+		uint32_t offset = 2;
+		QVector<DMDFrame*> frames;
+		
+		for (uint16_t i = 0; i < num_images; ++i)
+		{
+			uint32_t header = dmd[offset] << 24 | dmd[offset + 1] | dmd[offset + 2] + dmd[offset + 3];
+			offset += 4;
+			DMDFrame* frame = new DMDFrame();
+			for (uint32_t y = 0; y < 32; ++y)
+			{
+				for (uint32_t x = 0; x < 128; x += 4)
+				{
+					uint8_t pixels = dmd[offset++];
+					uint8_t pixel4 = pixels >> 6;
+					uint8_t pixel3 = (pixels >> 4) & 3;
+					uint8_t pixel2 = (pixels >> 2) & 3;
+					uint8_t pixel1 = pixels & 3;
+
+					
+					frame->set_pixel(x, y,     (uint8_t)(pixel1) * 85u);
+					frame->set_pixel(x + 1, y, (uint8_t)(pixel2) * 85u);
+					frame->set_pixel(x + 2, y, (uint8_t)(pixel3) * 85u);
+					frame->set_pixel(x + 3, y, (uint8_t)(pixel4) * 85u);
+					
+				}
+			}
+			frames.push_back(frame);
+
+		}
+		int i = frames.size();
+		m_animation_engine->show_animation(new ImageAnimation(frames, 0));
+
+	}
 }

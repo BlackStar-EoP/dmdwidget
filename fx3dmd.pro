@@ -15,6 +15,7 @@ SOURCES += $$PWD/main.cpp \
            $$PWD/dmdwidget.cpp \
            $$PWD/dmdoutputdevice.cpp \
            $$PWD/widgetoutputdevice.cpp \
+           $$PWD/futaba_naelw3601aa_outputdevice.cpp \
            $$PWD/pindmd2outputdevice.cpp \
            $$PWD/pin2dmdoutputdevice.cpp \
            $$PWD/dmdanimationengine.cpp \
@@ -40,6 +41,8 @@ HEADERS += $$PWD/mainwindow.h \
            $$PWD/dmdwidget.h \
            $$PWD/dmdoutputdevice.h \
            $$PWD/widgetoutputdevice.h \
+           $$PWD/widgetoutputdevice.h \
+           $$PWD/futaba_naelw3601aa_outputdevice.h \
            $$PWD/pindmd2outputdevice.h \
            $$PWD/pin2dmdoutputdevice.h \
            $$PWD/dmdanimationengine.h \

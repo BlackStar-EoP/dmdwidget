@@ -26,8 +26,11 @@ SOFTWARE.
 
 #include "dmdanimationengine.h"
 #include "dmdapplication.h"
+
 #include "widgetoutputdevice.h"
 #include "pindmd2outputdevice.h"
+#include "futaba_naelw3601aa_outputdevice.h"
+
 #include "fx3process.h"
 #include "animationwindow.h"
 #include "deviceconfigwindow.h"
@@ -161,15 +164,15 @@ int main(int argc, char *argv[])
 	//floyd_steinberg_dither("05.JPG");
 	
 	QVector<DMDOutputDevice*> output_devices;
-	output_devices.push_back(new PinDMD2OutputDevice());
+	//output_devices.push_back(new PinDMD2OutputDevice());
 	output_devices.push_back(new WidgetOutputDevice(nullptr, 4));
-	
+	//output_devices.push_back(new FutabaNAELW3601AAOutputDevice());
 	DMDAnimationEngine animation_engine(output_devices);
 	app.set_animation_engine(&animation_engine);
 	AnimationWindow animation_window(nullptr, &animation_engine);
 	//DeviceConfigWindow config_window(nullptr);
-	ROMInspectWindow2 rom_window(nullptr, &animation_engine);
-	//FantasiesWindow fantasies_window(nullptr, &animation_engine);
+	//ROMInspectWindow2 rom_window(nullptr, &animation_engine);
+	FantasiesWindow fantasies_window(nullptr, &animation_engine);
 
 	app.start_polling();
 	
