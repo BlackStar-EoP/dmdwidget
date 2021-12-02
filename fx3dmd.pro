@@ -31,6 +31,7 @@ SOURCES += $$PWD/main.cpp \
            $$PWD/rominspectwindow.cpp \
            $$PWD/rominspectwindow2.cpp \
            $$PWD/fantasieswindow.cpp \
+           $$PWD/teslawindow.cpp \
            $$PWD/dmdeventfilter.cpp \
            $$PWD/dmdkeys.cpp \
            $$PWD/dmdconfig.cpp
@@ -58,6 +59,7 @@ HEADERS += $$PWD/mainwindow.h \
            $$PWD/rominspectwindow.h \
            $$PWD/rominspectwindow2.h \
            $$PWD/fantasieswindow.h \
+           $$PWD/teslawindow.h \
            $$PWD/dmdeventfilter.h \
            $$PWD/dmdkeys.h \
            $$PWD/span.h \

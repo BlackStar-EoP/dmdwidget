@@ -173,6 +173,9 @@
     <ClCompile Include="vendor\Qt-Color-Widgets\src\swatch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="teslawindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="widgetoutputdevice.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -311,6 +314,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <CustomBuild Include="vendor\Qt-Color-Widgets\include\swatch.hpp">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="teslawindow.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
     <ClInclude Include="widgetoutputdevice.h">
@@ -463,6 +469,12 @@
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="release\moc_swatch.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="debug\moc_teslawindow.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="release\moc_teslawindow.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="debug\qrc_color_widgets.cpp">

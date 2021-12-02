@@ -270,33 +270,33 @@ return m_bitDMD[bytenumber];
 
 	inline bool is_fantasies_logo() const
 	{
-		char cmpbufferp[]{ 0x70, 0xF0, 0x77, 0xF7 };
+		uint8_t cmpbufferp[]{ 0x70, 0xF0, 0x77, 0xF7 };
 		return  (memcmp(m_bitDMD + 261, cmpbufferp, 4) == 0);
 	}
 
 	inline bool is_the_real_simulator() const
 	{
-		char cmpbufferp[]{ 0x3F, 0x7F, 0x3E, 0x07 };
+		uint8_t cmpbufferp[]{ 0x3F, 0x7F, 0x3E, 0x07 };
 		return  (memcmp(m_bitDMD + 305, cmpbufferp, 4) == 0);
 	}
 
 	inline bool is_score() const
 	{
 		// Score
-		char scorebuffer[]{ 0x3F, 0x07, 0x3E, 0x77 };
+		uint8_t scorebuffer[]{ 0x3F, 0x07, 0x3E, 0x77 };
 		return (memcmp(m_bitDMD + 21, scorebuffer, 4) == 0);
 	}
 
 	inline bool is_score2() const
 	{
 		// Score
-		char scorebuffer[]{ 0x3F, 0x07, 0x3E, 0x77 };
+		uint8_t scorebuffer[]{ 0x3F, 0x07, 0x3E, 0x77 };
 		return (memcmp(m_bitDMD + 20, scorebuffer, 4) == 0);
 	}
 
 	inline bool is_hiscore_label() const
 	{
-		char buffer[]{ 0xE0, 0x73, 0x70, 0x00 };
+		uint8_t buffer[]{ 0xE0, 0x73, 0x70, 0x00 };
 		return (memcmp(m_bitDMD + 20, buffer, 4) == 0);
 	}
 
