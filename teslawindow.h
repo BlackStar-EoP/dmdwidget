@@ -41,20 +41,24 @@ SOFTWARE.
 
 class DMDAnimationEngine;
 class QLabel;
+class QRadioButton;
+class QButtonGroup;
 class QSlider;
 
 class TeslaWindow : public QWidget
 {
 	Q_OBJECT
 public:
-	TeslaWindow(QWidget* parent);
+	TeslaWindow(QWidget* parent, DMDAnimationEngine* animation_engine);
 	~TeslaWindow();
 
 private:
 	void initUI();
 	void update_image();
+	void load_zen_animation();
+	void show_frame();
 
-private slots:
+public slots:
 	void open_file_button_clicked();
 	void next_button_clicked();
 	void prev_button_clicked();
@@ -63,6 +67,12 @@ private slots:
 	void width_min_button_clicked();
 	void height_plus_button_clicked();
 	void height_min_button_clicked();
+
+	void zen_dmd_button_clicked();
+	void next_frame_button_clicked();
+	void prev_frame_button_clicked();
+	void save_frame_button_clicked();
+	void show_anim_button_clicked();
 
 private:
 	uint32_t m_size = 0u;
@@ -75,4 +85,19 @@ private:
 
 	uint32_t m_parse_width = 512;
 	uint32_t m_parse_height = 1024;
+
+	QLabel* m_width_label = nullptr;
+	QLabel* m_height_label = nullptr;
+
+	QRadioButton* m_rgba_rb = nullptr;
+	QRadioButton* m_argb_rb = nullptr;
+	QRadioButton* m_abgr_rb = nullptr;
+	QRadioButton* m_bgra_rb = nullptr;
+	QButtonGroup* m_colorgroup = nullptr;
+
+	QLabel* m_dmd_animation_label = nullptr;
+
+	DMDAnimationEngine* m_animation_engine = nullptr;
+	QVector<DMDFrame*> m_frames;
+	uint32_t m_frame_index = 0u;
 };

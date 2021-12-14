@@ -173,7 +173,7 @@ int main(int argc, char *argv[])
 	AnimationWindow animation_window(nullptr, &animation_engine);
 	//DeviceConfigWindow config_window(nullptr);
 	//ROMInspectWindow2 rom_window(nullptr, &animation_engine);
-	TeslaWindow tesla_window(nullptr);
+	TeslaWindow tesla_window(nullptr, &animation_engine);
 	//FantasiesWindow fantasies_window(nullptr, &animation_engine);
 	
 	app.start_polling();
