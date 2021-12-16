@@ -94,6 +94,15 @@ void AnimationThread::set_animation(DMDAnimation* animation)
 	m_animation = animation;
 }
 
+void AnimationThread::show_frame(const DMDFrame& frame)
+{
+	for (DMDOutputDevice* device : m_output_devices)
+	{
+		if (device->isDeviceAvailable())
+			device->sendFrame(frame);
+	}
+}
+
 void AnimationThread::start_recording()
 {
 	m_recording = true;

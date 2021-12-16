@@ -32,6 +32,7 @@ SOFTWARE.
 #include <QMap>
 
 class DMDAnimation;
+class DMDFrame;
 class DMDOutputDevice;
 class ImageAnimation;
 
@@ -41,6 +42,7 @@ public:
 	DMDAnimationEngine(QVector<DMDOutputDevice*> output_devices);
 	~DMDAnimationEngine();
 	void show_animation(DMDAnimation* animation);
+	void show_frame(const DMDFrame& frame);
 	const QMap<QString, DMDAnimation*>& animations() const;
 	void set_DMD_invalid();
 	void start_recording();

@@ -33,6 +33,7 @@ SOFTWARE.
 
 class DMDOutputDevice;
 class DMDAnimation;
+class DMDFrame;
 
 class AnimationThread : public QThread
 {
@@ -43,6 +44,7 @@ public:
 	void run() override;
 
 	void set_animation(DMDAnimation* animation);
+	void show_frame(const DMDFrame& frame);
 
 	void start_recording();
 	void stop_recording();

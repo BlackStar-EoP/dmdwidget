@@ -73,6 +73,11 @@ void DMDAnimationEngine::show_animation(DMDAnimation* animation)
 	m_animation_thread.set_animation(animation);
 }
 
+void DMDAnimationEngine::show_frame(const DMDFrame& frame)
+{
+	m_animation_thread.show_frame(frame);
+}
+
 const QMap<QString, DMDAnimation*>& DMDAnimationEngine::animations() const
 {
 	return m_animations;
