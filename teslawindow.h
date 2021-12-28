@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include <QMouseEvent>
+#include <QLabel>
 #include <QWidget>
 #include <QSet>
 #include <QMap>
@@ -34,6 +36,7 @@ SOFTWARE.
 #include <QTimer>
 #include <QTextEdit>
 #include <QLineEdit>
+#include <QImage>
 
 #include "fantasiesdmd.h"
 
@@ -44,6 +47,25 @@ class QLabel;
 class QRadioButton;
 class QButtonGroup;
 class QSlider;
+class ImageLabel;
+
+class ImageLabel : public QLabel
+{
+	Q_OBJECT
+public:
+	explicit ImageLabel(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags())
+		: QLabel(parent, f)
+	{
+	}
+
+	void mousePressEvent(QMouseEvent* ev) override
+	{
+		emit clicked(ev->pos());
+	}
+
+signals:
+	void clicked(QPoint pos);
+};
 
 class TeslaWindow : public QWidget
 {
@@ -51,6 +73,38 @@ class TeslaWindow : public QWidget
 public:
 	TeslaWindow(QWidget* parent, DMDAnimationEngine* animation_engine);
 	~TeslaWindow();
+
+	enum ColorMode : uint32_t
+	{
+		RGBA,
+		RGAB,
+		RBGA,
+		RBAG,
+		RAGB,
+		RABG,
+
+		GRBA,
+		GRAB,
+		GBAR,
+		GBRA,
+		GABR,
+		GARB,
+
+		BRGA,
+		BRAG,
+		BGRA,
+		BGAR,
+		BAGR,
+		BARG,
+
+		ARGB,
+		ARBG,
+		ABGR,
+		ABRG,
+		AGBR,
+		AGRB,
+		NUM_COLOR_MODES
+	};
 
 private:
 	void initUI();
@@ -74,11 +128,20 @@ public slots:
 	void save_frame_button_clicked();
 	void show_anim_button_clicked();
 
+	void inc_color_mode_button_clicked();
+	void dec_color_mode_button_clicked();
+
+	void image_clicked(QPoint pos);
+	void save_button_clicked();
+
+private:
+	QString color_mode_string(ColorMode color_mode);
+	void parse_color(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a, uint32_t& index);
 private:
 	uint32_t m_size = 0u;
 	uint8_t* m_data = nullptr; 
 	QLabel* m_file_name_label = nullptr;
-	QLabel* m_image_label = nullptr;
+	ImageLabel* m_image_label = nullptr;
 	uint32_t m_image_nr = 0u;
 	QSlider* m_width_slider = nullptr;
 	QSlider* m_height_slider = nullptr;
@@ -89,15 +152,13 @@ private:
 	QLabel* m_width_label = nullptr;
 	QLabel* m_height_label = nullptr;
 
-	QRadioButton* m_rgba_rb = nullptr;
-	QRadioButton* m_argb_rb = nullptr;
-	QRadioButton* m_abgr_rb = nullptr;
-	QRadioButton* m_bgra_rb = nullptr;
-	QButtonGroup* m_colorgroup = nullptr;
-
 	QLabel* m_dmd_animation_label = nullptr;
+	QLabel* m_color_mode_label = nullptr;
+	QLabel* m_image_clicked_label = nullptr;
 
 	DMDAnimationEngine* m_animation_engine = nullptr;
 	QVector<DMDFrame*> m_frames;
 	uint32_t m_frame_index = 0u;
+	ColorMode m_color_mode = RGBA;
+	QImage m_image;
 };

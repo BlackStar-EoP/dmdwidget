@@ -40,7 +40,6 @@ SOFTWARE.
 #include <QButtonGroup>
 #include <assert.h>
 
-
 class TeslaEventFilter : public QObject
 {
 public:
@@ -141,8 +140,9 @@ void TeslaWindow::initUI()
 	connect(prev_button, SIGNAL(clicked()), this, SLOT(prev_button_clicked()));
 
 
-	m_image_label = new QLabel("", this);
-	m_image_label->setGeometry(100, 60, 1024, 1024);
+	m_image_label = new ImageLabel(this);
+	m_image_label->setGeometry(200, 10, 1024, 1024);
+	connect(m_image_label, SIGNAL(clicked(QPoint)), this, SLOT(image_clicked(QPoint)));
 
 
 	m_width_slider = new QSlider(this);
@@ -172,20 +172,24 @@ void TeslaWindow::initUI()
 	m_height_label = new QLabel("", this);
 	m_height_label->setGeometry(10, 220, 100, 20);
 
-	m_rgba_rb = new QRadioButton("RGBA", this);
-	m_rgba_rb->setGeometry(10, 240, 100, 20);
-	m_argb_rb = new QRadioButton("ARGB", this);
-	m_argb_rb->setGeometry(10, 260, 100, 20);
-	m_abgr_rb = new QRadioButton("ABGR", this);
-	m_abgr_rb->setGeometry(10, 280, 100, 20);
-	m_bgra_rb = new QRadioButton("BGRA", this);
-	m_bgra_rb->setGeometry(10, 300, 100, 20);
-	m_colorgroup = new QButtonGroup(this);
-	m_colorgroup->addButton(m_rgba_rb);
-	m_colorgroup->addButton(m_argb_rb);
-	m_colorgroup->addButton(m_abgr_rb);
-	m_colorgroup->addButton(m_bgra_rb);
-	m_rgba_rb->setChecked(true);
+
+	QPushButton* inc_color_mode_button = new QPushButton("M+", this);
+	inc_color_mode_button->setGeometry(10, 240, 100, 20);
+	connect(inc_color_mode_button, SIGNAL(clicked()), this, SLOT(inc_color_mode_button_clicked()));
+
+	QPushButton* dec_color_mode_button = new QPushButton("M-", this);
+	dec_color_mode_button->setGeometry(10, 260, 100, 20);
+	connect(dec_color_mode_button, SIGNAL(clicked()), this, SLOT(dec_color_mode_button_clicked()));
+
+	m_color_mode_label = new QLabel("", this);
+	m_color_mode_label->setGeometry(10, 280, 100, 20);
+
+	m_image_clicked_label = new QLabel(this);
+	m_image_clicked_label->setGeometry(10, 300, 200, 20);
+
+	QPushButton* save_button = new QPushButton("SAVE", this);
+	save_button->setGeometry(10, 320, 100, 20);
+	connect(save_button, SIGNAL(clicked()), this, SLOT(save_button_clicked()));
 
 	QPushButton* open_dmd_file_button= new QPushButton("open dmd", this);
 	open_dmd_file_button->setGeometry(10, 500, 100, 25);
@@ -203,6 +207,8 @@ void TeslaWindow::initUI()
 	QPushButton* show_anim_button = new QPushButton("show anim", this);
 	show_anim_button->setGeometry(10, 590, 100, 25);
 	connect(show_anim_button, SIGNAL(clicked()), this, SLOT(show_anim_button_clicked()));
+
+
 
 }
 
@@ -302,6 +308,47 @@ void TeslaWindow::show_anim_button_clicked()
 }
 
 
+void TeslaWindow::inc_color_mode_button_clicked()
+{
+	if (m_color_mode < (NUM_COLOR_MODES - 1))
+	{
+		uint32_t new_mode = m_color_mode + 1;
+		m_color_mode = (ColorMode)new_mode;
+	}
+		
+	update_image();
+}
+
+void TeslaWindow::dec_color_mode_button_clicked()
+{
+	if (m_color_mode > 0)
+	{
+		uint32_t new_mode = m_color_mode - 1;
+		m_color_mode = (ColorMode)new_mode;
+	}
+
+	update_image();
+}
+
+void TeslaWindow::image_clicked(QPoint pos)
+{
+	uint32_t index = (m_parse_width * m_parse_height * 4) * m_image_nr;
+
+	index += pos.y() * m_parse_width + pos.x();
+	uint32_t col = m_data[index++] << 24 | 
+					m_data[index++] << 16 |
+					m_data[index++] << 24 |
+					m_data[index++] << 8;
+
+
+	m_image_clicked_label->setText(QString("Click (%1, %2) is 0x%3").arg(pos.x()).arg(pos.y()).arg(col, 0, 16));
+}
+
+void TeslaWindow::save_button_clicked()
+{
+	m_image.save("SAVE.PNG");
+}
+
 void TeslaWindow::update_image()
 {
 	QImage img(m_parse_width, m_parse_height, QImage::Format_RGBA8888);
@@ -319,40 +366,7 @@ void TeslaWindow::update_image()
 		uint8_t b;
 		uint8_t a;
 
-		if (m_colorgroup->checkedButton() == m_rgba_rb)
-		{
-			r = m_data[index++];
-			g = m_data[index++];
-			b = m_data[index++];
-			a = m_data[index++];
-		}
-		else if (m_colorgroup->checkedButton() == m_argb_rb)
-		{
-			a = m_data[index++];
-			r = m_data[index++];
-			g = m_data[index++];
-			b = m_data[index++];
-		}
-		else if (m_colorgroup->checkedButton() == m_abgr_rb)
-		{
-			a = m_data[index++];
-			b = m_data[index++];
-			g = m_data[index++];
-			r = m_data[index++];
-		}
-		else if (m_colorgroup->checkedButton() == m_bgra_rb)
-		{
-			b = m_data[index++];
-			g = m_data[index++];
-			r = m_data[index++];
-			a = m_data[index++];
-		}
-
-		
-
-
-		//uint16_t rgb = m_data[index] | ((uint16_t)m_data[index + 1] << 8);
-		//index += 2;
+		parse_color(r, g, b, a, index);
 
 		++x;
 		if (x >= m_parse_width)
@@ -372,31 +386,13 @@ void TeslaWindow::update_image()
 	m_image_label->setPixmap(QPixmap::fromImage(img));
 	m_width_label->setText(QString("w = %1").arg(m_parse_width));
 	m_height_label->setText(QString("h = %1").arg(m_parse_height));
-
+	m_color_mode_label->setText(color_mode_string(m_color_mode));
+	m_image = img;
 }
 
 
 void TeslaWindow::load_zen_animation()
 {
-	//QVector<DMDFrame*> frames;
-
-	//for (uint32_t i = 0; i < 68999; ++i)
-	//{
-	//	QString filename = QString("./dmd/shot") + QString::number(i) + ".dmd";
-
-	//	if (m_fantasies_DMD.read_file(filename))
-	//	{
-	//		const DMDFrame& parsed_dmd = m_fantasies_DMD.parse_DMD();
-	//		frames.push_back(new DMDFrame(parsed_dmd));
-	//	}
-	//}
-
-	//ImageAnimation* anim = new ImageAnimation(frames, 0);
-	//m_animation_engine->show_animation(anim);
-
-
-	//void ROMInspectWindow::file_open_button_clicked()
-//{
 	QString filename = QFileDialog::getOpenFileName(this, tr("Open ZEN DMD animation"), "", tr("DMV (*.dmv)"));
 	if (filename != "")
 	{
@@ -454,4 +450,221 @@ void TeslaWindow::show_frame()
 	QVector<DMDFrame*> frame;
 	frame.push_back(m_frames[m_frame_index]);
 	m_animation_engine->show_animation(new ImageAnimation(frame, 0));
+}
+
+QString TeslaWindow::color_mode_string(ColorMode color_mode)
+{
+	switch (color_mode)
+	{
+		case RGBA: return "RGBA"; break;
+		case RGAB: return "RGAB"; break;
+		case RBGA: return "RBGA"; break;
+		case RBAG: return "RBAG"; break;
+		case RAGB: return "RAGB"; break;
+		case RABG: return "RABG"; break;
+
+		case GRBA: return "GRBA"; break;
+		case GRAB: return "GRAB"; break;
+		case GBAR: return "GBAR"; break;
+		case GBRA: return "GBRA"; break;
+		case GABR: return "GABR"; break;
+		case GARB: return "GARB"; break;
+
+		case BRGA: return "BRGA"; break;
+		case BRAG: return "BRAG"; break;
+		case BGRA: return "BGRA"; break;
+		case BGAR: return "BGAR"; break;
+		case BAGR: return "BAGR"; break;
+		case BARG: return "BARG"; break;
+
+		case ARGB: return "ARGB"; break;
+		case ARBG: return "ARBG"; break;
+		case ABGR: return "ABGR"; break;
+		case ABRG: return "ABRG"; break;
+		case AGBR: return "AGBR"; break;
+		case AGRB: return "AGRB"; break;
+		case NUM_COLOR_MODES: return "NUM_COLOR_MODES"; break;
+	}
+
+	return "UNKNOWN";
+}
+
+void TeslaWindow::parse_color(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a, uint32_t& index)
+{
+	switch (m_color_mode)
+	{
+	case RGBA:
+		r = m_data[index++];
+		g = m_data[index++];
+		b = m_data[index++];
+		a = m_data[index++];
+		break;
+
+	case RGAB:
+		r = m_data[index++];
+		g = m_data[index++];
+		a = m_data[index++];
+		b = m_data[index++];
+		break;
+
+	case RBGA:
+		r = m_data[index++];
+		b = m_data[index++];
+		g = m_data[index++];
+		a = m_data[index++];
+		break;
+
+	case RBAG:
+		r = m_data[index++];
+		b = m_data[index++];
+		a = m_data[index++];
+		g = m_data[index++];
+		break;
+
+	case RAGB:
+		r = m_data[index++];
+		a = m_data[index++];
+		g = m_data[index++];
+		b = m_data[index++];
+		break;
+
+	case RABG:
+		r = m_data[index++];
+		a = m_data[index++];
+		b = m_data[index++];
+		g = m_data[index++];
+		break;
+
+
+	case GRBA:
+		g = m_data[index++];
+		r = m_data[index++];
+		b = m_data[index++];
+		a = m_data[index++];
+		break;
+
+	case GRAB:
+		g = m_data[index++];
+		r = m_data[index++];
+		a = m_data[index++];
+		b = m_data[index++];
+		break;
+
+	case GBAR:
+		g = m_data[index++];
+		b = m_data[index++];
+		a = m_data[index++];
+		r = m_data[index++];
+		break;
+
+	case GBRA:
+		g = m_data[index++];
+		b = m_data[index++];
+		r = m_data[index++];
+		a = m_data[index++];
+		break;
+
+	case GABR:
+		g = m_data[index++];
+		a = m_data[index++];
+		b = m_data[index++];
+		r = m_data[index++];
+		break;
+
+	case GARB:
+		g = m_data[index++];
+		a = m_data[index++];
+		r = m_data[index++];
+		b = m_data[index++];
+		break;
+
+
+	case BRGA:
+		b = m_data[index++];
+		g = m_data[index++];
+		r = m_data[index++];
+		a = m_data[index++];
+		break;
+
+	case BRAG:
+		b = m_data[index++];
+		r = m_data[index++];
+		a = m_data[index++];
+		g = m_data[index++];
+		break;
+
+	case BGRA:
+		b = m_data[index++];
+		g = m_data[index++];
+		r = m_data[index++];
+		a = m_data[index++];
+		break;
+
+	case BGAR:
+		b = m_data[index++];
+		g = m_data[index++];
+		a = m_data[index++];
+		r = m_data[index++];
+		break;
+
+	case BAGR:
+		b = m_data[index++];
+		a = m_data[index++];
+		g = m_data[index++];
+		r = m_data[index++];
+		break;
+
+	case BARG:
+		b = m_data[index++];
+		a = m_data[index++];
+		r = m_data[index++];
+		g = m_data[index++];
+		break;
+
+
+	case ARGB:
+		a = m_data[index++];
+		r = m_data[index++];
+		g = m_data[index++];
+		b = m_data[index++];
+		break;
+
+	case ARBG:
+		a = m_data[index++];
+		r = m_data[index++];
+		b = m_data[index++];
+		g = m_data[index++];
+		break;
+
+	case ABGR:
+		a = m_data[index++];
+		b = m_data[index++];
+		g = m_data[index++];
+		r = m_data[index++];
+		break;
+
+	case ABRG:
+		a = m_data[index++];
+		b = m_data[index++];
+		r = m_data[index++];
+		g = m_data[index++];
+		break;
+
+	case AGBR:
+		a = m_data[index++];
+		g = m_data[index++];
+		b = m_data[index++];
+		r = m_data[index++];
+		break;
+
+	case AGRB:
+		a = m_data[index++];
+		g = m_data[index++];
+		r = m_data[index++];
+		b = m_data[index++];
+		break;
+
+		default:
+			break;
+	}
 }
