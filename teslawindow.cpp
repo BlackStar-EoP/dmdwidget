@@ -362,11 +362,11 @@ void TeslaWindow::image_clicked(QPoint pos)
 
 	uint32_t index = (m_parse_width * m_parse_height * 4) * m_image_nr;
 
-	index += pos.y() * m_parse_width + pos.x();
-	uint32_t col = m_data[index++] << 24 | 
-					m_data[index++] << 16 |
-					m_data[index++] << 24 |
-					m_data[index++] << 8;
+	index += (pos.y() * m_parse_width + pos.x()) * 4;
+	uint32_t col = ((uint32_t)m_data[index] << 24) | 
+					((uint32_t)m_data[index + 1] << 16) |
+					((uint32_t)m_data[index + 2] << 8) |
+					((uint32_t)m_data[index + 3]);
 
 
 	m_image_clicked_label->setText(QString("Click (%1, %2) is 0x%3").arg(pos.x()).arg(pos.y()).arg(col, 0, 16));
@@ -778,12 +778,18 @@ void TeslaWindow::parse_color(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a, ui
 		reverse_bits(a);
 	}
 
-	bool show_alpha = true;
+	bool show_alpha = false;
 	if (show_alpha)
 	{
 		r = a;
 		b = a;
 		g = a;
+	}
+
+	bool convertHSVtoRGB = false;
+	if (convertHSVtoRGB)
+	{
+		HSVtoRGB(r, g, b, r, g, b);
 	}
 
 }
@@ -794,7 +800,7 @@ void TeslaWindow::rotate_bits(uint8_t& val, uint8_t rotate)
 		return;
 
 	uint8_t tmp = val >> rotate;
-	tmp |= (val << 8u - rotate);
+	tmp |= (val << (8u - rotate));
 
 	val = tmp;
 }
@@ -829,4 +835,53 @@ void TeslaWindow::reverse_bits(uint8_t& val)
 	}
 
 	val = tmp;
+}
+
+void TeslaWindow::HSVtoRGB(float H, float S, float V, uint8_t& ro, uint8_t& go, uint8_t& bo)
+{
+	if (H > 360 || H < 0 || S>100 || S < 0 || V>100 || V < 0)
+	{
+		printf("");
+		return;
+	}
+	float s = S / 100;
+	float v = V / 100;
+	float C = s * v;
+	float X = C * (1 - abs(fmod(H / 60.0, 2) - 1));
+	float m = v - C;
+	float r, g, b;
+	if (H >= 0 && H < 60) {
+		r = C, g = X, b = 0;
+	}
+	else if (H >= 60 && H < 120) {
+		r = X, g = C, b = 0;
+	}
+	else if (H >= 120 && H < 180) {
+		r = 0, g = C, b = X;
+	}
+	else if (H >= 180 && H < 240) {
+		r = 0, g = X, b = C;
+	}
+	else if (H >= 240 && H < 300) {
+		r = X, g = 0, b = C;
+	}
+	else
+	{
+		r = C, g = 0, b = X;
+	}
+	int R = (r + m) * 255;
+	int G = (g + m) * 255;
+	int B = (b + m) * 255;
+
+	if (R > 255)
+		printf("");
+	if (G > 255)
+		printf("");
+	if (B > 255)
+		printf("");
+
+	ro = R;
+	go = G;
+	bo = B;
+	bo = B;
 }

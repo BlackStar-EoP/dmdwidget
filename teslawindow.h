@@ -147,6 +147,7 @@ private:
 	void rotate_bits(uint8_t& val, uint8_t rotate);
 	void swap_nibbles(uint8_t& val);
 	void reverse_bits(uint8_t& val);
+	void HSVtoRGB(float H, float S, float V, uint8_t& ro, uint8_t& go, uint8_t& bo);
 
 private:
 	uint32_t m_size = 0u;
