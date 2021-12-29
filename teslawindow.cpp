@@ -332,6 +332,9 @@ void TeslaWindow::dec_color_mode_button_clicked()
 
 void TeslaWindow::image_clicked(QPoint pos)
 {
+	if (m_data == nullptr)
+		return;
+
 	uint32_t index = (m_parse_width * m_parse_height * 4) * m_image_nr;
 
 	index += pos.y() * m_parse_width + pos.x();
