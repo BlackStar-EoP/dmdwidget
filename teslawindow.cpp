@@ -39,6 +39,8 @@ SOFTWARE.
 #include <QKeyEvent>
 #include <QRadioButton>
 #include <QButtonGroup>
+#include <QCheckBox>
+
 #include <assert.h>
 
 class TeslaEventFilter : public QObject
@@ -47,7 +49,6 @@ public:
 	TeslaEventFilter(TeslaWindow& window)
 		: m_window(window)
 	{
-
 	}
 
 	bool eventFilter(QObject* watched, QEvent* event) override
@@ -187,9 +188,33 @@ void TeslaWindow::initUI()
 	m_image_clicked_label = new QLabel(this);
 	m_image_clicked_label->setGeometry(10, 300, 200, 20);
 
+
+	QPushButton* rotate_plus_button = new QPushButton("R+", this);
+	rotate_plus_button->setGeometry(10, 320, 100, 20);
+	connect(rotate_plus_button, SIGNAL(clicked()), this, SLOT(rotate_plus_button_clicked()));
+
+	QPushButton* rotate_min_button = new QPushButton("R-", this);
+	rotate_min_button->setGeometry(10, 340, 100, 20);
+	connect(rotate_min_button, SIGNAL(clicked()), this, SLOT(rotate_min_button_clicked()));
+
+	m_rotate_label = new QLabel("Rotate value = ", this);
+	m_rotate_label->setGeometry(10, 360, 100, 20);
+
+	m_swap_nibbles_checkbox = new QCheckBox("Swap nibbles", this);
+	m_swap_nibbles_checkbox->setGeometry(10, 380, 100, 20);
+	connect(m_swap_nibbles_checkbox, SIGNAL(stateChanged(int)), this, SLOT(swap_nibbles_checkbox_clicked(int)));
+	
+	m_reverse_bits_checkbox = new QCheckBox("Reverse bits", this);
+	m_reverse_bits_checkbox->setGeometry(10, 400, 100, 20);
+	connect(m_reverse_bits_checkbox, SIGNAL(stateChanged(int)), this, SLOT(reverse_bits_checkbox_clicked(int)));
+
 	QPushButton* save_button = new QPushButton("SAVE", this);
-	save_button->setGeometry(10, 320, 100, 20);
+	save_button->setGeometry(10, 420, 100, 20);
 	connect(save_button, SIGNAL(clicked()), this, SLOT(save_button_clicked()));
+
+	QPushButton* permutate_save_button = new QPushButton("Permutate save", this);
+	permutate_save_button->setGeometry(10, 440, 100, 20);
+	connect(permutate_save_button, SIGNAL(clicked()), this, SLOT(permutate_save_button_clicked()));
 
 
 	m_dmd_label = new DMDLabel(this);
@@ -281,7 +306,7 @@ void TeslaWindow::zen_dmd_button_clicked()
 
 void TeslaWindow::next_frame_button_clicked()
 {
-	if (m_frame_index < m_zen_dmd_frames.size() - 1)
+	if (m_frame_index < m_zen_dmd_frames.size() - 1u)
 	{
 		m_frame_index++;
 		show_frame();
@@ -352,6 +377,34 @@ void TeslaWindow::save_button_clicked()
 	QString filename = QFileDialog::getSaveFileName(this, tr("SavePNG"), "", tr("PNG (*.png)"));
 	if (filename != "")
 		m_image.save(filename);
+}
+
+void TeslaWindow::rotate_plus_button_clicked()
+{
+	if (m_rotate_value < 7)
+		m_rotate_value++;
+
+	m_rotate_label->setText(QString("Rotate value = %1").arg(m_rotate_value));
+	update_image();
+}
+
+void TeslaWindow::rotate_min_button_clicked()
+{
+	if (m_rotate_value > 0)
+		m_rotate_value--;
+	
+	m_rotate_label->setText(QString("Rotate value = %1").arg(m_rotate_value));
+	update_image();
+}
+
+void TeslaWindow::swap_nibbles_checkbox_clicked(int)
+{
+	update_image();
+}
+
+void TeslaWindow::reverse_bits_checkbox_clicked(int)
+{
+	update_image();
 }
 
 void TeslaWindow::update_image()
@@ -452,6 +505,40 @@ void TeslaWindow::load_zen_animation()
 void TeslaWindow::show_frame()
 {
 	m_dmd_label->show_frame(m_zen_dmd_frames[m_frame_index]);
+}
+
+void TeslaWindow::permutate_save_button_clicked()
+{
+	if (m_data == nullptr)
+		return;
+
+	m_swap_nibbles_checkbox->setChecked(false);
+	m_reverse_bits_checkbox->setChecked(false);
+
+	for (uint32_t rb = 0; rb < 2; ++rb)
+	{
+		m_swap_nibbles_checkbox->setChecked(false);
+		for (uint32_t sn = 0; sn < 2; ++sn)
+		{
+			for (uint32_t rotate = 0; rotate < 8; ++rotate)
+			{
+				m_rotate_value = rotate;
+
+				for (uint32_t colmode = 0; colmode < NUM_COLOR_MODES; ++colmode)
+				{
+					m_color_mode = (ColorMode) colmode;
+					update_image();
+
+					QString filename = QString("PERM_RB%1_SN%2_ROT%3_COLMODE_%4.PNG").arg(rb).arg(sn).arg(rotate).arg(color_mode_string(m_color_mode));
+					QByteArray tmp1 = filename.toLatin1();
+					const char* data = tmp1.data();
+					m_image.save(filename);
+				}
+			}
+			m_swap_nibbles_checkbox->setChecked(true);
+		}
+		m_reverse_bits_checkbox->setChecked(true);
+	}
 }
 
 QString TeslaWindow::color_mode_string(ColorMode color_mode)
@@ -669,4 +756,77 @@ void TeslaWindow::parse_color(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a, ui
 		default:
 			break;
 	}
+
+	rotate_bits(r, m_rotate_value);
+	rotate_bits(g, m_rotate_value);
+	rotate_bits(b, m_rotate_value);
+	rotate_bits(a, m_rotate_value);
+
+	if (m_swap_nibbles_checkbox->isChecked())
+	{
+		swap_nibbles(r);
+		swap_nibbles(g);
+		swap_nibbles(b);
+		swap_nibbles(a);
+	}
+
+	if (m_reverse_bits_checkbox->isChecked())
+	{
+		reverse_bits(r);
+		reverse_bits(g);
+		reverse_bits(b);
+		reverse_bits(a);
+	}
+
+	bool show_alpha = true;
+	if (show_alpha)
+	{
+		r = a;
+		b = a;
+		g = a;
+	}
+
+}
+
+void TeslaWindow::rotate_bits(uint8_t& val, uint8_t rotate)
+{
+	if (rotate == 0u)
+		return;
+
+	uint8_t tmp = val >> rotate;
+	tmp |= (val << 8u - rotate);
+
+	val = tmp;
+}
+
+void TeslaWindow::swap_nibbles(uint8_t& val)
+{
+	uint8_t tmp = val >> 4u;
+	tmp |= (val << 4u);
+
+	val = tmp;
+}
+
+void TeslaWindow::reverse_bits(uint8_t& val)
+{
+	uint8_t tmp = 0u;
+	for (uint8_t i = 0; i < 8u; ++i)
+	{
+		bool bit = (val & (1u << i)) != 0u;
+		if (bit)
+		{
+			tmp |= (1u << (7u - i));
+		}
+		/*0 - 7 
+		* 1 - 6
+		* 2 - 5
+		* 3 - 4
+		* 4 - 3
+		* 5 - 2
+		* 6 - 1
+		* 7 - 0
+		*/
+	}
+
+	val = tmp;
 }

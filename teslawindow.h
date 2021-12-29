@@ -49,6 +49,7 @@ class QRadioButton;
 class QButtonGroup;
 class QSlider;
 class ImageLabel;
+class QCheckBox;
 
 class ImageLabel : public QLabel
 {
@@ -134,10 +135,19 @@ public slots:
 
 	void image_clicked(QPoint pos);
 	void save_button_clicked();
+	void rotate_plus_button_clicked();
+	void rotate_min_button_clicked();
+	void swap_nibbles_checkbox_clicked(int);
+	void reverse_bits_checkbox_clicked(int);
+	void permutate_save_button_clicked();
 
 private:
 	QString color_mode_string(ColorMode color_mode);
 	void parse_color(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a, uint32_t& index);
+	void rotate_bits(uint8_t& val, uint8_t rotate);
+	void swap_nibbles(uint8_t& val);
+	void reverse_bits(uint8_t& val);
+
 private:
 	uint32_t m_size = 0u;
 	uint8_t* m_data = nullptr; 
@@ -164,4 +174,10 @@ private:
 	DMDLabel* m_dmd_label = nullptr;
 
 	QVector<DMDFrame> m_zen_dmd_frames;
+
+
+	QLabel* m_rotate_label = nullptr;
+	QCheckBox* m_swap_nibbles_checkbox = nullptr;
+	QCheckBox* m_reverse_bits_checkbox = nullptr;
+	uint8_t m_rotate_value = 0u;
 };
