@@ -42,6 +42,7 @@ SOFTWARE.
 
 #include "dmdframe.h"
 
+class DMDLabel;
 class DMDAnimationEngine;
 class QLabel;
 class QRadioButton;
@@ -157,8 +158,10 @@ private:
 	QLabel* m_image_clicked_label = nullptr;
 
 	DMDAnimationEngine* m_animation_engine = nullptr;
-	QVector<DMDFrame*> m_frames;
 	uint32_t m_frame_index = 0u;
 	ColorMode m_color_mode = RGBA;
 	QImage m_image;
+	DMDLabel* m_dmd_label = nullptr;
+
+	QVector<DMDFrame> m_zen_dmd_frames;
 };

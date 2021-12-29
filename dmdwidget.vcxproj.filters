@@ -122,6 +122,9 @@
     <ClCompile Include="dmdkeys.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="dmdlabel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="dmdoutputdevice.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -262,6 +265,9 @@
     <ClInclude Include="dmdkeys.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <CustomBuild Include="dmdlabel.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
     <ClInclude Include="dmdoutputdevice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -421,6 +427,12 @@
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="release\moc_dmdapplication.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="debug\moc_dmdlabel.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="release\moc_dmdlabel.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="debug\moc_dmdwidget.cpp">

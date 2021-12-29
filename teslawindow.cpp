@@ -26,6 +26,7 @@ SOFTWARE.
 
 #include "dmdanimationengine.h"
 #include "imageanimation.h"
+#include "dmdlabel.h"
 
 #include <QPushButton>
 #include <QLabel>
@@ -141,9 +142,8 @@ void TeslaWindow::initUI()
 
 
 	m_image_label = new ImageLabel(this);
-	m_image_label->setGeometry(200, 10, 1024, 1024);
+	m_image_label->setGeometry(600, 10, 1024, 1024);
 	connect(m_image_label, SIGNAL(clicked(QPoint)), this, SLOT(image_clicked(QPoint)));
-
 
 	m_width_slider = new QSlider(this);
 	m_width_slider->setGeometry(10, 120, 100, 20);
@@ -190,6 +190,10 @@ void TeslaWindow::initUI()
 	QPushButton* save_button = new QPushButton("SAVE", this);
 	save_button->setGeometry(10, 320, 100, 20);
 	connect(save_button, SIGNAL(clicked()), this, SLOT(save_button_clicked()));
+
+
+	m_dmd_label = new DMDLabel(this);
+	m_dmd_label->setPosition(120, 500);
 
 	QPushButton* open_dmd_file_button= new QPushButton("open dmd", this);
 	open_dmd_file_button->setGeometry(10, 500, 100, 25);
@@ -277,7 +281,7 @@ void TeslaWindow::zen_dmd_button_clicked()
 
 void TeslaWindow::next_frame_button_clicked()
 {
-	if (m_frame_index < m_frames.size() - 1)
+	if (m_frame_index < m_zen_dmd_frames.size() - 1)
 	{
 		m_frame_index++;
 		show_frame();
@@ -301,10 +305,6 @@ void TeslaWindow::save_frame_button_clicked()
 
 void TeslaWindow::show_anim_button_clicked()
 {
-	if (m_frames.size() == 0)
-		return;
-
-	m_animation_engine->show_animation(new ImageAnimation(m_frames, 0));
 }
 
 
@@ -346,7 +346,9 @@ void TeslaWindow::image_clicked(QPoint pos)
 
 void TeslaWindow::save_button_clicked()
 {
-	m_image.save("SAVE.PNG");
+	QString filename = QFileDialog::getSaveFileName(this, tr("SavePNG"), "", tr("PNG (*.png)"));
+	if (filename != "")
+		m_image.save(filename);
 }
 
 void TeslaWindow::update_image()
@@ -408,14 +410,14 @@ void TeslaWindow::load_zen_animation()
 		uint16_t num_images = (uint16_t)dmd[1] << 8u | dmd[0];
 		uint32_t offset = 2;
 		
-		m_frames.clear();
+		m_zen_dmd_frames.clear();
 		m_frame_index = 0u;
 
 		for (uint16_t i = 0; i < num_images; ++i)
 		{
 			uint32_t header = dmd[offset] << 24 | dmd[offset + 1] | dmd[offset + 2] + dmd[offset + 3];
 			offset += 4;
-			DMDFrame* frame = new DMDFrame();
+			DMDFrame frame;
 			for (uint32_t y = 0; y < 32; ++y)
 			{
 				for (uint32_t x = 0; x < 128; x += 4)
@@ -427,29 +429,26 @@ void TeslaWindow::load_zen_animation()
 					uint8_t pixel1 = pixels & 3;
 
 
-					frame->set_pixel(x, y, (uint8_t)(pixel1) * 85u);
-					frame->set_pixel(x + 1, y, (uint8_t)(pixel2) * 85u);
-					frame->set_pixel(x + 2, y, (uint8_t)(pixel3) * 85u);
-					frame->set_pixel(x + 3, y, (uint8_t)(pixel4) * 85u);
+					frame.set_pixel(x, y, (uint8_t)(pixel1) * 85u);
+					frame.set_pixel(x + 1, y, (uint8_t)(pixel2) * 85u);
+					frame.set_pixel(x + 2, y, (uint8_t)(pixel3) * 85u);
+					frame.set_pixel(x + 3, y, (uint8_t)(pixel4) * 85u);
 
 				}
 			}
-			m_frames.push_back(frame);
+			m_zen_dmd_frames.push_back(frame);
 
 		}
-		int i = m_frames.size();
-		show_anim_button_clicked();
+		//int i = m_frames.size();
+		//show_anim_button_clicked();
+
+		show_frame();
 	}
 }
 
 void TeslaWindow::show_frame()
 {
-	if (m_frames.size() == 0)
-		return;
-
-	QVector<DMDFrame*> frame;
-	frame.push_back(m_frames[m_frame_index]);
-	m_animation_engine->show_animation(new ImageAnimation(frame, 0));
+	m_dmd_label->show_frame(m_zen_dmd_frames[m_frame_index]);
 }
 
 QString TeslaWindow::color_mode_string(ColorMode color_mode)
