@@ -141,10 +141,21 @@ void TeslaWindow::initUI()
 	prev_button->setGeometry(10, 90, 100, 20);
 	connect(prev_button, SIGNAL(clicked()), this, SLOT(prev_button_clicked()));
 
+	// ellende
 
-	m_image_label = new ImageLabel(this);
+
+	QScrollArea* scroll_area = new QScrollArea(this);
+	scroll_area->setGeometry(600, 10, 1024, 1024);
+	scroll_area->setWidgetResizable(true);
+
+	m_image_label = new ImageLabel(scroll_area);
 	m_image_label->setGeometry(600, 10, 1024, 1024);
+	scroll_area->setWidget(m_image_label);
 	connect(m_image_label, SIGNAL(clicked(QPoint)), this, SLOT(image_clicked(QPoint)));
+
+
+
+	// qt en scrollbars...
 
 	m_width_slider = new QSlider(this);
 	m_width_slider->setGeometry(10, 120, 100, 20);
@@ -409,13 +420,18 @@ void TeslaWindow::reverse_bits_checkbox_clicked(int)
 
 void TeslaWindow::update_image()
 {
-	QImage img(m_parse_width, m_parse_height, QImage::Format_RGBA8888);
+	
 	
 	uint32_t x = 0;
 	uint32_t y = 0;
 
 
 	uint32_t index = (m_parse_width * m_parse_height * 4) * m_image_nr;
+	uint32_t bytes_per_row = (m_parse_width * 4);
+	uint32_t height = m_size / bytes_per_row;
+	height += bytes_per_row;
+
+	QImage img(m_parse_width, height, QImage::Format_RGBA8888);
 
 	while (index < m_size)
 	{
@@ -433,14 +449,23 @@ void TeslaWindow::update_image()
 			++y;
 		}
 
-		if (y >= m_parse_height)
+		if (y >= height)
 			break;
-
+		
 		////img.setPixel(x, y, qRgb(rgb >> 11, rgb >> 5, rgb &  0x1F));
-		img.setPixel(x, y, qRgb(r, g, b));
+		//img.setPixel(x, y, qRgb(r, g, b)); // slow!!!
+
+		// Get the line we want
+		QRgb* line = (QRgb*)img.scanLine(y);
+
+		// Go to the pixel we want
+		line += x;
+
+		// Actually set the pixel
+		*line = qRgb(r, g, b);
 
 	}
-
+	m_image_label->setGeometry(0, 0, m_parse_width, height);
 	m_image_label->setPixmap(QPixmap::fromImage(img));
 	m_width_label->setText(QString("w = %1").arg(m_parse_width));
 	m_height_label->setText(QString("h = %1").arg(m_parse_height));
