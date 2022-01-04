@@ -197,7 +197,7 @@ void TeslaWindow::initUI()
 	m_color_mode_label->setGeometry(10, 280, 100, 20);
 
 	m_image_clicked_label = new QLabel(this);
-	m_image_clicked_label->setGeometry(10, 300, 200, 20);
+	m_image_clicked_label->setGeometry(10, 300, 300, 20);
 
 
 	QPushButton* rotate_plus_button = new QPushButton("R+", this);
@@ -372,15 +372,19 @@ void TeslaWindow::image_clicked(QPoint pos)
 		return;
 
 	uint32_t index = (m_parse_width * m_parse_height * 4) * m_image_nr;
-
+	
 	index += (pos.y() * m_parse_width + pos.x()) * 4;
+
+	if (index >= m_size)
+		return;
+
 	uint32_t col = ((uint32_t)m_data[index] << 24) | 
 					((uint32_t)m_data[index + 1] << 16) |
 					((uint32_t)m_data[index + 2] << 8) |
 					((uint32_t)m_data[index + 3]);
 
 
-	m_image_clicked_label->setText(QString("Click (%1, %2) is 0x%3").arg(pos.x()).arg(pos.y()).arg(col, 0, 16));
+	m_image_clicked_label->setText(QString("Click (%1, %2) is 0x%3, address = 0x%4").arg(pos.x()).arg(pos.y()).arg(col, 0, 16).arg(index, 0, 16));
 }
 
 void TeslaWindow::save_button_clicked()
@@ -420,14 +424,16 @@ void TeslaWindow::reverse_bits_checkbox_clicked(int)
 
 void TeslaWindow::update_image()
 {
-	
-	
 	uint32_t x = 0;
 	uint32_t y = 0;
 
 
 	uint32_t index = (m_parse_width * m_parse_height * 4) * m_image_nr;
 	uint32_t bytes_per_row = (m_parse_width * 4);
+
+	if (bytes_per_row == 0u)
+		return;
+
 	uint32_t height = m_size / bytes_per_row;
 	height += bytes_per_row;
 

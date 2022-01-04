@@ -172,7 +172,7 @@ int main(int argc, char *argv[])
 	app.set_animation_engine(&animation_engine);
 	AnimationWindow animation_window(nullptr, &animation_engine);
 	//DeviceConfigWindow config_window(nullptr);
-	//ROMInspectWindow2 rom_window(nullptr, &animation_engine);
+	ROMInspectWindow2 rom_window(nullptr, &animation_engine);
 	TeslaWindow tesla_window(nullptr, &animation_engine);
 	//FantasiesWindow fantasies_window(nullptr, &animation_engine);
 	
