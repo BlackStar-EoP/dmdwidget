@@ -40,6 +40,7 @@ SOFTWARE.
 #include <QRadioButton>
 #include <QButtonGroup>
 #include <QCheckBox>
+#include <QDirIterator>
 
 #include <assert.h>
 
@@ -248,7 +249,13 @@ void TeslaWindow::initUI()
 	show_anim_button->setGeometry(10, 590, 100, 25);
 	connect(show_anim_button, SIGNAL(clicked()), this, SLOT(show_anim_button_clicked()));
 
+	QPushButton* save_anim_button = new QPushButton("save anim", this);
+	save_anim_button->setGeometry(10, 620, 100, 25);
+	connect(save_anim_button, SIGNAL(clicked()), this, SLOT(save_anim_button_clicked()));
 
+	QPushButton* dump_anim_button = new QPushButton("dump anims", this);
+	dump_anim_button->setGeometry(10, 620, 100, 25);
+	connect(dump_anim_button, SIGNAL(clicked()), this, SLOT(dump_anim_button_clicked()));
 
 }
 
@@ -267,6 +274,10 @@ void TeslaWindow::open_file_button_clicked()
 			file.close();
 			update_image();
 		}
+
+		//QFileInfo fileInfo(file.fileName());
+		//m_file_name_label->setText(fileInfo.fileName());
+		m_file_name_label->setText(file.fileName());
 	}
 }
 
@@ -312,7 +323,8 @@ void TeslaWindow::height_min_button_clicked()
 
 void TeslaWindow::zen_dmd_button_clicked()
 {
-	load_zen_animation();
+	QString filename = QFileDialog::getOpenFileName(this, tr("Open ZEN DMD animation"), "", tr("DMV (*.dmv)"));
+	load_zen_animation(filename);
 }
 
 void TeslaWindow::next_frame_button_clicked()
@@ -341,6 +353,68 @@ void TeslaWindow::save_frame_button_clicked()
 
 void TeslaWindow::show_anim_button_clicked()
 {
+	//m_animation_engine->show_animation();
+}
+
+void TeslaWindow::save_anim_button_clicked()
+{
+	if (m_dmd_filename == "")
+		return;
+
+	// Set up the save directory
+	QString dir = QString("D:/TeslaDMD/") + m_dmd_filename + "/";
+	auto test1 = dir.toStdString();
+	QDir saveDir(dir);
+	bool res = saveDir.mkpath(dir);
+	
+	for (int i = 0; i < m_zen_dmd_frames.size(); ++i)
+	{
+		uint framelength = 1;
+		// Skip duplicate frames
+		for (int j = i+1; j < m_zen_dmd_frames.size(); ++j)
+		{
+			if (m_zen_dmd_frames[j] == m_zen_dmd_frames[j - 1])
+				++framelength;
+			else
+				break;
+		}
+		//if (i > 0 && m_zen_dmd_frames[i] == m_zen_dmd_frames[i - 1])
+		//	continue;
+		
+		QString savefile = dir + QString("%1_%2.png").arg(i).arg(framelength);
+		auto test = savefile.toStdString();
+		m_zen_dmd_frames[i].img().save(savefile);
+	}
+
+}
+
+void TeslaWindow::dump_anim_button_clicked()
+{
+	QString dir = QFileDialog::getExistingDirectory();
+	auto td = dir.toStdString();
+
+	QDir dmdDir(dir);
+	QFileInfoList files = dmdDir.entryInfoList();
+	for (QFileInfo& file : files)
+	{
+		if (file.absoluteFilePath().endsWith("dmv"))
+		{
+			auto test = file.absoluteFilePath().toStdString();
+				load_zen_animation(file.absoluteFilePath());
+				
+				save_anim_button_clicked();
+		}
+	}
+	//QDirIterator it(dir, { "*.dmv" }, QDir::Files, QDirIterator::NoIteratorFlags);
+	//while (it.hasNext())
+	//{
+	//	auto test = it.fileName().toStdString();
+	//	load_zen_animation(it.fileName());
+	//	
+	//	save_anim_button_clicked();
+	//}
+		
+
 }
 
 
@@ -389,7 +463,7 @@ void TeslaWindow::image_clicked(QPoint pos)
 
 void TeslaWindow::save_button_clicked()
 {
-	QString filename = QFileDialog::getSaveFileName(this, tr("SavePNG"), "", tr("PNG (*.png)"));
+	QString filename = QFileDialog::getSaveFileName(this, tr("SavePNG"), m_file_name_label->text() + ".png", tr("PNG (*.png)"));
 	if (filename != "")
 		m_image.save(filename);
 }
@@ -480,18 +554,22 @@ void TeslaWindow::update_image()
 }
 
 
-void TeslaWindow::load_zen_animation()
+void TeslaWindow::load_zen_animation(const QString& filename)
 {
-	QString filename = QFileDialog::getOpenFileName(this, tr("Open ZEN DMD animation"), "", tr("DMV (*.dmv)"));
 	if (filename != "")
 	{
 		uint8_t* dmd;
 		QFile file(filename);
+		m_dmd_filename = "";
 		if (file.open(QIODevice::ReadOnly))
 		{
 			dmd = new uint8_t[file.size()];
 			file.read(reinterpret_cast<char*>(dmd), file.size());
 			file.close();
+			QFileInfo fileInfo(file.fileName());
+			m_dmd_filename = fileInfo.fileName();
+
+			//m_dmd_filename = file.fileName();
 		}
 
 		uint16_t num_images = (uint16_t)dmd[1] << 8u | dmd[0];
@@ -514,17 +592,31 @@ void TeslaWindow::load_zen_animation()
 					uint8_t pixel3 = (pixels >> 4) & 3;
 					uint8_t pixel2 = (pixels >> 2) & 3;
 					uint8_t pixel1 = pixels & 3;
+					const uint8_t MULTIPLIER = 127;
+					if (pixel1 == 3)
+						frame.set_pixel(x, y, 255);
+					else
+						frame.set_pixel(x, y, (uint8_t)(pixel1) * MULTIPLIER);
 
+					if (pixel2 == 3)
+						frame.set_pixel(x + 1, y, 255);
+					else
+						frame.set_pixel(x + 1, y, (uint8_t)(pixel2) * MULTIPLIER);
+					
+					if (pixel3 == 3)
+						frame.set_pixel(x + 2, y, 255);
+					else
+						frame.set_pixel(x + 2, y, (uint8_t)(pixel3) * MULTIPLIER);
+	
+					if (pixel4 == 3)
+						frame.set_pixel(x + 3, y, 255);
+					else
+						frame.set_pixel(x + 3, y, (uint8_t)(pixel4) * MULTIPLIER);
 
-					frame.set_pixel(x, y, (uint8_t)(pixel1) * 85u);
-					frame.set_pixel(x + 1, y, (uint8_t)(pixel2) * 85u);
-					frame.set_pixel(x + 2, y, (uint8_t)(pixel3) * 85u);
-					frame.set_pixel(x + 3, y, (uint8_t)(pixel4) * 85u);
-
+					
 				}
 			}
 			m_zen_dmd_frames.push_back(frame);
-
 		}
 		//int i = m_frames.size();
 		//show_anim_button_clicked();

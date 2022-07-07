@@ -29,6 +29,8 @@ SOFTWARE.
 #include <memory>
 #include "dmdconfig.h"
 
+#include <QImage>
+
 class DMDFrame
 {
 public:
@@ -80,6 +82,32 @@ public:
 	{
 		memset(m_grayscale_frame, 0, sizeof(m_grayscale_frame));
 		memset(m_color_frame, 0, sizeof(m_color_frame));
+	}
+
+	inline QImage img()
+	{
+		QImage img(DMDConfig::DMDWIDTH, DMDConfig::DMDHEIGHT, QImage::Format_RGBA8888);
+		for (uint32_t y = 0; y < DMDConfig::DMDHEIGHT; ++y)
+		{
+			for (uint32_t x = 0; x < DMDConfig::DMDWIDTH; ++x)
+			{
+				uint8_t pixel = grayscale_pixel(x, y);
+
+				// Zen hack
+				if (pixel == 255)
+					img.setPixel(x, y, qRgba(0u, 0u, 255u, 255u));
+				else
+					img.setPixel(x, y, qRgba(pixel, pixel, pixel, 255u));
+
+			}
+		}
+
+		return img;
+	}
+
+	bool operator == (const DMDFrame & other) const
+	{
+		return memcmp(m_grayscale_frame, other.m_grayscale_frame, DMDConfig::DMDWIDTH * DMDConfig::DMDHEIGHT) == 0;
 	}
 
 private:

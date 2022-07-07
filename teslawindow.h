@@ -111,7 +111,7 @@ public:
 private:
 	void initUI();
 	void update_image();
-	void load_zen_animation();
+	void load_zen_animation(const QString& filename);
 	void show_frame();
 
 public slots:
@@ -129,6 +129,8 @@ public slots:
 	void prev_frame_button_clicked();
 	void save_frame_button_clicked();
 	void show_anim_button_clicked();
+	void save_anim_button_clicked();
+	void dump_anim_button_clicked();
 
 	void inc_color_mode_button_clicked();
 	void dec_color_mode_button_clicked();
@@ -181,4 +183,6 @@ private:
 	QCheckBox* m_swap_nibbles_checkbox = nullptr;
 	QCheckBox* m_reverse_bits_checkbox = nullptr;
 	uint8_t m_rotate_value = 0u;
+
+	QString m_dmd_filename = "";
 };
