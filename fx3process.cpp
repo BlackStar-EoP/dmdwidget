@@ -133,7 +133,7 @@ bool FX3Process::getDMDColor(QColor& color)
 
 	ReadProcessMemory(m_FX3_process_handle, (void*)(m_DMD_memory_offset), &ptr, sizeof(uint32_t), NULL);
 	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr + 0xF0), &ptr, sizeof(uint32_t), NULL);
-	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr + 0x58), &ptr, sizeof(uint32_t), NULL);
+	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr + 0x5C), &ptr, sizeof(uint32_t), NULL);
 	ReadProcessMemory(m_FX3_process_handle, (void*)(ptr + 0x08), &col, sizeof(uint32_t), NULL);
 
 	// Color is fetched as ARGB, values seem to be either 0x11 or 0x33 per channel
