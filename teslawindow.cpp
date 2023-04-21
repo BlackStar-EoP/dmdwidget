@@ -511,8 +511,10 @@ void TeslaWindow::update_image()
 	uint32_t height = m_size / bytes_per_row;
 	height += bytes_per_row;
 
-	QImage img(m_parse_width, height, QImage::Format_RGBA8888);
-
+	//QImage img(m_parse_width, height, QImage::Format_RGBA8888);
+	uint32_t w = 1024;
+	QImage img(w, 8096, QImage::Format_RGBA8888);
+	m_parse_width = w;
 	while (index < m_size)
 	{
 		uint8_t r;
@@ -522,7 +524,7 @@ void TeslaWindow::update_image()
 
 		parse_color(r, g, b, a, index);
 
-		++x;
+		x += 4;
 		if (x >= m_parse_width)
 		{
 			x = 0;
@@ -542,7 +544,14 @@ void TeslaWindow::update_image()
 		line += x;
 
 		// Actually set the pixel
-		*line = qRgb(r, g, b);
+		for (int i = 0; i < 4; ++i)
+		{
+			*line = qRgb(r, r, r); line++;
+			*line = qRgb(g, g, g); line++;
+			*line = qRgb(b, b, b); line++;
+			*line = qRgb(a, a, a); line++;
+		}
+		
 
 	}
 	m_image_label->setGeometry(0, 0, m_parse_width, height);
