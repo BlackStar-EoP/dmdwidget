@@ -33,7 +33,6 @@ SOFTWARE.
 #include <QFileDialog>
 #include <QFile>
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QScrollArea>
 #include <QSlider>
 #include <QKeyEvent>
@@ -96,10 +95,10 @@ TeslaWindow::TeslaWindow(QWidget* parent, DMDAnimationEngine* animation_engine)
 	uint32_t HEIGHT = 1080;
 	this->setGeometry(0, 0, WIDTH, HEIGHT);
 
-	QRect screenGeometry = QApplication::desktop()->screenGeometry();
-	int x = (screenGeometry.width() - width()) / 2;
-	int y = (screenGeometry.height() - height()) / 2;
-	move(x, y);
+	//QRect screenGeometry = QApplication::desktop()->screenGeometry();
+	//int x = (screenGeometry.width() - width()) / 2;
+	//int y = (screenGeometry.height() - height()) / 2;
+	//move(x, y);
 	installEventFilter(new TeslaEventFilter(*this));
 
 	//QScrollArea* scrollarea = new QScrollArea(this);

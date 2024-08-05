@@ -29,7 +29,6 @@ SOFTWARE.
 #include <QFileDialog>
 #include <QFile>
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QPainter>
 #include <QTextEdit>
 #include <QVector>
@@ -52,10 +51,10 @@ ROMInspectWindow2::ROMInspectWindow2(QWidget* parent, DMDAnimationEngine* animat
 
 	this->setGeometry(0, 0, 800, 600);
 
-	QRect screenGeometry = QApplication::desktop()->screenGeometry();
-	int x = (screenGeometry.width() - width()) / 2;
-	int y = (screenGeometry.height() -height()) / 2;
-	move(x, y);
+	//QRect screenGeometry = QApplication::desktop()->screenGeometry();
+	//int x = (screenGeometry.width() - width()) / 2;
+	//int y = (screenGeometry.height() -height()) / 2;
+	//move(x, y);
 	show();
 }
 

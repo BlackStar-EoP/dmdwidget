@@ -61,10 +61,10 @@ public:
     int max_size = 128;
 
     Private(ColorWheel *widget)
-        : w(widget), hue(0), sat(0), val(0),
-        wheel_width(20), mouse_status(Nothing),
-        display_flags(FLAGS_DEFAULT),
-        color_from(&QColor::fromHsvF), rainbow_from_hue(&detail::rainbow_hsv)
+        //: w(widget), hue(0), sat(0), val(0),
+        //wheel_width(20), mouse_status(Nothing),
+        //display_flags(FLAGS_DEFAULT),
+        //color_from(&QColor::fromHsvF), rainbow_from_hue(&detail::rainbow_hsv)
     { }
 
     /// Calculate outer wheel radius from idget center

@@ -149,6 +149,7 @@ QVariant ColorPaletteModel::data(const QModelIndex &index, int role) const
 
 bool ColorPaletteModel::removeRows(int row, int count, const QModelIndex & parent)
 {
+    Q_UNUSED(parent);
     if ( !p->acceptable(row) || count <= 0 )
         return false;
 

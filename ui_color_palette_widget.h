@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'color_palette_widget.ui'
 **
-** Created by: Qt User Interface Compiler version 5.15.2
+** Created by: Qt User Interface Compiler version 6.6.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -46,16 +46,16 @@ public:
     void setupUi(QWidget *color_widgets__ColorPaletteWidget)
     {
         if (color_widgets__ColorPaletteWidget->objectName().isEmpty())
-            color_widgets__ColorPaletteWidget->setObjectName(QString::fromUtf8("color_widgets__ColorPaletteWidget"));
+            color_widgets__ColorPaletteWidget->setObjectName("color_widgets__ColorPaletteWidget");
         color_widgets__ColorPaletteWidget->resize(227, 186);
         verticalLayout = new QVBoxLayout(color_widgets__ColorPaletteWidget);
-        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+        verticalLayout->setObjectName("verticalLayout");
         verticalLayout->setContentsMargins(0, 0, 0, 0);
         horizontalLayout_3 = new QHBoxLayout();
-        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
+        horizontalLayout_3->setObjectName("horizontalLayout_3");
         palette_list = new QComboBox(color_widgets__ColorPaletteWidget);
-        palette_list->setObjectName(QString::fromUtf8("palette_list"));
-        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        palette_list->setObjectName("palette_list");
+        QSizePolicy sizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(palette_list->sizePolicy().hasHeightForWidth());
@@ -64,13 +64,13 @@ public:
         horizontalLayout_3->addWidget(palette_list);
 
         group_edit_list = new QWidget(color_widgets__ColorPaletteWidget);
-        group_edit_list->setObjectName(QString::fromUtf8("group_edit_list"));
+        group_edit_list->setObjectName("group_edit_list");
         horizontalLayout_2 = new QHBoxLayout(group_edit_list);
         horizontalLayout_2->setSpacing(0);
-        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+        horizontalLayout_2->setObjectName("horizontalLayout_2");
         horizontalLayout_2->setContentsMargins(0, 0, 0, 0);
         button_palette_open = new QToolButton(group_edit_list);
-        button_palette_open->setObjectName(QString::fromUtf8("button_palette_open"));
+        button_palette_open->setObjectName("button_palette_open");
         QIcon icon;
         QString iconThemeName = QString::fromUtf8("document-open");
         if (QIcon::hasThemeIcon(iconThemeName)) {
@@ -83,7 +83,7 @@ public:
         horizontalLayout_2->addWidget(button_palette_open);
 
         button_palette_new = new QToolButton(group_edit_list);
-        button_palette_new->setObjectName(QString::fromUtf8("button_palette_new"));
+        button_palette_new->setObjectName("button_palette_new");
         QIcon icon1;
         iconThemeName = QString::fromUtf8("document-new");
         if (QIcon::hasThemeIcon(iconThemeName)) {
@@ -96,7 +96,7 @@ public:
         horizontalLayout_2->addWidget(button_palette_new);
 
         button_palette_duplicate = new QToolButton(group_edit_list);
-        button_palette_duplicate->setObjectName(QString::fromUtf8("button_palette_duplicate"));
+        button_palette_duplicate->setObjectName("button_palette_duplicate");
         QIcon icon2;
         iconThemeName = QString::fromUtf8("edit-copy");
         if (QIcon::hasThemeIcon(iconThemeName)) {
@@ -115,18 +115,18 @@ public:
         verticalLayout->addLayout(horizontalLayout_3);
 
         swatch = new color_widgets::Swatch(color_widgets__ColorPaletteWidget);
-        swatch->setObjectName(QString::fromUtf8("swatch"));
+        swatch->setObjectName("swatch");
 
         verticalLayout->addWidget(swatch);
 
         group_edit_palette = new QWidget(color_widgets__ColorPaletteWidget);
-        group_edit_palette->setObjectName(QString::fromUtf8("group_edit_palette"));
+        group_edit_palette->setObjectName("group_edit_palette");
         horizontalLayout = new QHBoxLayout(group_edit_palette);
         horizontalLayout->setSpacing(0);
-        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        horizontalLayout->setObjectName("horizontalLayout");
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
         button_palette_delete = new QToolButton(group_edit_palette);
-        button_palette_delete->setObjectName(QString::fromUtf8("button_palette_delete"));
+        button_palette_delete->setObjectName("button_palette_delete");
         QIcon icon3;
         iconThemeName = QString::fromUtf8("document-close");
         if (QIcon::hasThemeIcon(iconThemeName)) {
@@ -139,7 +139,7 @@ public:
         horizontalLayout->addWidget(button_palette_delete);
 
         button_palette_revert = new QToolButton(group_edit_palette);
-        button_palette_revert->setObjectName(QString::fromUtf8("button_palette_revert"));
+        button_palette_revert->setObjectName("button_palette_revert");
         QIcon icon4;
         iconThemeName = QString::fromUtf8("document-revert");
         if (QIcon::hasThemeIcon(iconThemeName)) {
@@ -152,7 +152,7 @@ public:
         horizontalLayout->addWidget(button_palette_revert);
 
         button_palette_save = new QToolButton(group_edit_palette);
-        button_palette_save->setObjectName(QString::fromUtf8("button_palette_save"));
+        button_palette_save->setObjectName("button_palette_save");
         QIcon icon5;
         iconThemeName = QString::fromUtf8("document-save");
         if (QIcon::hasThemeIcon(iconThemeName)) {
@@ -164,12 +164,12 @@ public:
 
         horizontalLayout->addWidget(button_palette_save);
 
-        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
         horizontalLayout->addItem(horizontalSpacer);
 
         button_color_add = new QToolButton(group_edit_palette);
-        button_color_add->setObjectName(QString::fromUtf8("button_color_add"));
+        button_color_add->setObjectName("button_color_add");
         QIcon icon6;
         iconThemeName = QString::fromUtf8("list-add");
         if (QIcon::hasThemeIcon(iconThemeName)) {
@@ -182,7 +182,7 @@ public:
         horizontalLayout->addWidget(button_color_add);
 
         button_color_remove = new QToolButton(group_edit_palette);
-        button_color_remove->setObjectName(QString::fromUtf8("button_color_remove"));
+        button_color_remove->setObjectName("button_color_remove");
         QIcon icon7;
         iconThemeName = QString::fromUtf8("list-remove");
         if (QIcon::hasThemeIcon(iconThemeName)) {

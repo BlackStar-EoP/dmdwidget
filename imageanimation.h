@@ -26,9 +26,9 @@ SOFTWARE.
 
 #include "dmdanimation.h"
 
+
 class QImage;
 class DMDFrame;
-class QStringList;
 
 class ImageAnimation : public DMDAnimation
 {

@@ -34,7 +34,6 @@ SOFTWARE.
 #include <QFileDialog>
 #include <QFile>
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QPainter>
 #include <QSet>
 #include <QKeyEvent>
@@ -94,11 +93,11 @@ FantasiesWindow::FantasiesWindow(QWidget* parent, DMDAnimationEngine* animation_
 	initUI();
 	this->setGeometry(0, 0, 1024, 768);
 
-	QRect screenGeometry = QApplication::desktop()->screenGeometry();
+	/*QRect screenGeometry = QApplication::desktop()->screenGeometry();
 	int x = (screenGeometry.width() - width()) / 2;
-	int y = (screenGeometry.height() -height()) / 2;
+	int y = (screenGeometry.height() -height()) / 2;*/
 	installEventFilter(new FantasiesEventFilter(*this));
-	move(x, y);
+	//move(x, y);
 	show();
 }
 

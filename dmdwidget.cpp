@@ -344,32 +344,32 @@ void DMDWidget::captureDMD()
 uint32_t DMDWidget::findString(uint8_t* buffer, SIZE_T buffer_size, const QString& string)
 {
 
-	for (SIZE_T i = 0; i < buffer_size - string.length(); ++i)
-	{
-		if (buffer[i] != string[0])
-			continue;
+	//for (SIZE_T i = 0; i < buffer_size - string.length(); ++i)
+	//{
+	//	if ((QChar)buffer[i] != string.at(0))
+	//		continue;
 
-		bool match = true;
-		for (uint32_t test = 1; test < string.length(); ++test)
-		{
-			//if (DMDSIGNATURE[test] == 0xFF)
-			//	continue;
+	//	bool match = true;
+	//	for (uint32_t test = 1; test < string.length(); ++test)
+	//	{
+	//		//if (DMDSIGNATURE[test] == 0xFF)
+	//		//	continue;
 
-			if (buffer[i + test] != string[test])
-			{
-				match = false;
-				break;
-			}
-		}
+	//		if (buffer[i + test] != string[test])
+	//		{
+	//			match = false;
+	//			break;
+	//		}
+	//	}
 
-		if (match)
-		{
-			QString matchloc = QString::number((uint32_t)buffer) + QString(" - offset - ") + QString::number(i);
-			//uint8_t* buffer2 = buffer + i - 100;
-			m_list_widget->addItem(new QListWidgetItem(matchloc));
-			//return i;
-		}
-	}
+	//	if (match)
+	//	{
+	//		QString matchloc = QString::number((uint32_t)buffer) + QString(" - offset - ") + QString::number(i);
+	//		//uint8_t* buffer2 = buffer + i - 100;
+	//		m_list_widget->addItem(new QListWidgetItem(matchloc));
+	//		//return i;
+	//	}
+	//}
 	return 0;
 }
 

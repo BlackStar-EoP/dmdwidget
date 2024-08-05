@@ -27,7 +27,6 @@ SOFTWARE.
 
 #include <QEvent>
 #include <QKeyEvent>
-#include <QSound>
 
 #include <assert.h>
 

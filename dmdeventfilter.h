@@ -39,7 +39,7 @@ private:
 	bool is_ctrl(uint32_t native_key) const;
 	DMDKeys::Button flipper(uint32_t native_key, uint32_t native_modifier) const;
 	DMDKeys::Button magna_save(uint32_t native_key, uint32_t native_modifier) const;
-	DMDKeys::Button DMDEventFilter::button_for_key(int keycode) const;
+	DMDKeys::Button button_for_key(int keycode) const;
 	void fire_button_pressed(DMDKeys::Button button);
 	void fire_button_released(DMDKeys::Button button);
 

@@ -52,7 +52,7 @@ public:
         Close
     };
 
-    explicit ColorDialog(QWidget *parent = 0, Qt::WindowFlags f = 0);
+    explicit ColorDialog(QWidget *parent = 0, Qt::WindowFlags f = Qt::Widget);
 
     /**
      * Get currently selected color

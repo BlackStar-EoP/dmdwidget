@@ -33,6 +33,7 @@ SOFTWARE.
 #include <QtGlobal>
 #include <QImage>
 #include <QPainter>
+#include <QStringList>
 
 DMDAnimationEngine::DMDAnimationEngine(QVector<DMDOutputDevice*> output_devices)
 : m_animation_thread(output_devices)

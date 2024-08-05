@@ -30,7 +30,6 @@ SOFTWARE.
 
 class QImage;
 class DMDFrame;
-class QStringList;
 
 class Block
 {
