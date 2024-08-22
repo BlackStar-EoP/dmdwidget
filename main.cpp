@@ -170,11 +170,11 @@ int main(int argc, char *argv[])
 	//output_devices.push_back(new FutabaNAELW3601AAOutputDevice());
 	DMDAnimationEngine animation_engine(output_devices);
 	app.set_animation_engine(&animation_engine);
-	AnimationWindow animation_window(nullptr, &animation_engine);
+	//AnimationWindow animation_window(nullptr, &animation_engine);
 	//DeviceConfigWindow config_window(nullptr);
-	ROMInspectWindow2 rom_window(nullptr, &animation_engine);
-	TeslaWindow tesla_window(nullptr, &animation_engine);
-	//FantasiesWindow fantasies_window(nullptr, &animation_engine);
+	//ROMInspectWindow2 rom_window(nullptr, &animation_engine);
+	//TeslaWindow tesla_window(nullptr, &animation_engine);
+	FantasiesWindow fantasies_window(nullptr, &animation_engine);
 	
 	app.start_polling();
 	

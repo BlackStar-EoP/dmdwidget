@@ -1,0 +1,8 @@
+Set target to v143
+Project properties C++ commandline add /Zc:__cplusplus
+Set C++ to ISO C++17
+Set Enable multicore compilation on in general
+
+If it starts crying about application at runtime:
+D:\Qt\6.6.3\msvc2019_64\bin>windeployqt6.exe E:\Projects\Edge of Panic\dmdwidget\debug
+(put in correct paths here)

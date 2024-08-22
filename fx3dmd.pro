@@ -24,6 +24,7 @@ SOURCES += $$PWD/main.cpp \
            $$PWD/fx3animation.cpp \
            $$PWD/imageanimation.cpp \
            $$PWD/gameanimation.cpp \
+           $$PWD/shaderanimation.cpp \
            $$PWD/dmdframe.cpp \
            $$PWD/animationwindow.cpp \
            $$PWD/deviceconfigwindow.cpp \
@@ -53,6 +54,7 @@ HEADERS += $$PWD/mainwindow.h \
            $$PWD/fx3animation.h \
            $$PWD/imageanimation.h \
            $$PWD/gameanimation.h \
+           $$PWD/shaderanimation.h \
            $$PWD/dmdframe.h \
            $$PWD/animationwindow.h \
            $$PWD/deviceconfigwindow.h \

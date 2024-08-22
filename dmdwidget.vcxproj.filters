@@ -112,6 +112,9 @@
     <ClCompile Include="rominspectwindow2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="shaderanimation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="teslawindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -198,6 +201,9 @@
     <CustomBuild Include="rominspectwindow2.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <ClInclude Include="shaderanimation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="span.h">
       <Filter>Header Files</Filter>
     </ClInclude>

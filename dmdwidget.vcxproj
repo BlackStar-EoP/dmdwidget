@@ -58,7 +58,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>.;"E:/Projects/Edge of Panic/dmdwidget/src";vendor\libusb-win32-bin-1.2.6.0\include;D:\qt\6.6.3\msvc2019_64\include;D:\qt\6.6.3\msvc2019_64\include\QtWidgets;D:\qt\6.6.3\msvc2019_64\include\QtMultimedia;D:\qt\6.6.3\msvc2019_64\include\QtGui;D:\qt\6.6.3\msvc2019_64\include\QtNetwork;D:\qt\6.6.3\msvc2019_64\include\QtCore;release;/include;D:\qt\6.6.3\msvc2019_64\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -permissive- -utf-8 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458  /Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -permissive- -utf-8 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 /Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>release\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
       <DebugInformationFormat>None</DebugInformationFormat>
@@ -76,7 +76,6 @@
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level3</WarningLevel>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>"E:\Projects\Edge of Panic\dmdwidget\vendor\libusb-win32-bin-1.2.6.0\lib\msvc_x64\libusb.lib";D:\qt\6.6.3\msvc2019_64\lib\Qt6Widgets.lib;D:\qt\6.6.3\msvc2019_64\lib\Qt6Multimedia.lib;D:\qt\6.6.3\msvc2019_64\lib\Qt6Gui.lib;D:\qt\6.6.3\msvc2019_64\lib\Qt6Network.lib;D:\qt\6.6.3\msvc2019_64\lib\Qt6Core.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -104,7 +103,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>.;"E:/Projects/Edge of Panic/dmdwidget/src";vendor\libusb-win32-bin-1.2.6.0\include;D:\qt\6.6.3\msvc2019_64\include;D:\qt\6.6.3\msvc2019_64\include\QtWidgets;D:\qt\6.6.3\msvc2019_64\include\QtMultimedia;D:\qt\6.6.3\msvc2019_64\include\QtGui;D:\qt\6.6.3\msvc2019_64\include\QtNetwork;D:\qt\6.6.3\msvc2019_64\include\QtCore;debug;/include;D:\qt\6.6.3\msvc2019_64\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -permissive- -utf-8 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458  /Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -permissive- -utf-8 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 /Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>debug\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -120,7 +119,6 @@
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level3</WarningLevel>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>"E:\Projects\Edge of Panic\dmdwidget\vendor\libusb-win32-bin-1.2.6.0\lib\msvc_x64\libusb.lib";D:\qt\6.6.3\msvc2019_64\lib\Qt6Widgetsd.lib;D:\qt\6.6.3\msvc2019_64\lib\Qt6Multimediad.lib;D:\qt\6.6.3\msvc2019_64\lib\Qt6Guid.lib;D:\qt\6.6.3\msvc2019_64\lib\Qt6Networkd.lib;D:\qt\6.6.3\msvc2019_64\lib\Qt6Cored.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -168,6 +166,7 @@
     <ClCompile Include="pindmd2outputdevice.cpp" />
     <ClCompile Include="rominspectwindow.cpp" />
     <ClCompile Include="rominspectwindow2.cpp" />
+    <ClCompile Include="shaderanimation.cpp" />
     <ClCompile Include="teslawindow.cpp" />
     <ClCompile Include="widgetoutputdevice.cpp" />
     <ClCompile Include="widgetoutputdeviceconfigtab.cpp" />
@@ -270,6 +269,7 @@
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MOC rominspectwindow2.h</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">debug\moc_rominspectwindow2.cpp;%(Outputs)</Outputs>
     </CustomBuild>
+    <ClInclude Include="shaderanimation.h" />
     <ClInclude Include="span.h" />
     <CustomBuild Include="teslawindow.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">teslawindow.h;release\moc_predefs.h;D:\qt\6.6.3\msvc2019_64\bin\moc.exe;%(AdditionalInputs)</AdditionalInputs>

@@ -343,10 +343,11 @@ void FantasiesWindow::split_range_button_clicked()
 }
 
 #include "gameanimation.h"
+#include "shaderanimation.h"
 
 void FantasiesWindow::debug_button_clicked()
 {
-	m_animation_engine->show_animation(new GameAnimation());
+	m_animation_engine->show_animation(new ShaderAnimation());
 
 	// // Rename stuff
 	//int32_t out_nr = 42000;
